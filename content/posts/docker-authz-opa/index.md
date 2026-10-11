@@ -1,10 +1,11 @@
 ---
-title: "OPA ile Docker Authorization: Sessiz Fail-Open ve Production'dan Diğer Dersler"
+title: "OPA ile Docker Authorization: Sessiz Fail-Open ve Canlı Ortamdan Dersler"
 date: 2026-10-11
-description: "docker plugin disable authorization'ı kapatır, enable geri açmaz. opa-docker-authz ile production'da karşılaşılan sessiz fail-open, policy kör noktaları ve bir kontrol listesi."
+description: "Plugin etkin görünüyor, policy doğru, ama Docker her şeye izin veriyor. opa-docker-authz ile canlı ortamda karşılaştığım sessiz bir güvenlik açığı ve çıkardığım dersler."
 tags: ["docker", "opa", "rego", "güvenlik"]
 ShowToc: true
 ---
+
 ## 1. Giriş
 
 Docker authorization plugin'leri, Docker daemon'una gelen her API isteğini işlenmeden önce bir policy'ye göre değerlendirmeyi sağlar. `opa-docker-authz`, bu mekanizmayı OPA (Open Policy Agent) ve Rego policy diliyle uygulayan bir plugin'dir.
@@ -85,7 +86,7 @@ Yazının geri kalanı için önemli ayrıntılar:
 
 **Middleware fail-closed çalışır.** Docker'ın resmi dokümanına göre zincirdeki bir plugin'e ulaşılamazsa istek reddedilir. Docker, plugin yazarlarına da fail-closed davranmalarını önerir. Dolayısıyla "plugin çöktü, her şey açıldı" senaryosu middleware düzeyinde beklenmez. Risk, plugin'in zincirden hiçbir uyarı olmadan çıkarılmasıdır.
 
-**Kullanıcı kimliği çoğu kurulumda boştur.** Plugin'e giden istekte `User` ve `AuthenticationMethod` alanları vardır. Moby kaynak koduna göre bu alanlar yalnızca istek TLS üzerinden geldiyse ve istemci bir client sertifikası sunduysa dolar. Kullanıcı adı sertifikanın CN alanından alınır. Unix socket üzerinden gelen isteklerde, yani yerel `docker` komutlarının neredeyse tamamında, iki alan da boş string'dir. Policy "bu isteği kim yaptı?" sorusunu cevaplayamaz. Sonuçları Bölüm 10'da.
+**Kullanıcı kimliği çoğu kurulumda boştur.** Plugin'e giden istekte `User` ve `AuthenticationMethod` alanları vardır. Moby kaynak koduna göre bu alanlar yalnızca istek TLS üzerinden geldiyse ve istemci bir client sertifikası sunduysa dolar. Kullanıcı adı sertifikanın CN alanından alınır. Unix socket üzerinden gelen isteklerde, yani yerel `docker` komutlarının neredeyse tamamında, iki alan da boş string'dir. Policy "bu isteği kim yaptı?" sorusunu cevaplayamaz. Bunun sonuçları Bölüm 10'da ele alınıyor.
 
 **Plugin her şeyi görmez.** Resmi dokümana göre:
 
@@ -109,7 +110,7 @@ docker plugin install --alias opa-docker-authz \
   opa-args="-policy-file /opa/policies/authz.rego"
 ```
 
-Policy yolu dikkat gerektirir. Plugin'in yapılandırması host'taki `/etc/docker` dizinini plugin'in içinde `/opa` yoluna salt okunur olarak bağlar. Host'ta `/etc/docker/policies/authz.rego` konumundaki dosya, plugin'in içinden `/opa/policies/authz.rego` olarak görünür. `opa-args` içine host yolu değil, plugin içindeki yol yazılmalıdır. Yanlış yol plugin'i açıkça fail-open bırakır (Bölüm 6).
+Policy yolu dikkat gerektirir. Plugin'in yapılandırması host'taki `/etc/docker` dizinini plugin'in içinde `/opa` yoluna salt okunur olarak bağlar. Host'ta `/etc/docker/policies/authz.rego` konumundaki dosya, plugin'in içinden `/opa/policies/authz.rego` olarak görünür. `opa-args` içine host yolu değil, plugin içindeki yol yazılmalıdır. Yol yanlışsa plugin her isteğe izin verir (Bölüm 6).
 
 Dosya ve dizin izinleri:
 
@@ -126,7 +127,7 @@ Plugin'i daemon'un yetkilendirme zincirine eklemek için `daemon.json`:
 }
 ```
 
-Mevcut bir `daemon.json` varsa bu anahtar diğer ayarlarla birleştirilmelidir. Sıra: önce plugin kurulur, sonra `daemon.json` güncellenir, sonra daemon'a yapılandırma yeniden okutulur. Bunun için servis yeniden başlatılabilir. `systemctl reload docker` de zinciri yeniden kurar ve çalışan konteynerleri durdurmaz (Bölüm 6).
+Mevcut bir `daemon.json` varsa bu anahtar diğer ayarlarla birleştirilmelidir. Sıra: önce plugin kurulur, sonra `daemon.json` güncellenir, sonra daemon'un yapılandırmayı yeniden okuması sağlanır. Bunun için servis yeniden başlatılabilir. `systemctl reload docker` de zinciri yeniden kurar ve çalışan konteynerleri durdurmaz (Bölüm 6).
 
 ## 5. Policy: Satır satır
 
@@ -201,7 +202,7 @@ mount_ok(m) {
 
 Docker'da bind mount iki ayrı alandan gelebilir. `-v kaynak:hedef` sözdizimi `HostConfig.Binds` dizisine, `--mount type=bind,...` sözdizimi `HostConfig.Mounts` dizisine yazılır. Policy ikisini de kontrol eder.
 
-Kaynak yol `/` ile bölündüğünde tam dört parça olmalıdır: `""`, `"home"`, kullanıcı adı, `"workspace"`. Hedef `/workspace` olmalıdır. Böylece `/home/<kullanıcı>/workspace/alt-dizin` gibi daha derin yollar da reddedilir. Gerekçe: Docker bind kaynağındaki sembolik bağları (symlink) çözer. Bu kural yokken, workspace içinde host'un köküne işaret eden bir symlink alt yol üzerinden bağlandığında host dosyalarının okunabildiği canlı ortamda gözlendi. Dört parça kuralı alt yol üzerinden gelen symlink'i kapatır. Workspace dizininin kendisinin symlink olması ayrı bir risktir (Bölüm 10).
+Kaynak yol `/` ile bölündüğünde tam dört parça olmalıdır: `""`, `"home"`, kullanıcı adı, `"workspace"`. Hedef `/workspace` olmalıdır. Böylece `/home/<kullanıcı>/workspace/alt-dizin` gibi daha derin yollar da reddedilir. Gerekçe: Docker bind kaynağındaki sembolik bağları (symlink) çözer. Bu kural eklenmeden önce canlı ortamda şu görüldü: workspace içine host'un köküne işaret eden bir symlink konup bu alt yol bağlandığında host'un dosyaları okunabiliyordu. Dört parça kuralı alt yol üzerinden gelen symlink'i kapatır. Workspace dizininin kendisinin symlink olması ayrı bir risktir (Bölüm 10).
 
 **Garanti ettikleri** (canlı daemon üzerinde doğrulandı): `--privileged`, `--cap-add`, host kökünü ya da `/etc`'yi bağlamak, alt yol symlink'i, Docker socket'ini konteynere bağlamak, `--device`, `--ipc=host` ve `--mount type=bind` ile workspace dışı bağlama reddedilir. Beklenen kullanım (workspace bind ve `--gpus all`) çalışır. Makine yeniden başlatıldığında plugin geri gelir ve kurallar uygulanmaya devam eder.
 
@@ -247,7 +248,7 @@ Canlı bir daemon üzerindeki test sonuçları kaynak koddaki mekanizmayla uyuml
 
 Son adımda zinciri yeniden kuran, yeniden kurulum değil reload'dur. Yeniden kurulum da bir disable/enable döngüsü içerir ve kendi başına plugin'i zincire geri eklemez. Zincire geri ekleme `SetPlugins` ile, yani reload sırasında olur.
 
-Daemon journal'ında, plugin'in kendisini devre dışı bırakan `POST .../plugins/opa-docker-authz/disable?force=1` isteğine `result: true` verdiği bir karar kaydı görülür. Bu policy yalnızca konteyner oluşturmayı denetlediği için disable isteği de authorization'dan geçer ve izin alır. Bu kayıttan sonra test isteklerine ait karar kaydı yoktur: istekler artık plugin'e ulaşmaz.
+Daemon journal'ında dikkat çekici bir kayıt var: plugin, kendisini devre dışı bırakan `POST .../plugins/opa-docker-authz/disable?force=1` isteğine izin vermiş (`result: true`). Bu policy yalnızca konteyner oluşturmayı denetlediği için disable isteği de authorization'dan geçer ve izin alır. Bu kayıttan sonra test isteklerine ait karar kaydı yoktur: istekler artık plugin'e ulaşmaz.
 
 ### Yaygın yanlış teşhis: dosya izinleri
 
@@ -280,7 +281,7 @@ Kaynak koddan çıkan karar tablosu:
 
 ### Tespit
 
-Durum göstergeleri bu durumu yakalamaz. Policy dosyasının hash'ini, dosya modunu ve `docker plugin ls` çıktısındaki etkin durumu toplayan bir drift kontrolü, fail-open sırasında da "doğru" sonuç verir. Zincirin gerçek durumu için `docker info` gibi yapılandırma çıktılarına da dayanılmamalıdır.
+Plugin'in "etkin" görünmesi ya da dosya hash'inin doğru olması bu sorunu yakalamaz. Policy dosyasının hash'ini, dosya modunu ve `docker plugin ls` çıktısındaki etkin durumu toplayan bir drift kontrolü, fail-open sırasında da "doğru" sonuç verir. Zincirin gerçek durumu için `docker info` gibi yapılandırma çıktılarına da dayanılmamalıdır.
 
 Güvenilir kontrol davranış testidir. Normal bir kullanıcı hesabıyla:
 
@@ -294,13 +295,13 @@ Bu komut şu mesajla reddedilmelidir:
 docker: Error response from daemon: authorization denied by plugin opa-docker-authz:latest: request rejected by administrative policy
 ```
 
-Komutun yalnızca başarısız olması yeterli değildir. İmaj çekilemediği ya da daemon'a ulaşılamadığı için de başarısız olabilir. Çıktıda `authorization denied` geçtiği kontrol edilmelidir. Periyodik sürümü Bölüm 11'de.
+Komutun yalnızca başarısız olması yeterli değildir. İmaj çekilemediği ya da daemon'a ulaşılamadığı için de başarısız olabilir. Çıktıda `authorization denied` geçtiği kontrol edilmelidir. Bu testin düzenli çalışan sürümü Bölüm 11'de.
 
 ## 7. Tuzak 2: Policy güncelleme
 
 Plugin, kaynak koduna göre policy dosyasını **her istekte** diskten okur. Önbellek yoktur. Dosya değiştiği anda bir sonraki istek yeni policy ile değerlendirilir. Policy güncellemesi için plugin'i yeniden yüklemeye gerek yoktur.
 
-Asıl risk, disable/enable komut çiftinin güncelleme otomasyonuna girmesidir. Policy değiştiğinde plugin'i disable/enable yapan, `daemon.json` değişmediği için reload yapmayan bir otomasyon, her çalıştığında dokunduğu makinelerde authorization'ı bir sonraki reload ya da yeniden başlatmaya kadar kapatır. Otomasyon ile dokümandaki prosedürün birbirinden ayrılması bu riski görünmez kılar.
+Asıl risk, disable/enable komut çiftinin güncelleme otomasyonuna girmesidir. Policy değiştiğinde plugin'i disable/enable yapan, `daemon.json` değişmediği için reload yapmayan bir otomasyon, her çalıştığında dokunduğu makinelerde authorization'ı bir sonraki reload ya da yeniden başlatmaya kadar kapatır. Dokümanda doğru prosedür yazılı olsa bile otomasyon farklı bir şey yapıyorsa bu risk gözden kaçar.
 
 Güvenli policy güncellemesi:
 
@@ -345,7 +346,7 @@ else
 fi
 ```
 
-Yayılım, her makine `ps=OK priv=DENIED` raporlamadan tamamlanmış sayılmamalıdır.
+Her makine `ps=OK priv=DENIED` raporlamadan dağıtım bitmiş sayılmamalı.
 
 ## 8. Tuzak 3: Rego sözdizimi ve plugin sürümü
 
@@ -578,7 +579,7 @@ Policy yalnızca konteyner oluşturmayı denetler. Kimlik olmadığı için "bu 
 
 ### `docker` grubu root eşdeğeridir
 
-Docker'ın resmi dokümanına göre `docker` grubu kullanıcıya root düzeyinde yetki verir ve Docker daemon'unu yalnızca güvenilir kullanıcılar kontrol edebilmelidir. Authorization plugin'i bu gerçeği değiştirmez, yalnızca bazı yolları kapatır. Bu yolların listesi kolayca eksik kalabilir. Plugin'in kendisi de bir yönetim hatasıyla, policy yeterince sıkı değilse bir kullanıcı isteğiyle, sessizce devreden çıkabilir.
+Docker'ın resmi dokümanına göre `docker` grubu kullanıcıya root düzeyinde yetki verir ve Docker daemon'unu yalnızca güvenilir kullanıcılar kontrol edebilmelidir. Authorization plugin'i bu gerçeği değiştirmez, yalnızca bazı yolları kapatır. Bu yolların listesi kolayca eksik kalabilir. Plugin, bir yönetici hatasıyla ya da policy yeterince sıkı değilse sıradan bir kullanıcının isteğiyle sessizce devreden çıkabilir.
 
 ### Authorization tek başına bir güvenlik sınırı değil
 
@@ -647,7 +648,7 @@ fi
 
 ## 12. Sonuç
 
-Güvenlik kontrolleri durumlarına göre değil, davranışlarına göre doğrulanmalıdır. Plugin etkin görünebilir, policy dosyası doğru ve izinler düzgün olabilir. Bunlara rağmen authorization zinciri boş olabilir. Tek satırlık bir `docker run --privileged` testi bu durumu bir saniyede gösterir. `docker plugin disable` authorization'ı kapatır, `enable` geri açmaz, `systemctl reload docker` açar.
+Bir güvenlik kontrolünün çalıştığını "etkin" görünmesinden değil, gerçekten engelleyip engellemediğini test ederek anlarsınız. Plugin etkin görünebilir, policy dosyası doğru ve izinler düzgün olabilir. Bunlara rağmen authorization zinciri boş olabilir. Tek satırlık bir `docker run --privileged` testi bu durumu bir saniyede gösterir. `docker plugin disable` authorization'ı kapatır, `enable` geri açmaz, `systemctl reload docker` açar.
 
 Docker authorization plugin'i, `docker` grubunun root eşdeğeri olduğu gerçeğini değiştirmez. Kimlik bilmeyen, yalnızca bazı endpoint'leri denetleyen ve sessizce devreden çıkabilen bir katmandır. Güvenilir kullanıcılar arasında kazaları önlemek için faydalıdır. Güvenilmeyen kullanıcıları ayırmak için rootless çalışma, kullanıcı başına izolasyon ya da kimliği bilen bir kontrol düzlemi gibi daha sağlam bir temel gerekir.
 
