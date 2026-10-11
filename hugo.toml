@@ -1,0 +1,53 @@
+baseURL = 'https://onurbaydas.online/'
+locale = 'tr-tr'
+title = 'Onur Baydaş'
+theme = 'PaperMod'
+defaultContentLanguage = 'tr'
+enableRobotsTXT = true
+
+[pagination]
+  pagerSize = 10
+
+[languages]
+  [languages.tr]
+    languageName = 'Türkçe'
+    locale = 'tr-tr'
+    weight = 1
+    [[languages.tr.menus.main]]
+      name = 'Yazılar'
+      pageRef = '/posts'
+      weight = 10
+    [[languages.tr.menus.main]]
+      name = 'Etiketler'
+      pageRef = '/tags'
+      weight = 20
+    [[languages.tr.menus.main]]
+      name = 'Ara'
+      pageRef = '/search'
+      weight = 30
+
+[params]
+  author = 'Onur Baydaş'
+  description = 'Teknik yazılar'
+  defaultTheme = 'auto'
+  ShowReadingTime = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowToc = true
+  TocOpen = false
+  ShowShareButtons = true
+  ShareButtons = ['linkedin', 'x']
+  [params.homeInfoParams]
+    Title = 'Onur Baydaş'
+    Content = 'Teknik yazılar.'
+  [[params.socialIcons]]
+    name = 'github'
+    url = 'https://github.com/onurbaydas'
+
+[outputs]
+  home = ['HTML', 'RSS', 'JSON']
+
+[markup]
+  [markup.highlight]
+    noClasses = false

@@ -1,0 +1,8 @@
+.post-content pre.mermaid {
+  background: #fff;
+  color: #000;
+  border-radius: var(--radius);
+  padding: 16px;
+  overflow-x: auto;
+  text-align: center;
+}
