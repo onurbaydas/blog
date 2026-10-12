@@ -112,7 +112,6 @@ Bu bloktaki her satır karşılaştığımız bir hatayı düzeltti:
 `sudo` yalnızca container içinde çalışır, böylece kullanıcılar kendi ortamlarına `apt install` yapabilir. Bu root NAS'a makine hesabı olarak ulaştığı için başka bir kullanıcının dataset'ini okuyamaz. Docker daemon'una erişimin kendisi ayrı bir sorundur. Onu [Docker authorization üzerine ayrı bir yazıda](/posts/docker-authz-opa/) anlattım.
 
 `jovyan` durumu farklı bir şekilde bozulur. Host'ta UID 1000 için bir bilet önbelleği yoktur, dolayısıyla `rpc.gssd`'nin sunabileceği bir kimlik yoktur. Doğru çalışan tek UID kullanıcının kendi UID'sidir.
-<!-- ONUR: Kayıtlarda root ya da jovyan sürecinin /workspace'te birebir hangi hatayı aldığı yok (Permission denied? Stale file handle? Key has expired?). Hatırlıyorsan ekle. -->
 
 ## UID Uyuşmazlığı
 
@@ -184,8 +183,7 @@ payload = {
 }
 ```
 
-Bizim TrueNAS sürümümüzde bu çağrı sahipliği uygulamadı ve yeni dataset'ler `root:root 755` olarak kaldı. Yalnızca Kerberos kabul eden bir share'de bu, sahibinin kendi ev dizinine yazamaması ve kimliği doğrulanmış diğer her kullanıcının o dizini okuyabilmesi demektir.
-<!-- ONUR: Commit, isimle yapılan çağrının "SCALE API v2.0" üzerinde sahipliği hiç uygulamadığını söylüyor. Güncel API dokümanı (v25.10) filesystem.setperm için user/group isim alanlarını listeliyor. TrueNAS sürümünü buraya yaz ve API'nin hata mı döndürdüğünü, başarı mı bildirdiğini belirt. -->
+Bizim TrueNAS sürümümüzde bu çağrı sahipliği uygulamadı ve yeni dataset'ler `root:root 755` olarak kaldı. Yalnızca Kerberos kabul eden bir share'de bu, sahibinin kendi ev dizinine yazamaması ve kimliği doğrulanmış diğer her kullanıcının o dizini okuyabilmesi demektir. Daha yeni TrueNAS API dokümanları `filesystem.setperm` için `user` ve `group` isim alanlarını listeliyor, yani isimle yapılan çağrı sizin sürümünüzde farklı davranabilir. Sayısal ID kullanmak bu soruyu tamamen ortadan kaldırır.
 
 ### Neden sessiz kalıyor
 

@@ -112,7 +112,6 @@ Each line in that block fixed a failure we hit:
 This `sudo` is container root only: users can `apt install`, but on `/workspace` it is the machine account and cannot read anyone's dataset. Access to the Docker daemon itself is a separate problem, covered in a [separate post on Docker authorization](/posts/docker-authz-opa/).
 
 The `jovyan` case fails in a different way. The host has no ticket cache for UID 1000, so `rpc.gssd` has nothing to present. The user's own UID is the only one that works correctly.
-<!-- ONUR: The records do not show which exact error a root or jovyan process got on /workspace (Permission denied? Stale file handle? Key has expired?). Fill in if you remember. -->
 
 ## The UID Mismatch
 
@@ -184,8 +183,7 @@ payload = {
 }
 ```
 
-On our TrueNAS version this did not apply ownership, and new datasets stayed `root:root 755`. Under a Kerberos-only share, the owner cannot write to their own home, and any other authenticated user can read it.
-<!-- ONUR: The commit says the name-based call never applied ownership on "SCALE API v2.0". The current API reference (v25.10) does list user/group name fields for filesystem.setperm. Add your TrueNAS version here, and say whether the API returned an error or reported success. -->
+On our TrueNAS version this did not apply ownership, and new datasets stayed `root:root 755`. Under a Kerberos-only share, the owner cannot write to their own home, and any other authenticated user can read it. Newer TrueNAS API references list `user` and `group` name fields for `filesystem.setperm`, so name-based calls may behave differently on your version. Numeric IDs avoid the question entirely.
 
 ### Why this stays quiet
 
