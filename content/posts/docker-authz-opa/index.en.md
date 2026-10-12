@@ -2,12 +2,14 @@
 title: "Docker Authorization with OPA: The Silent Fail-Open and Other Production Lessons"
 date: 2026-10-12
 lastmod: 2026-10-12
+url: "/posts/docker-authz-opa-en/"
+translationKey: "docker-authz-opa"
 description: "The plugin looks enabled, the policy is correct, yet Docker allows everything. A silent security gap I hit with opa-docker-authz in production, and its lessons."
 tags: ["docker", "opa", "rego", "security"]
 ShowToc: true
 ---
 
-*Bu yazının Türkçesi: [OPA ile Docker Authorization](/posts/docker-authz-opa/)*
+*Bu yazının Türkçesi: [OPA ile Docker Authorization](https://onurbaydas.online/posts/docker-authz-opa/)*
 
 ## 1. Introduction
 

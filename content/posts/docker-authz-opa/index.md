@@ -2,6 +2,7 @@
 title: "OPA ile Docker Authorization: Sessiz Fail-Open ve Canlı Ortamdan Dersler"
 date: 2026-10-11
 lastmod: 2026-10-12
+translationKey: "docker-authz-opa"
 description: "Plugin etkin görünüyor, policy doğru, ama Docker her şeye izin veriyor. opa-docker-authz ile canlı ortamda karşılaştığım sessiz bir güvenlik açığı ve çıkardığım dersler."
 tags: ["docker", "opa", "rego", "güvenlik"]
 ShowToc: true

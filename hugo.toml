@@ -25,6 +25,28 @@ enableRobotsTXT = true
       name = 'Ara'
       pageRef = '/search'
       weight = 30
+  [languages.en]
+    languageName = 'English'
+    locale = 'en-us'
+    weight = 2
+    title = 'Onur Baydaş'
+    [languages.en.params]
+      description = 'Technical writing'
+      [languages.en.params.homeInfoParams]
+        Title = 'Onur Baydaş'
+        Content = 'Technical writing.'
+    [[languages.en.menus.main]]
+      name = 'Posts'
+      pageRef = '/posts'
+      weight = 10
+    [[languages.en.menus.main]]
+      name = 'Tags'
+      pageRef = '/tags'
+      weight = 20
+    [[languages.en.menus.main]]
+      name = 'Search'
+      pageRef = '/search'
+      weight = 30
 
 [params]
   author = 'Onur Baydaş'
