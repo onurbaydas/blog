@@ -1,7 +1,7 @@
 ---
 title: "Bir Kullanıcı, İki UID: Domain'e Bağlı TrueNAS'ta NFSv4, Kerberos ve Docker"
 date: 2026-10-12
-description: "SSSD ve TrueNAS aynı AD kullanıcısına farklı UID verdi. Bunun nobody, root:root 755 ve \"I have no name!\" olarak nasıl göründüğü ve çözümü."
+description: "SSSD ve TrueNAS aynı AD kullanıcısına farklı UID verdi. Bunun nobody, root:root 755 ve \"I have no name!\" olarak nasıl göründüğü ve onları nasıl hizaladık."
 tags: ["docker", "nfs", "kerberos", "truenas", "active-directory"]
 ShowToc: true
 ---
@@ -9,9 +9,8 @@ ShowToc: true
 ## Giriş
 
 Paylaşımlı GPU laboratuvarımızda birkaç hafta içinde üç ayrı şey bozuldu. Kullanıcının NFS üzerindeki ev dizininde dosyalar `nobody:nogroup` olarak görünmeye başladı. Yeni açılan bir kullanıcı dataset'i, kullanıcıya ait ve `700` izinli olması gerekirken `root:root` sahipliğinde ve `755` izinli çıktı. Bir öğrencinin Jupyter container'ı `I have no name!` istemiyle açıldı ve `sudo` çalışmadı.
-<!-- ONUR: Bu çerçeveyi doğrula. Üç belirti olay notlarından alındı; "sistem saçmaladı" diye hatırladığın anın birebir kaydı yok. -->
 
-Üçünün de kök nedeni aynıydı. Aynı Active Directory kullanıcısının Linux istemcilerde bir UID'si, depolama sunucusunda başka bir UID'si vardı. İki taraf da kendi kurallarına göre doğru yapılandırılmıştı.
+Üçünün de kök nedeni aynıydı. Aynı Active Directory kullanıcısının Linux istemcilerde bir UID'si, depolama sunucusunda başka bir UID'si vardı. İki taraf da kendi kurallarına göre doğru yapılandırılmıştı. Sonunda iki sayı arasındaki farkı ölçüp depolama sunucusunun ID aralığını tam o kadar kaydırarak çözdük.
 
 Bu yazı bir kullanıcının kimliğini oturum açmadan NFS üzerindeki bir dosyaya kadar takip ediyor. Uyuşmazlığın nerede sorun çıkardığını ve neden çoğu zaman gizli kaldığını gösteriyor. Sonunda çözümü, kendi kurulumunuz için bir kontrol listesini ve alternatifleri anlatıyor.
 
@@ -26,7 +25,7 @@ Ortam dört parçadan oluşuyor:
 
 İzolasyon hedefi basit: Docker devreye girse bile A kullanıcısı B kullanıcısının dataset'ini okuyamamalı.
 
-Diyagram her adımda hangi kimliğin geçerli olduğunu gösteriyor. UID'ler örnektir.
+Diyagram, düzeltmeden önce her adımda hangi kimliğin geçerli olduğunu gösteriyor. UID'ler örnektir.
 
 ```mermaid
 flowchart TD
@@ -36,13 +35,13 @@ flowchart TD
     D --> E["docker exec --user 1914801105<br/>container içindeki süreç"]
     E --> F["Çekirdek NFS istemcisi<br/>çağıran UID = 1914801105"]
     F --> G["rpc.gssd<br/>UID ile ccache bulur<br/>principal alice@EXAMPLE.LOCAL"]
-    G --> H["TrueNAS<br/>kendi idmap'iyle principal'dan UID<br/>alice = 100001105"]
-    H --> I["ZFS izin kontrolü<br/>sahip 100001105, izin 0700"]
+    G --> H["TrueNAS<br/>kendi idmap'iyle (RID) principal'dan UID<br/>alice = 100001106"]
+    H --> I["ZFS izin kontrolü<br/>sahip 100001106, izin 0700"]
     I --> J["Yanıt: sahip isim olarak<br/>EXAMPLE\\alice@example.local"]
     J --> K["İstemcide nfsidmap + SSSD<br/>isimden yerel UID 1914801105"]
 ```
 
-İstemcinin hesapladığı sayı sunucuya hiç ulaşmaz. Yalnızca doğru Kerberos biletini bulmak için kullanılır. Sunucu principal ile ve kendi sayısıyla çalışır, sahip bilgisi istemciye isim olarak geri döner. Her çeviri adımı çalıştığı sürece iki sayı hiç karşılaşmaz.
+İstemcinin hesapladığı sayı sunucuya hiç ulaşmaz. Yalnızca doğru Kerberos biletini bulmak için kullanılır. Sunucu principal ile ve kendi sayısıyla çalışır, sahip bilgisi istemciye isim olarak geri döner. Her çeviri adımı çalıştığı sürece iki sayı hiç karşılaşmaz. Uyuşmazlığın bu kadar uzun süre gizli kalabilmesinin nedeni de budur.
 
 ## Container'lar Neden Burada Root Olarak Çalışmamalı
 
@@ -69,7 +68,7 @@ Container host'un çekirdeğini paylaşır. Container içindeki bir süreç `/wo
 
 `rpc.gssd` man sayfası root konusunda açıktır: varsayılan olarak, GSS kimlik doğrulaması gerektiren UID 0 erişimlerinde makinenin kendi kimlik bilgileri (machine credentials) kullanılır.
 
-Bu nedenle container içindeki root süreci NAS'a kullanıcı olarak değil, makine hesabı olarak ulaşır. Makine hesabı hiçbir kullanıcı dataset'inin sahibi değildir ve hepsi `0700` izinlidir. Sonuçta container içindeki root, kullanıcının dosyalarına kullanıcının kendisinden daha az erişebilir. Bu bir güvenlik özelliğidir, ama pratikte bazı şeyleri bozar. Root olarak çalışıp `/workspace`'e yazan her kurulum adımı başarısız olur.
+Bu nedenle container içindeki root süreci NAS'a kullanıcı olarak değil, makine hesabı olarak ulaşır. Makine hesabı hiçbir kullanıcı dataset'inin sahibi değildir ve hepsi `0700` izinlidir. Sonuçta container içindeki root, kullanıcının dosyalarına kullanıcının kendisinden daha az erişebilir. Bu güvenlik açısından iyidir, ama pratikte bazı şeyleri bozar. Root olarak çalışıp `/workspace`'e yazan her kurulum adımı başarısız olur.
 
 Başlatıcı betiğimiz eskiden Jupyter dizinlerini root olarak oluşturup ardından `chown -R` ile kullanıcıya veriyordu. Kerberos ile bağlı bir dizinde bu adım çalışamaz. Bu adımı kullanıcı olarak çalışan bir `mkdir` ile değiştirdik:
 
@@ -123,20 +122,21 @@ Active Directory kullanıcıları UID ile değil SID ile tanır. AD kullanıcıl
 
 **İstemcilerde SSSD.** AD sağlayıcısında `ldap_id_mapping` varsayılan olarak açıktır. `sssd-ad(5)` man sayfasına göre sağlayıcı, UID ve GID değerlerini AD'deki `objectSID` alanından üretir. ID eşleme açıkken `uidNumber` ve `gidNumber` alanları yok sayılır. Varsayılan aralık 200.000'den 2.000.200.000'e kadar uzanır ve 200.000'lik dilimlere bölünür. Her domain, SID'inin hash'iyle seçilen bir dilime düşer. Bu yüzden ortaya çıkan UID'ler büyük ve rastgele görünen sayılardır.
 
-**TrueNAS'ta winbind.** TrueNAS AD'ye Samba üzerinden bağlanır. Dokümanına göre varsayılan olarak, kullanıcı ya da grup SID'inin RID bileşenine dayalı algoritmik bir yöntem kullanır. Bu, RID backend'idir. Samba man sayfası formülü şöyle verir: `ID = RID - BASE_RID + LOW_RANGE_ID`.
-<!-- ONUR: Lab'daki TrueNAS'ın varsayılan RID backend'ini kullandığını doğrula ve range_low değerini yaz. Kayıtlar yalnızca TrueNAS'ın kendi UID'sini çözdüğünü gösteriyor. -->
+**TrueNAS'ta winbind ve RID backend'i.** TrueNAS AD'ye Samba üzerinden bağlanır. Dokümanına göre varsayılan olarak, kullanıcı ya da grup SID'inin RID bileşenine dayalı algoritmik bir yöntem kullanır. Varsayılan domain aralığı 100000001 ile 200000000 arasıdır. Bizim TrueNAS da bu varsayılanı kullanıyordu. Samba man sayfası formülü şöyle verir: `ID = RID - BASE_RID + LOW_RANGE_ID`.
 
-İki motor da deterministiktir, ama farklı formüller kullanırlar. Aynı kullanıcı için istemci `1914801105`, TrueNAS ise `100001105` hesaplayabilir. İkisi de yanlış değildir, ama aynı sayı değildirler.
+İki motor da deterministiktir, ama farklı tabanlardan başlarlar. RID'i 1105 olan bir kullanıcı için istemci `1914801105`, TrueNAS ise `100001106` hesapladı. İkisi de yanlış değildi, ama aynı sayı değildiler.
 
 ### Uyuşmazlık katman katman nerede vurur
+
+Örnek UID'ler düzeltmeden önceki değerlerdir.
 
 | Katman | Kimlik nereden gelir | Örnek UID | Uyuşmazlık burada ne yapar |
 |---|---|---|---|
 | İstemci host | SSSD, SID'den ID eşleme | 1914801105 | İstemci içinde tutarlıdır. `id -u` bu sayıyı verir, başlatıcı da onu container'a geçirir. Bu sayı TrueNAS'a bir gün sayı olarak gönderilirse yanlış hesabı ya da hiçbir hesabı göstermez. |
 | Container | `docker exec --user <host UID>` | 1914801105 | `passwd` kaydı yoksa `I have no name!` çıkar ve `sudo` bozulur. Süreç root ya da `jovyan` olarak çalışırsa NFS istekleri kullanıcının kimliğini taşımaz. |
 | NFS isteği | `rpc.gssd` `/tmp/krb5cc_<UID>` dosyasını bulur, principal ağa gider | `alice@EXAMPLE.LOCAL` | Sayı istemcide yalnızca bir arama anahtarıdır. Bilet önbelleği sürecin gerçekten çalıştığı UID ile adlandırıldığı sürece uyuşmazlık burada önemli değildir. |
-| TrueNAS dosya sistemi | winbind idmap ile principal'dan UID, ZFS sahipliğiyle karşılaştırılır | 100001105 | Dataset'in sahibi *bu* sayı olmalıdır. Sahiplik yanlışsa kullanıcı kendi `0700` dataset'ine giremez. |
-| TrueNAS API `filesystem.setperm` | Provisioning kodu ne gönderirse | 100001105 (doğru) ya da 1914801105 (yanlış) | İsimle yaptığımız çağrı uygulanmadı. Dataset `root:root 755` kaldı: sahibi yazamadı, diğer kullanıcılar okuyabildi. İstemcinin UID'sini göndermek de aynı derecede yanlış olurdu. |
+| TrueNAS dosya sistemi | winbind idmap ile principal'dan UID, ZFS sahipliğiyle karşılaştırılır | 100001106 | Dataset'in sahibi *bu* sayı olmalıdır. Sahiplik yanlışsa kullanıcı kendi `0700` dataset'ine giremez. |
+| TrueNAS API `filesystem.setperm` | Provisioning kodu ne gönderirse | 100001106 (doğru) ya da 1914801105 (yanlış) | İsimle yaptığımız çağrı uygulanmadı. Dataset `root:root 755` kaldı: sahibi yazamadı, diğer kullanıcılar okuyabildi. İstemcinin UID'sini göndermek de aynı derecede yanlış olurdu. |
 | NFSv4 isim eşleme (idmapd) | Sunucu `EXAMPLE\alice@example.local` gönderir, istemci bunu NSS (SSSD) üzerinden çevirir | istemci: 1914801105 | İstemcinin NFSv4 domain'i uymazsa isim çevrilmez ve dosya `nobody` görünür. Uyarsa isim istemcinin kendi UID'sine çevrilir ve uyuşmazlık görünmez olur. |
 
 ### Belirti 1: `nobody:nogroup`
@@ -165,7 +165,7 @@ sudo nfsidmap -c
 
 `nfsidmap -c` önbelleğe alınmış eşlemelerin tutulduğu keyring'i temizler. Man sayfası, eskimiş tek bir anahtarın bile sahipliğin `nobody` görünmesine yol açabileceği konusunda uyarır.
 
-Düzeltmeden sonra sahiplik doğru göründü ve uyuşmazlık *görünmez* oldu: `ls -l` `alice` gösteriyordu, `ls -ln` `1914801105` gösteriyordu, TrueNAS ise `100001105` saklıyordu.
+Bu düzeltmeden sonra sahiplik doğru *göründü* ve uyuşmazlık görünmez oldu: `ls -l` `alice` gösteriyordu, `ls -ln` `1914801105` gösteriyordu, TrueNAS ise `100001106` saklıyordu.
 
 ### Belirti 2: `root:root 755` sahipliğinde yeni dataset
 
@@ -199,12 +199,14 @@ Uyuşmazlığı ancak iki sayıyı yan yana koyduğunuzda görürsünüz.
 
 ## Çözüm
 
-Sayıları eşitlemeye çalışmadık. Bunun yerine bir taraftan diğerine hiçbir sayının geçmemesini sağladık:
+Çözüm iki parçadan oluştu. Önce her katmanın doğru kimliği taşımasını sağladık, sonra iki sayıyı eşitledik.
+
+### 1. kısım: her adımda doğru kimlik
 
 1. **Ağda isimler.** Her istemcinin `idmapd.conf` dosyasına `Domain = example.local` yazılır ve `nfsidmap -c` çalıştırılır. Böylece TrueNAS'tan gelen sahip dizeleri SSSD üzerinden yerel kullanıcılara çevrilir.
-2. **Erişim için principal'lar.** Share yalnızca `KRB5` kabul eder, `mapall`/`maproot` yoktur. İstemciler `sec=krb5` ile bağlanır, `rpc.gssd` çalıştırır, bilet önbelleğini öngörülebilir bir yolda (`/tmp/krb5cc_%U`) tutar ve yeniler. NAS erişime principal'a göre karar verir.
-3. **Container içinde kullanıcının UID'si.** `/workspace`'e dokunan her süreç `--user <host UID>:<host GID>` ile çalışır, böylece `rpc.gssd` kullanıcının biletini bulur. Root işleri yalnızca container'ın kendi dosyalarına dokunan ayrı bir `--user 0` exec'iyle yapılır.
-4. **Sahiplik için sunucunun UID'si.** Provisioning, TrueNAS'a kullanıcı için *kendisinin* hangi UID'yi kullandığını sorar ve sahipliği sayısal olarak ayarlar:
+2. **Erişim için principal'lar.** Share yalnızca `KRB5` kabul eder, `mapall`/`maproot` yoktur. İstemciler `sec=krb5` ile bağlanır, `rpc.gssd` çalıştırır, bilet önbelleğini öngörülebilir bir yolda (`/tmp/krb5cc_%U`) tutar ve yeniler.
+3. **Container içinde kullanıcının UID'si.** `/workspace`'e dokunan her süreç `--user <host UID>:<host GID>` ile çalışır. Root işleri yalnızca container'ın kendi dosyalarına dokunan ayrı bir `--user 0` exec'iyle yapılır.
+4. **Sahiplik için sunucunun kendi çözümlemesi.** Provisioning, TrueNAS'a kullanıcı için hangi UID'yi kullandığını sorar ve sahipliği sayısal olarak ayarlar:
 
 ```python
 uid_resp = self._post("/user/get_user_obj", {"username": username})
@@ -223,11 +225,41 @@ payload = {
 resp = self._post("/filesystem/setperm", payload)
 ```
 
-`user.get_user_obj`, bir kullanıcı için `struct passwd` alanlarını (`pw_uid` ve `pw_gid` dahil) döndürür ve Active Directory hesapları için de çalışır. TrueNAS API dokümanı `filesystem.setperm` içindeki `uid` ve `gid` alanlarını sayısal sahip kimlikleri olarak tanımlar.
+`user.get_user_obj`, bir kullanıcı için `struct passwd` alanlarını (`pw_uid` ve `pw_gid` dahil) döndürür ve Active Directory hesapları için de çalışır. TrueNAS API dokümanı `filesystem.setperm` içindeki `uid` ve `gid` alanlarını sayısal sahip kimlikleri olarak tanımlar. TrueNAS kullanıcıyı çözemezse provisioning durur ve root sahipliğinde bir dataset bırakmaz.
 
-Bu yöntem işe yarıyor, çünkü artık iki soruyu da aynı bileşen cevaplıyor: erişimi denetlerken principal'ı bir UID'ye TrueNAS eşliyor, dataset'in sahibi olan UID'yi de TrueNAS seçiyor. İstemcinin UID'si yalnızca bilet önbelleğini bulmak için kullanılıyor ve SSSD o önbelleği aynı UID ile adlandırıyor. Her taraf kendi içinde tutarlı kalıyor.
+### 2. kısım: TrueNAS aralığını kaydırarak UID'leri hizalamak
 
-Kontrol bilerek gürültülü başarısız oluyor. TrueNAS kullanıcıyı çözemezse provisioning durur ve root sahipliğinde bir dataset oluşturmaz.
+İki motor da kullanıcının RID'ine sabit bir taban ekler. TrueNAS'ta bu taban `range_low - BASE_RID`, SSSD'de ise domain'in düştüğü dilimin başlangıcıdır. `sssd-ad(5)` sayfası `ldap_idmap_range_size` değerinin domain'deki en büyük RID'den küçük olmamasını şart koşar, yani her kullanıcı o tek dilime sığar. İki taraf da aynı RID'i eklediği için iki UID arasındaki fark domain'deki her kullanıcıda aynıdır. TrueNAS tabanını bu fark kadar kaydırırsanız sayılar eşitlenir.
+
+Yaptığımız şey buydu:
+
+1. Bir kullanıcı seçip iki taraftaki UID'sine baktık: Ubuntu istemcide `id -u`, TrueNAS'ta kullanıcının UID'si.
+2. Deltayı hesapladık: istemci UID'si eksi TrueNAS UID'si.
+3. TrueNAS'ın Active Directory idmap ayarlarında domain kaydının **Range Low** ve **Range High** değerlerine deltayı ekledik.
+4. Diğer kullanıcıları kontrol ettik. Delta artık hepsinde sıfır olmalı.
+5. Mevcut dataset'lerin sahipliğini yeniden ayarladık, çünkü TrueNAS'taki bütün AD UID'leri değişmişti.
+
+Örnek sayılarla:
+
+```text
+istemci (SSSD):   alice  RID 1105  ->  1914801105
+TrueNAS (RID):    alice  RID 1105  ->  100001106    (aralık 100000001-200000000)
+delta = 1914801105 - 100001106 = 1814799999
+
+yeni TrueNAS aralığı: 100000001 + delta = 1914800000
+                      200000000 + delta = 2014799999
+TrueNAS (RID):    alice  RID 1105  ->  1914801105   == istemci
+```
+
+Değişiklikten sonra kontrol ettiğimiz her kullanıcıda UID istemcide, container'da ve TrueNAS'ta aynıydı. `ls -ln` artık iki tarafta da aynı sayıyı gösteriyor. Bir sayı sınırı geçse bile doğru kişiyi gösteriyor.
+
+Sahipliği yeniden ayarlamak isteğe bağlı bir adım değil. ZFS sahibi sayı olarak saklar. Bu yüzden mevcut her dataset hâlâ eski TrueNAS UID'lerini gösteriyordu ve her birinin sahipliği, kullanıcısının yeni UID'sine taşınmak zorundaydı.
+
+Bu yöntemin bazı sınırları var:
+
+- SSSD'nin seçtiği dilime bağlıdır. Hepsi aynı dilime düşsün diye tüm istemciler aynı SSSD ID eşleme ayarlarını kullanmalıdır. Man sayfası, hash çakışmalarının dilimleri makineden makineye farklılaştırabileceği konusunda uyarır. Bu yüzden birden fazla istemcide kontrol edin.
+- RID'i SSSD aralık boyutundan büyük olan kullanıcılar bu şemaya uymaz. Man sayfasına göre bu kullanıcılar için sorgular başarısız olur.
+- TrueNAS dokümanı, domain aralığının yerel hesaplarla ya da güvenilen domain aralıklarıyla çakışmaması gerektiği ve idmap hatalarının izinleri yanlış kullanıcılara atayabileceği konusunda uyarır. Değişikliği bir bakım penceresinde yapın ve kullanıcılar oturum açmadan önce doğrulayın.
 
 ## Kendi Kurulumunuzu Nasıl Kontrol Edersiniz
 
@@ -250,7 +282,7 @@ id 'EXAMPLE\alice'
 midclt call user.get_user_obj '{"username": "alice"}'
 ```
 
-`pw_uid` değerini istemcideki `id -u` çıktısıyla karşılaştırın. Farklıysa iki ayrı UID alanınız var demektir. Sınırdan hiçbir sayı geçmediği sürece bu bir sorun değildir.
+`pw_uid` değerini istemcideki `id -u` çıktısıyla karşılaştırın. Farklıysa iki üç kullanıcı için deltayı hesaplayın. Delta hepsinde aynıysa yukarıdaki aralık kaydırma işe yarar.
 
 **NFS mount'unu ve isim eşlemeyi kontrol edin:**
 
@@ -266,10 +298,10 @@ journalctl -t nfsidmap --since today       # "does not map into domain" = yanlı
 
 ```bash
 ls -l  ~/nfs-home     # isimler: alice görünmeli, asla nobody değil
-ls -ln ~/nfs-home     # sayılar: sunucunun değil, istemcinin UID'si görünmeli
+ls -ln ~/nfs-home     # sayılar: hizalamadan sonra TrueNAS'takiyle aynı UID
 ```
 
-TrueNAS'ta `ls -ln /mnt/pool/users/alice` sunucunun UID'sini ve `drwx------` iznini göstermelidir.
+TrueNAS'ta `ls -ln /mnt/pool/users/alice` aynı UID'yi ve `drwx------` iznini göstermelidir.
 
 **Container içinde:**
 
@@ -279,22 +311,17 @@ docker exec --user "$(id -u):$(id -g)" mybox sh -c 'id; whoami; ls -ln /workspac
 
 `id` host'taki UID'yi, `whoami` bir hata değil bir isim göstermelidir. `/workspace` içindeki dosyalar da aynı UID'yi göstermelidir. Ardından aynı komutu `--user 0` ile çalıştırıp `/workspace`'i listelemeyi deneyin. Makine hesabının dataset'e erişimi olmayan bir Kerberos mount'unda bu başarısız olmalıdır. Başarılı olursa share'in `maproot` ayarını ve dataset'in iznini kontrol edin.
 
-## Alternatifler: UID'leri Hizalamak ya da İkisiyle Yaşamak
+## Alternatifler
 
-Diğer seçenek, iki tarafın aynı sayıyı hesaplamasını sağlamaktır. Bunun yaygın iki yolu var.
+**SSSD'yi POSIX attribute'larına geçirmek.** Her kullanıcı için AD'de `uidNumber`/`gidNumber` saklanır, SSSD'de `ldap_id_mapping = False` yapılır ve TrueNAS'ta AD (RFC2307) idmap backend'i seçilir. İki taraf da herhangi bir dilim ya da aralıktan bağımsız olarak aynı saklanan sayıyı okur. Bedelleri:
 
-**SSSD'yi POSIX attribute'larına geçirmek.** Her kullanıcı için AD'de `uidNumber`/`gidNumber` saklanır, SSSD'de `ldap_id_mapping = False` yapılır ve TrueNAS'ta AD (RFC2307) idmap backend'i seçilir. İki taraf da aynı saklanan sayıyı okur. Bedelleri:
-
-- Her hesabın bu attribute'lara ihtiyacı vardır. Provisioning onları benzersiz ve kalıcı olarak atamak zorundadır.
+- Her hesabın bu attribute'lara ihtiyacı vardır ve provisioning onları benzersiz ve kalıcı olarak atamak zorundadır.
 - SSSD man sayfası, performans için bu attribute'ların Global Catalog'a da kopyalanmasını önerir.
-- Çalışan bir sistemde bunu değiştirmek her kullanıcının UID'sini değiştirir. Man sayfası, ID eşleme ayarlarını değiştirmenin kullanıcı ve grup kimliklerini değiştireceği konusunda uyarır. Bu, her ev dizininin ve NAS'taki her dosyanın sahipliğini yeniden ayarlamak demektir.
-- TrueNAS, idmap ayarlarını yalnızca deneyimli yöneticilerin özelleştirmesi gerektiğini söyler. Hatalı bir yapılandırma, özellikle NFS üzerinden erişilen verilerde izinlerin yanlış kullanıcılara ya da gruplara atanmasına yol açabilir.
+- Man sayfası, ID eşleme ayarlarını değiştirmenin kullanıcı ve grup kimliklerini değiştireceği konusunda uyarır. Bu durumda istemcilerdeki her ev dizininin sahipliği yeniden ayarlanmalıdır.
 
-**İki tarafta aynı algoritma.** İstemcilerde aynı `idmap_rid` aralığıyla winbind kullanılır ya da SSSD winbind'e yaklaştırılır. SSSD'de `ldap_idmap_autorid_compat` seçeneği vardır, ama bu winbind'in *autorid* algoritmasını hedefler ve man sayfası onu deterministik olmayan bir algoritma olarak tanımlar. `idmap_rid` ile aynı sonucu vermez. Pratikte bu, istemcinin kimlik altyapısını değiştirmek demektir.
+**İki UID alanıyla yaşamak.** Sayılar farklı bırakılır, Kerberos ve idmapd isimlerine güvenilir, sahiplik her zaman sunucunun kendi çözümlemesinden ayarlanır. Hiçbir şey taşınmaz, ama herkes istemcinin UID'sini asla sunucuya göndermemesi gerektiğini bilmelidir. Bu da `sec=sys`, NFSv3 ve sayısal sahipliği koruyan dikkatsiz yedeklemeleri dışarıda bırakır. Bir süre böyle çalıştık ve uyuşmazlık tam da bu yüzden gizli kaldı. (İstemcilerde SSSD yerine winbind kullanmak da iki tarafa aynı algoritmayı verir, ama kimlik altyapısını değiştirmeyi gerektirir.)
 
-**Uyguladığımız yaklaşım: iki UID alanı, sınırdan sayı geçmez.** AD'de ya da mevcut dataset'lerde hiçbir şey değişmez ve SSSD sıfır yapılandırmalı ID eşlemesini korur. Bedeli, herkesin bilmesi gereken bir kuraldır: *istemcinin UID'sini asla sunucuya gönderme*. Bu kural, bu share'ler için `sec=sys` ve NFSv3 kullanımını dışarıda bırakır. Sayısal sahipliği koruyan her yedekleme ya da taşıma aracı da dikkat ister.
-
-Tek NAS'lı ve her yerde Kerberos kullanılan bir laboratuvar için ikinci yaklaşım daha ucuzdu. Birden fazla NFS sunucusu, `sec=sys` istemcileri ya da sayısal ID taşıyan araçlar varsa, UID'leri bir kez hizalamak taşıma maliyetine değer.
+**Uyguladığımız yaklaşım: TrueNAS RID aralığını kaydırmak.** Tek bir sunucuda tek bir ayar değişir, AD'ye ve istemcilere dokunulmaz. Bedeli, mevcut dataset'lerin sahipliğinin bir kez yeniden ayarlanması ve SSSD'nin dilimine bağımlı kalmaktır. SSSD'nin ID eşleme ayarları değişirse ya da bir istemci farklı bir dilime düşerse delta geri gelir. Tek NAS'lı ve istemcileri aynı yapılandırılmış bir laboratuvar için, her yerde kullanıcı başına tek UID elde etmenin en ucuz yolu buydu.
 
 ## Sonuç
 
@@ -303,19 +330,19 @@ NFSv4 ve Kerberos ile ağdaki kimlik bir principal ve bir isim dizesinden oluşu
 Bu olaydan üç kural çıktı:
 
 - Kerberos NFS'e dokunan container süreçlerini kullanıcının host'taki UID'siyle çalıştırın, root işlerini container içinde tutun.
-- Sunucudaki sahipliği sunucunun kendi UID'siyle ayarlayın.
-- Herhangi bir sayısal sahipliğe güvenmeden önce, istemcideki `id -u` değerini sunucunun aynı kullanıcı için kullandığı UID ile karşılaştırın.
+- Sunucudaki sahipliği, sunucunun kendi çözümlediği UID ile ayarlayın.
+- İstemcideki `id -u` değerini sunucunun aynı kullanıcı için kullandığı UID ile karşılaştırın. Aralarında sabit bir fark varsa sunucunun RID aralığını o kadar kaydırın ve verinin sahipliğini yeniden ayarlayın.
 
 ## Kaynaklar
 
 - `rpc.gssd(8)`, bilet önbelleği araması ve UID 0 için makine kimlik bilgileri: https://man7.org/linux/man-pages/man8/rpc.gssd.8.html
 - `nfsidmap(5)`, NFSv4 `kullanıcı@domain` isimleri, `-c`, `-d`, nobody görünen eski anahtarlar: https://man7.org/linux/man-pages/man5/nfsidmap.5.html
 - `idmapd.conf(5)`, `Domain` ve varsayılan değeri: https://linux.die.net/man/5/idmapd.conf
-- `sssd-ad(5)`, `ldap_id_mapping`, ID aralıkları, `ldap_idmap_autorid_compat`: https://man.archlinux.org/man/sssd-ad.5.en
+- `sssd-ad(5)`, `ldap_id_mapping`, ID aralıkları ve dilimler, `ldap_idmap_range_size`: https://man.archlinux.org/man/sssd-ad.5.en
 - `sssd-krb5(5)`, `krb5_ccname_template`, yenileme ayarları: https://man.archlinux.org/man/sssd-krb5.5.en
 - Samba `idmap_rid(8)`: https://www.samba.org/samba/docs/current/man-html/idmap_rid.8.html
 - TrueNAS, Configuring Active Directory (idmap backend'leri ve uyarılar): https://www.truenas.com/docs/scale/credentials/directoryservices/configad/
-- TrueNAS, Directory Services Screens: https://www.truenas.com/docs/scale/credentials/directoryservices/directoryservicesscreens/
+- TrueNAS, Directory Services Screens (Range Low/High, varsayılan aralıklar): https://www.truenas.com/docs/scale/credentials/directoryservices/directoryservicesscreens/
 - TrueNAS API, `filesystem.setperm`: https://api.truenas.com/v25.10/api_methods_filesystem.setperm.html
 - TrueNAS API, `user.get_user_obj`: https://api.truenas.com/v25.10/api_methods_user.get_user_obj.html
 - Docker, container çalıştırma (varsayılan kullanıcı, `--user`, sayısal UID'ler): https://docs.docker.com/engine/containers/run/
