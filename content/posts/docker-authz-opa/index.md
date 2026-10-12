@@ -7,6 +7,8 @@ tags: ["docker", "opa", "rego", "güvenlik"]
 ShowToc: true
 ---
 
+*English version: [Docker Authorization with OPA](/posts/docker-authz-opa-en/)*
+
 ## 1. Giriş
 
 Docker authorization plugin'leri, Docker daemon'una gelen her API isteğini işlenmeden önce bir policy'ye göre değerlendirmeyi sağlar. `opa-docker-authz`, bu mekanizmayı OPA (Open Policy Agent) ve Rego policy diliyle uygulayan bir plugin'dir.
@@ -240,7 +242,7 @@ Kısaca: **`docker plugin disable` authorization'ı kapatır, `docker plugin ena
 
 Zincirden çıkarma bir hata değil, bir düzeltmedir. 2017'de açılan moby issue #31836, authorization plugin'i devre dışı bırakıldıktan sonra daemon'un istekleri hâlâ o plugin'e gönderdiğini bildirdi. Plugin artık yanıt vermediği için tüm API istekleri bloklanıyordu.
 
-Düzeltme olan commit `38de272bd4`, `Disable()` fonksiyonuna authorization tipindeki plugin'i middleware zincirinden çıkaran kodu ekledi. Aynı commit `Enable()` tarafına plugin'i zincire geri ekleyen bir kod eklemedi. Bu bölümdeki sessiz fail-open, o düzeltmenin bu asimetrisinden doğan bir yan etkidir.
+Düzeltme olan commit `38de272bd4`, `Disable()` fonksiyonuna authorization tipindeki plugin'i middleware zincirinden çıkaran kodu ekledi. Aynı commit `Enable()` tarafına plugin'i zincire geri ekleyen bir kod eklemedi. Bu ilk düzeltme zincirden çıkarmayı farklı bir kodla yapıyordu; aynı yıl moby #33655 ("Eliminate authz plugin disable race") bu kodu bugünkü `RemovePlugin` fonksiyonuna taşıdı ve davranış aynı kaldı. Bu bölümdeki sessiz fail-open, o düzeltmenin bu asimetrisinden doğan bir yan etkidir.
 
 ### Gözlenen davranış
 
@@ -266,7 +268,7 @@ Bu belirti için sık başvurulan açıklama şudur: "Policy dosyası 644 değil
 - Yukarıdaki tabloda izinler 644 yapıldıktan sonra disable/enable ile koruma hâlâ kapalıdır. Düzelten adım reload'dur.
 - `opa-docker-authz` policy dosyasını `os.ReadFile` ile okur. Okuma hatası (izin hatası dahil) olursa isteği **reddeder**. İzin sorunu fail-closed bir sonuç üretir.
 
-Karışıklığın olası kaynağı: resmi `openpolicyagent/opa` CLI imajı root olmayan bir kullanıcıyla çalışır. 600 izinli bir policy dosyası bu imajla `opa check` edilirse "permission denied" alınır. Bu, plugin'in davranışı hakkında bilgi vermez. 755/644 izinleri zararsız bir hijyen kuralı olarak kalabilir, ama fail-open'ın nedeni değildir.
+Karışıklığın olası kaynağı: resmi `openpolicyagent/opa` CLI imajı root olmayan bir kullanıcıyla çalışır. 600 izinli bir policy dosyası bu imajla `opa check` edilirse "permission denied" alınır. Bu, plugin'in davranışı hakkında bilgi vermez. 755/644 izinleri, ayrı çalıştırılan `opa check` gibi araçların dosyayı okuyabilmesi için önerilen bir hijyen kuralıdır, ama fail-open'ın nedeni değildir.
 
 ### Plugin'in açıkça fail-open olduğu durum
 
@@ -512,7 +514,7 @@ deny { not input.Body.HostConfig }
 
 Bu kural, konteyner oluşturma isteğinde `HostConfig` yoksa isteği reddeder. Normal `docker run` her zaman `HostConfig` gönderdiği için meşru kullanımı etkilemez.
 
-Bu kör nokta teorik değil. CVE-2024-41110'da, özel hazırlanmış bir API isteğiyle daemon isteği authorization plugin'ine gövdesiz iletebiliyordu. Gövdeye bakarak karar veren plugin'ler, normalde reddedecekleri bir isteğe izin verebiliyordu. Açık ilk olarak Ocak 2019'da Docker Engine v18.09.1'de düzeltilmişti. Düzeltme sonraki ana sürümlere taşınmadığı için regresyon olarak geri geldi. Advisory'ye göre v23.0.14, v26.1.4 ve v27.1.0'dan sonraki sürümler yamalıdır. docker-ce için düzeltme v27.1.1'dedir.
+Bu kör nokta teorik değil. CVE-2024-41110'da, özel hazırlanmış bir API isteğiyle daemon isteği authorization plugin'ine gövdesiz iletebiliyordu. Gövdeye bakarak karar veren plugin'ler, normalde reddedecekleri bir isteğe izin verebiliyordu. Açık ilk olarak Ocak 2019'da Docker Engine v18.09.1'de düzeltilmişti. Düzeltme sonraki ana sürümlere taşınmadığı için regresyon olarak geri geldi. Advisory'ye göre etkilenen sürümler v19.03.15, v20.10.27, v23.0.14, v24.0.9, v25.0.5, v26.0.2, v26.1.4, v27.0.3, v27.1.0 ve her birinin dalındaki önceki sürümlerdir. Advisory yamalı sürümü yalnızca üç dal için verir: v23.0.14, v26.1.4 ve v27.1.0'dan sonraki sürümler. docker-ce için düzeltme v27.1.1'dedir. 19.03, 20.10, 24.0, 25.0, 26.0 ve 27.0 dalları için advisory yamalı sürüm vermez. Bu dallardan birindeyseniz yamalı bir sürüme yükseltin.
 
 `deny { not input.Body.HostConfig }` kuralı tam bu durumu yakalar: gövdesiz bir create isteğinde `HostConfig` undefined olur ve istek reddedilir. Engine yamalı olsa bile kural savunma derinliği olarak kalmalıdır, çünkü policy'nin güvenliği engine'deki tek bir düzeltmeye bağlı olmamalı.
 
@@ -618,10 +620,10 @@ Her seçeneğin bir bedeli vardır. Rootless Docker mevcut bir kuruluma sonradan
 
 **Sürüm**
 - Docker Engine en az 29.3.1 olsun. Bu sürüm, AuthZ plugin'lerinin atlatılabildiği CVE-2026-34040'ı ve `docker plugin install` sırasında privilege doğrulamasının atlanabildiği CVE-2026-33997'yi yamalar.
-- Daha eski bir sürümde kalmak zorundaysanız en azından CVE-2024-41110 için yamalı bir sürüm kullanın (docker-ce v27.1.1, Bölüm 9).
+- Daha eski bir sürümde kalmak zorundaysanız en azından CVE-2024-41110 için yamalı bir sürüm kullanın. Advisory yamalı sürümü yalnızca 23.0, 26.1 ve 27.1 dalları için verir: v23.0.14, v26.1.4 ve v27.1.0'dan sonraki sürümler (docker-ce v27.1.1). 19.03, 20.10, 24.0, 25.0, 26.0 ve 27.0 dalları için yamalı sürüm verilmez; bu dallardaysanız yamalı bir sürüme yükseltin (Bölüm 9).
 
 **İzinler**
-- Policy dizini `0755 root:root`, dosyası `0644 root:root` olsun. Fail-open'ın nedeni bu değildir, ama ayrı çalıştırılan `opa check` gibi kontrol araçlarının dosyayı okuyabilmesi için gereklidir.
+- Policy dizini `0755 root:root`, dosyası `0644 root:root` olsun. Fail-open'ın nedeni bu değildir. Ayrı çalıştırılan `opa check` gibi araçların dosyayı okuyabilmesi için önerilen bir hijyen kuralıdır.
 - Policy yolunu plugin içindeki yola göre yazın (`/etc/docker/...` → `/opa/...`). Yol yanlışsa plugin açıkça fail-open olur.
 
 **Davranış testi**
@@ -684,6 +686,7 @@ Bölüm 6'ya zincirden çıkarmanın tarihçesi, Bölüm 9'a CVE-2024-41110 ve B
 - moby, `daemon/command/daemon.go`: https://github.com/moby/moby/blob/b1bf272a8c767e2a21737fa0625844e9970c3dc2/daemon/command/daemon.go
 - moby, issue #31836 (disable edilen authz plugin'in istekleri bloklaması): https://github.com/moby/moby/issues/31836
 - moby, commit `38de272bd4` (disable edilen authz plugin'i zincirden çıkarma): https://github.com/moby/moby/commit/38de272bd4
+- moby, PR #33655 (Eliminate authz plugin disable race): https://github.com/moby/moby/pull/33655
 - NVD, CVE-2024-41110: https://nvd.nist.gov/vuln/detail/CVE-2024-41110
 - moby, GHSA-v23v-6jw2-98fq (CVE-2024-41110 advisory): https://github.com/moby/moby/security/advisories/GHSA-v23v-6jw2-98fq
 - NVD, CVE-2026-34040: https://nvd.nist.gov/vuln/detail/CVE-2026-34040
