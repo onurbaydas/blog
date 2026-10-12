@@ -1,6 +1,7 @@
 ---
 title: "OPA ile Docker Authorization: Sessiz Fail-Open ve Canlı Ortamdan Dersler"
 date: 2026-10-11
+lastmod: 2026-10-12
 description: "Plugin etkin görünüyor, policy doğru, ama Docker her şeye izin veriyor. opa-docker-authz ile canlı ortamda karşılaştığım sessiz bir güvenlik açığı ve çıkardığım dersler."
 tags: ["docker", "opa", "rego", "güvenlik"]
 ShowToc: true
@@ -235,6 +236,12 @@ Zincir boşken middleware her isteği doğrudan handler'a verir (Bölüm 3). Son
 
 Kısaca: **`docker plugin disable` authorization'ı kapatır, `docker plugin enable` geri açmaz, `systemctl reload docker` açar.**
 
+#### Tarihçe: zincirden çıkarma neden var?
+
+Zincirden çıkarma bir hata değil, bir düzeltmedir. 2017'de açılan moby issue #31836, authorization plugin'i devre dışı bırakıldıktan sonra daemon'un istekleri hâlâ o plugin'e gönderdiğini bildirdi. Plugin artık yanıt vermediği için tüm API istekleri bloklanıyordu.
+
+Düzeltme olan commit `38de272bd4`, `Disable()` fonksiyonuna authorization tipindeki plugin'i middleware zincirinden çıkaran kodu ekledi. Aynı commit `Enable()` tarafına plugin'i zincire geri ekleyen bir kod eklemedi. Bu bölümdeki sessiz fail-open, o düzeltmenin bu asimetrisinden doğan bir yan etkidir.
+
 ### Gözlenen davranış
 
 Canlı bir daemon üzerindeki test sonuçları kaynak koddaki mekanizmayla uyumludur:
@@ -245,6 +252,8 @@ Canlı bir daemon üzerindeki test sonuçları kaynak koddaki mekanizmayla uyuml
 | Policy değişti + `disable` / `enable` | Çalıştı (fail-open) |
 | Dizin 755, dosya 644 yapıldı + `disable` / `enable` | Çalıştı (fail-open) |
 | Plugin yeniden kuruldu (`disable` → `rm` → `install`) + `systemctl reload docker` | Reddedildi |
+
+Davranış güncel sürümde de aynıdır: Docker Engine 29.9.0 ve opa-docker-authz v0.9 ile disable/enable sonrası `--privileged` çalışır, `systemctl reload docker` sonrası reddedilir.
 
 Son adımda zinciri yeniden kuran, yeniden kurulum değil reload'dur. Yeniden kurulum da bir disable/enable döngüsü içerir ve kendi başına plugin'i zincire geri eklemez. Zincire geri ekleme `SetPlugins` ile, yani reload sırasında olur.
 
@@ -503,6 +512,10 @@ deny { not input.Body.HostConfig }
 
 Bu kural, konteyner oluşturma isteğinde `HostConfig` yoksa isteği reddeder. Normal `docker run` her zaman `HostConfig` gönderdiği için meşru kullanımı etkilemez.
 
+Bu kör nokta teorik değil. CVE-2024-41110'da, özel hazırlanmış bir API isteğiyle daemon isteği authorization plugin'ine gövdesiz iletebiliyordu. Gövdeye bakarak karar veren plugin'ler, normalde reddedecekleri bir isteğe izin verebiliyordu. Açık ilk olarak Ocak 2019'da Docker Engine v18.09.1'de düzeltilmişti. Düzeltme sonraki ana sürümlere taşınmadığı için regresyon olarak geri geldi. Advisory'ye göre v23.0.14, v26.1.4 ve v27.1.0'dan sonraki sürümler yamalıdır. docker-ce için düzeltme v27.1.1'dedir.
+
+`deny { not input.Body.HostConfig }` kuralı tam bu durumu yakalar: gövdesiz bir create isteğinde `HostConfig` undefined olur ve istek reddedilir. Engine yamalı olsa bile kural savunma derinliği olarak kalmalıdır, çünkü policy'nin güvenliği engine'deki tek bir düzeltmeye bağlı olmamalı.
+
 Aynı kör nokta, gövdeye bakan her deny-list kuralında vardır. Policy'ye konteyner oluşturma dışında bir karar noktası eklendiğinde (`volume create`, `exec`) o noktanın da gövdesiz isteği reddettiği ayrıca test edilmelidir.
 
 ### Plugin API'si
@@ -603,6 +616,10 @@ Her seçeneğin bir bedeli vardır. Rootless Docker mevcut bir kuruluma sonradan
 
 ## 11. Production kontrol listesi
 
+**Sürüm**
+- Docker Engine en az 29.3.1 olsun. Bu sürüm, AuthZ plugin'lerinin atlatılabildiği CVE-2026-34040'ı ve `docker plugin install` sırasında privilege doğrulamasının atlanabildiği CVE-2026-33997'yi yamalar.
+- Daha eski bir sürümde kalmak zorundaysanız en azından CVE-2024-41110 için yamalı bir sürüm kullanın (docker-ce v27.1.1, Bölüm 9).
+
 **İzinler**
 - Policy dizini `0755 root:root`, dosyası `0644 root:root` olsun. Fail-open'ın nedeni bu değildir, ama ayrı çalıştırılan `opa check` gibi kontrol araçlarının dosyayı okuyabilmesi için gereklidir.
 - Policy yolunu plugin içindeki yola göre yazın (`/etc/docker/...` → `/opa/...`). Yol yanlışsa plugin açıkça fail-open olur.
@@ -652,6 +669,10 @@ Bir güvenlik kontrolünün çalıştığını "etkin" görünmesinden değil, g
 
 Docker authorization plugin'i, `docker` grubunun root eşdeğeri olduğu gerçeğini değiştirmez. Kimlik bilmeyen, yalnızca bazı endpoint'leri denetleyen ve sessizce devreden çıkabilen bir katmandır. Güvenilir kullanıcılar arasında kazaları önlemek için faydalıdır. Güvenilmeyen kullanıcıları ayırmak için rootless çalışma, kullanıcı başına izolasyon ya da kimliği bilen bir kontrol düzlemi gibi daha sağlam bir temel gerekir.
 
+## Güncelleme (12 Ekim 2026)
+
+Bölüm 6'ya zincirden çıkarmanın tarihçesi, Bölüm 9'a CVE-2024-41110 ve Bölüm 11'e minimum Docker Engine sürümü eklendi.
+
 ## 13. Kaynaklar
 
 - Docker, Access authorization plugin: https://docs.docker.com/engine/extend/plugins_authorization/
@@ -661,6 +682,12 @@ Docker authorization plugin'i, `docker` grubunun root eşdeğeri olduğu gerçe�
 - moby, `pkg/authorization/middleware.go`: https://github.com/moby/moby/blob/b1bf272a8c767e2a21737fa0625844e9970c3dc2/pkg/authorization/middleware.go
 - moby, `daemon/pkg/plugin/backend_linux.go`: https://github.com/moby/moby/blob/b1bf272a8c767e2a21737fa0625844e9970c3dc2/daemon/pkg/plugin/backend_linux.go
 - moby, `daemon/command/daemon.go`: https://github.com/moby/moby/blob/b1bf272a8c767e2a21737fa0625844e9970c3dc2/daemon/command/daemon.go
+- moby, issue #31836 (disable edilen authz plugin'in istekleri bloklaması): https://github.com/moby/moby/issues/31836
+- moby, commit `38de272bd4` (disable edilen authz plugin'i zincirden çıkarma): https://github.com/moby/moby/commit/38de272bd4
+- NVD, CVE-2024-41110: https://nvd.nist.gov/vuln/detail/CVE-2024-41110
+- moby, GHSA-v23v-6jw2-98fq (CVE-2024-41110 advisory): https://github.com/moby/moby/security/advisories/GHSA-v23v-6jw2-98fq
+- NVD, CVE-2026-34040: https://nvd.nist.gov/vuln/detail/CVE-2026-34040
+- NVD, CVE-2026-33997: https://nvd.nist.gov/vuln/detail/CVE-2026-33997
 - opa-docker-authz, `main.go`: https://github.com/open-policy-agent/opa-docker-authz/blob/v0.9/main.go
 - opa-docker-authz, sürümler: https://github.com/open-policy-agent/opa-docker-authz/releases
 - opa-docker-authz v0.9, `go.mod`: https://github.com/open-policy-agent/opa-docker-authz/blob/v0.9/go.mod
