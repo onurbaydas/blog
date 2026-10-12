@@ -12,6 +12,8 @@ ShowToc: true
 
 ## 1. Giriş
 
+Paylaşımlı, çok kullanıcılı Linux iş istasyonlarında Docker'ı kısıtlamak için `opa-docker-authz` kurdum. Rutin bir policy güncellemesinden sonra `--privileged` konteynerlerin sessizce çalıştığını fark ettim. Bu yazı, o olayın ve sonrasında kaynak kodda bulduklarımın özeti.
+
 Docker authorization plugin'leri, Docker daemon'una gelen her API isteğini işlenmeden önce bir policy'ye göre değerlendirmeyi sağlar. `opa-docker-authz`, bu mekanizmayı OPA (Open Policy Agent) ve Rego policy diliyle uygulayan bir plugin'dir.
 
 Bu yazı şu konuları ele alıyor:
@@ -671,6 +673,8 @@ fi
 Bir güvenlik kontrolünün çalıştığını "etkin" görünmesinden değil, gerçekten engelleyip engellemediğini test ederek anlarsınız. Plugin etkin görünebilir, policy dosyası doğru ve izinler düzgün olabilir. Bunlara rağmen authorization zinciri boş olabilir. Tek satırlık bir `docker run --privileged` testi bu durumu bir saniyede gösterir. `docker plugin disable` authorization'ı kapatır, `enable` geri açmaz, `systemctl reload docker` açar.
 
 Docker authorization plugin'i, `docker` grubunun root eşdeğeri olduğu gerçeğini değiştirmez. Kimlik bilmeyen, yalnızca bazı endpoint'leri denetleyen ve sessizce devreden çıkabilen bir katmandır. Güvenilir kullanıcılar arasında kazaları önlemek için faydalıdır. Güvenilmeyen kullanıcıları ayırmak için rootless çalışma, kullanıcı başına izolasyon ya da kimliği bilen bir kontrol düzlemi gibi daha sağlam bir temel gerekir.
+
+Bu olaydan sonra davranış testini periyodik olarak çalıştırıyorum. "Etkin görünmek" ile "çalışmak" arasındaki farkı test etmeden bilemezsiniz.
 
 ## Güncelleme (12 Ekim 2026)
 

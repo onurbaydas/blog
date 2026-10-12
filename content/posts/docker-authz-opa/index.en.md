@@ -13,6 +13,8 @@ ShowToc: true
 
 ## 1. Introduction
 
+I set up `opa-docker-authz` to restrict Docker on shared, multi-user Linux workstations. After a routine policy update, I noticed that `--privileged` containers were silently running. This article summarizes that incident and what I found in the source code afterward.
+
 Docker authorization plugins let you evaluate every API request sent to the Docker daemon against a policy before the daemon processes it. `opa-docker-authz` is a plugin that implements this mechanism with OPA (Open Policy Agent) and its policy language, Rego.
 
 This article covers:
@@ -672,6 +674,8 @@ fi
 You know a security control works by testing whether it actually blocks, not because it looks "enabled." The plugin can look enabled, and the policy file and permissions can be correct. Despite all that, the authorization plugin chain can be empty. A one-line `docker run --privileged` test reveals this in a second. `docker plugin disable` turns authorization off, `enable` doesn't turn it back on, and `systemctl reload docker` does.
 
 A Docker authorization plugin doesn't change the fact that the `docker` group is root-equivalent. It's a layer that doesn't know identity, checks only some endpoints, and can silently drop out of service. It's useful for preventing accidents among trusted users. Separating untrusted users requires a sturdier foundation, such as rootless operation, per-user isolation, or a control plane that knows identity.
+
+Since that incident, I run the behavioral test periodically. You can't know the difference between "looks enabled" and "works" without testing it.
 
 ## 13. References
 

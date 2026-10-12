@@ -25,6 +25,10 @@ enableRobotsTXT = true
       name = 'Ara'
       pageRef = '/search'
       weight = 30
+    [[languages.tr.menus.main]]
+      name = 'Hakkımda'
+      pageRef = '/about'
+      weight = 40
   [languages.en]
     languageName = 'English'
     locale = 'en-us'
@@ -47,6 +51,10 @@ enableRobotsTXT = true
       name = 'Search'
       pageRef = '/search'
       weight = 30
+    [[languages.en.menus.main]]
+      name = 'About'
+      pageRef = '/about'
+      weight = 40
 
 [params]
   author = 'Onur Baydaş'
