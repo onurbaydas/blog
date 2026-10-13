@@ -44,4 +44,3 @@ container security, and GPU/AI infrastructure topics.
 - Email: onurbaydas@gmail.com
 - GitHub: [github.com/onurbaydas](https://github.com/onurbaydas)
 
-I'm also finishing my degree in computer engineering.

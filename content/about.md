@@ -44,4 +44,3 @@ konularında freelance teknik yazı işlerine açığım.
 - E-posta: onurbaydas@gmail.com
 - GitHub: [github.com/onurbaydas](https://github.com/onurbaydas)
 
-Bilgisayar mühendisliği eğitimimi de tamamlamak üzereyim.
