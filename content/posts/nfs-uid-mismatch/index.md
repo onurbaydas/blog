@@ -9,7 +9,7 @@ ShowToc: true
 
 ## Giriş
 
-Paylaşımlı GPU laboratuvarımızda birkaç hafta içinde birkaç ayrı şey bozuldu. Kullanıcının NFS üzerindeki ev dizininde dosyalar `nobody:nogroup` olarak görünmeye başladı. Share'i sıkılaştırdıktan sonra kullanıcı, `ls` onu sahip olarak gösterdiği halde kendi ev dizinine yazamaz oldu. Yeni açılan bir kullanıcı dataset'i, kullanıcıya ait ve `700` izinli olması gerekirken `root:root` sahipliğinde ve `755` izinli çıktı. Bir öğrencinin Jupyter container'ı `I have no name!` istemiyle açıldı ve `sudo` çalışmadı.
+Paylaşımlı, çok kullanıcılı Linux iş istasyonlarında birkaç hafta içinde birkaç ayrı şey bozuldu. Kullanıcının NFS üzerindeki ev dizininde dosyalar `nobody:nogroup` olarak görünmeye başladı. Share'i sıkılaştırdıktan sonra kullanıcı, `ls` onu sahip olarak gösterdiği halde kendi ev dizinine yazamaz oldu. Yeni açılan bir kullanıcı dataset'i, kullanıcıya ait ve `700` izinli olması gerekirken `root:root` sahipliğinde ve `755` izinli çıktı. Bir kullanıcının Jupyter container'ı `I have no name!` istemiyle açıldı ve `sudo` çalışmadı.
 
 Bunların çoğunun kök nedeni aynıydı. Aynı Active Directory kullanıcısının Linux istemcilerde bir UID'si, depolama sunucusunda başka bir UID'si vardı. İki taraf da kendi kurallarına göre doğru yapılandırılmıştı. Sonunda istemcilerin kullandığı tabanı hesaplayıp depolama sunucusunun ID aralığını aynı sayıdan başlattık. Erişimin çalışması için aynı yol üzerindeki iki eşlemenin daha, biri istemcide biri sunucuda, düzeltilmesi gerekti.
 
@@ -383,7 +383,7 @@ docker exec --user "$(id -u):$(id -g)" mybox sh -c 'id; whoami; ls -ln /workspac
 
 **İki UID alanıyla yaşamak.** Sayılar farklı bırakılır, Kerberos ve idmapd isimlerine güvenilir, sahiplik her zaman sunucunun kendi çözümlemesinden ayarlanır. Hiçbir şey taşınmaz, ama herkes istemcinin UID'sini asla sunucuya göndermemesi gerektiğini bilmelidir. Bu da `sec=sys`, NFSv3 ve sayısal sahipliği koruyan dikkatsiz yedeklemeleri dışarıda bırakır. Bir süre böyle çalıştık ve uyuşmazlık tam da bu yüzden gizli kaldı. (İstemcilerde SSSD yerine winbind kullanmak da iki tarafa aynı algoritmayı verir, ama kimlik altyapısını değiştirmeyi gerektirir.)
 
-**Uyguladığımız yaklaşım: TrueNAS RID aralığını taşımak.** Tek bir sunucuda tek bir ayar değişir, AD'ye ve istemcilere dokunulmaz. Bedeli, mevcut dataset'lerin sahipliğinin bir kez yeniden ayarlanması, NAS'ın domain'e yeniden katılması ve SSSD'nin dilimine bağımlı kalmaktır. SSSD'nin ID eşleme ayarları değişirse ya da bir istemci farklı bir dilime düşerse uyuşmazlık geri gelir. Tek NAS'lı ve istemcileri aynı yapılandırılmış bir laboratuvar için, her yerde kullanıcı başına tek UID elde etmenin en ucuz yolu buydu.
+**Uyguladığımız yaklaşım: TrueNAS RID aralığını taşımak.** Tek bir sunucuda tek bir ayar değişir, AD'ye ve istemcilere dokunulmaz. Bedeli, mevcut dataset'lerin sahipliğinin bir kez yeniden ayarlanması, NAS'ın domain'e yeniden katılması ve SSSD'nin dilimine bağımlı kalmaktır. SSSD'nin ID eşleme ayarları değişirse ya da bir istemci farklı bir dilime düşerse uyuşmazlık geri gelir. Tek NAS'lı ve istemcileri aynı yapılandırılmış bir ortam için, her yerde kullanıcı başına tek UID elde etmenin en ucuz yolu buydu.
 
 ## Sonuç
 

@@ -10,7 +10,7 @@ ShowToc: true
 
 ## Introduction
 
-In our shared GPU lab, several things broke in the same few weeks. Files on a user's NFS home showed up as `nobody:nogroup`. Once we tightened the share, a user could no longer write to their own home, even though `ls` showed them as the owner. A freshly provisioned home dataset came out owned by `root:root` with mode `755` instead of belonging to the user with mode `700`. A student's Jupyter container opened with the prompt `I have no name!` and `sudo` refused to work.
+On a set of shared, multi-user Linux workstations, several things broke in the same few weeks. Files on a user's NFS home showed up as `nobody:nogroup`. Once we tightened the share, a user could no longer write to their own home, even though `ls` showed them as the owner. A freshly provisioned home dataset came out owned by `root:root` with mode `755` instead of belonging to the user with mode `700`. A user's Jupyter container opened with the prompt `I have no name!` and `sudo` refused to work.
 
 Most of this came from one root cause. The same Active Directory user had one UID on the Linux clients and a different UID on the storage server. Neither side was misconfigured on its own terms. In the end, we computed the base the clients used and set the storage server's ID range to start at the same number. Two more lookups on the same path, one on the client and one on the server, also had to be fixed before access worked.
 
@@ -376,7 +376,7 @@ docker exec --user "$(id -u):$(id -g)" mybox sh -c 'id; whoami; ls -ln /workspac
 
 **Two UID spaces.** Leave the numbers different and rely on Kerberos plus idmapd names, always setting ownership from the server's own lookup. Nothing is migrated, but everyone must know never to send a client UID to the server, which rules out `sec=sys`, NFSv3, and careless numeric backups. We ran like this for a while; it is how the mismatch stayed hidden. (Replacing SSSD with winbind on the clients would also give one algorithm on both sides, at the cost of a new identity stack.)
 
-**The approach we used: move the TrueNAS RID range.** It changes one setting on one server, and it touches neither AD nor the clients. The cost is a one-time re-own of the existing datasets, a rejoin of the NAS to the domain, and a dependency on SSSD's slice. If the SSSD ID mapping settings change, or a client lands in a different slice, the mismatch comes back. For a lab with one NAS and identical clients, that was the cheapest way to get one UID per user everywhere.
+**The approach we used: move the TrueNAS RID range.** It changes one setting on one server, and it touches neither AD nor the clients. The cost is a one-time re-own of the existing datasets, a rejoin of the NAS to the domain, and a dependency on SSSD's slice. If the SSSD ID mapping settings change, or a client lands in a different slice, the mismatch comes back. For an environment with one NAS and identical clients, that was the cheapest way to get one UID per user everywhere.
 
 ## Conclusion
 
