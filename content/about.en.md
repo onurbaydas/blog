@@ -20,9 +20,8 @@ every layer, from storage to scheduling, is your responsibility.
   hyperconverged platforms, TrueNAS/ZFS.
 - **GPU infrastructure:** NVIDIA GPU servers for AI and research workloads, GPU
   partitioning with MIG and vGPU, job scheduling with Slurm.
-- **Multi-user platforms:** I built a reservation and access platform for a shared
-  GPU lab, covering user isolation, container access control, and day-to-day
-  operations.
+- **Multi-user platforms:** Shared Linux systems for many users: user isolation,
+  container access control, and day-to-day operations.
 - **Container security:** Restricting Docker on shared machines, authorization
   policies with OPA/Rego, and the gaps those policies can't close.
 - **Identity and operations:** Samba-based Active Directory, Kerberos/NFS home

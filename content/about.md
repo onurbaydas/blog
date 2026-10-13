@@ -20,9 +20,8 @@ sorumluluğunuzda olduğu ortamlar.
   hiper-yakınsak platformlar, TrueNAS/ZFS.
 - **GPU altyapısı:** Yapay zekâ ve araştırma iş yükleri için NVIDIA GPU sunucuları,
   MIG ve vGPU ile GPU bölümleme, Slurm ile iş zamanlama.
-- **Çok kullanıcılı platformlar:** Paylaşımlı bir GPU laboratuvarı için rezervasyon
-  ve erişim platformu geliştirdim; kullanıcı izolasyonu, container erişim kontrolü ve
-  günlük operasyon dahil.
+- **Çok kullanıcılı platformlar:** Paylaşımlı, çok kullanıcılı Linux sistemleri:
+  kullanıcı izolasyonu, container erişim kontrolü ve günlük operasyon.
 - **Container güvenliği:** Paylaşımlı makinelerde Docker'ı kısıtlamak, OPA/Rego ile
   authorization policy'leri ve bu policy'lerin kapatamadığı açıklar.
 - **Kimlik ve operasyon:** Samba tabanlı Active Directory, Kerberos/NFS ev dizinleri,
