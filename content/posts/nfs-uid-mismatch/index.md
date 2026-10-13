@@ -1,16 +1,17 @@
 ---
 title: "Bir Kullanıcı, İki UID: Domain'e Bağlı TrueNAS'ta NFSv4, Kerberos ve Docker"
 date: 2026-10-12
-description: "SSSD ve TrueNAS aynı AD kullanıcısına farklı UID verdi. Bunun nobody, root:root 755 ve \"I have no name!\" olarak nasıl göründüğü ve onları nasıl hizaladık."
+translationKey: "nfs-uid-mismatch"
+description: "SSSD ve TrueNAS aynı AD kullanıcısına farklı UID verdi. Bunun nobody, Permission denied, root:root 755 ve \"I have no name!\" olarak nasıl göründüğü ve onları nasıl hizaladık."
 tags: ["docker", "nfs", "kerberos", "truenas", "active-directory"]
 ShowToc: true
 ---
 
 ## Giriş
 
-Paylaşımlı GPU laboratuvarımızda birkaç hafta içinde üç ayrı şey bozuldu. Kullanıcının NFS üzerindeki ev dizininde dosyalar `nobody:nogroup` olarak görünmeye başladı. Yeni açılan bir kullanıcı dataset'i, kullanıcıya ait ve `700` izinli olması gerekirken `root:root` sahipliğinde ve `755` izinli çıktı. Bir öğrencinin Jupyter container'ı `I have no name!` istemiyle açıldı ve `sudo` çalışmadı.
+Paylaşımlı GPU laboratuvarımızda birkaç hafta içinde birkaç ayrı şey bozuldu. Kullanıcının NFS üzerindeki ev dizininde dosyalar `nobody:nogroup` olarak görünmeye başladı. Share'i sıkılaştırdıktan sonra kullanıcı, `ls` onu sahip olarak gösterdiği halde kendi ev dizinine yazamaz oldu. Yeni açılan bir kullanıcı dataset'i, kullanıcıya ait ve `700` izinli olması gerekirken `root:root` sahipliğinde ve `755` izinli çıktı. Bir öğrencinin Jupyter container'ı `I have no name!` istemiyle açıldı ve `sudo` çalışmadı.
 
-Üçünün de kök nedeni aynıydı. Aynı Active Directory kullanıcısının Linux istemcilerde bir UID'si, depolama sunucusunda başka bir UID'si vardı. İki taraf da kendi kurallarına göre doğru yapılandırılmıştı. Sonunda iki sayı arasındaki farkı ölçüp depolama sunucusunun ID aralığını tam o kadar kaydırarak çözdük.
+Bunların çoğunun kök nedeni aynıydı. Aynı Active Directory kullanıcısının Linux istemcilerde bir UID'si, depolama sunucusunda başka bir UID'si vardı. İki taraf da kendi kurallarına göre doğru yapılandırılmıştı. Sonunda istemcilerin kullandığı tabanı hesaplayıp depolama sunucusunun ID aralığını aynı sayıdan başlattık. Erişimin çalışması için aynı yol üzerindeki iki eşlemenin daha, biri istemcide biri sunucuda, düzeltilmesi gerekti.
 
 Bu yazı bir kullanıcının kimliğini oturum açmadan NFS üzerindeki bir dosyaya kadar takip ediyor. Uyuşmazlığın nerede sorun çıkardığını ve neden çoğu zaman gizli kaldığını gösteriyor. Sonunda çözümü, kendi kurulumunuz için bir kontrol listesini ve alternatifleri anlatıyor.
 
@@ -70,6 +71,8 @@ Container host'un çekirdeğini paylaşır. Container içindeki bir süreç `/wo
 
 Bu nedenle container içindeki root süreci NAS'a kullanıcı olarak değil, makine hesabı olarak ulaşır. Makine hesabı hiçbir kullanıcı dataset'inin sahibi değildir ve hepsi `0700` izinlidir. Sonuçta container içindeki root, kullanıcının dosyalarına kullanıcının kendisinden daha az erişebilir. Bu güvenlik açısından iyidir, ama pratikte bazı şeyleri bozar. Root olarak çalışıp `/workspace`'e yazan her kurulum adımı başarısız olur.
 
+Bizde sorun daha da erken başladı. Başlatıcı container'ları root olarak ve `-w /workspace` ile başlatıyordu. Share yalnızca Kerberos kabul eder hale gelince container hiç açılmaz oldu: çalışma ortamının `/workspace`'e yaptığı `chdir` root olarak çalıştı ve reddedildi. Çözüm, container'ı `-w /` ile başlatmak oldu. Böylece root NFS yoluna hiç dokunmuyor, `/workspace`'e yalnızca kullanıcı olarak çalışan exec'lerde geçiliyor.
+
 Başlatıcı betiğimiz eskiden Jupyter dizinlerini root olarak oluşturup ardından `chown -R` ile kullanıcıya veriyordu. Kerberos ile bağlı bir dizinde bu adım çalışamaz. Bu adımı kullanıcı olarak çalışan bir `mkdir` ile değiştirdik:
 
 ```bash
@@ -123,7 +126,7 @@ Active Directory kullanıcıları UID ile değil SID ile tanır. AD kullanıcıl
 
 **TrueNAS'ta winbind ve RID backend'i.** TrueNAS AD'ye Samba üzerinden bağlanır. Dokümanına göre varsayılan olarak, kullanıcı ya da grup SID'inin RID bileşenine dayalı algoritmik bir yöntem kullanır. Varsayılan domain aralığı 100000001 ile 200000000 arasıdır. Bizim TrueNAS da bu varsayılanı kullanıyordu. Samba man sayfası formülü şöyle verir: `ID = RID - BASE_RID + LOW_RANGE_ID`.
 
-İki motor da deterministiktir, ama farklı tabanlardan başlarlar. RID'i 1105 olan bir kullanıcı için istemci `1914801105`, TrueNAS ise `100001106` hesapladı. İkisi de yanlış değildi, ama aynı sayı değildiler.
+İki motor da deterministiktir, ama farklı tabanlardan başlarlar. RID'i 1105 olan bir kullanıcı için istemci `1914801105`, TrueNAS ise `100001106` hesapladı. İkisi de yanlış değildi, ama aynı sayı değildiler. İki sayıyı ilk kez, istemcideki `id` çıktısını TrueNAS'ta kullanıcının dosyalarının sahibiyle karşılaştırdığımızda yan yana gördük.
 
 ### Uyuşmazlık katman katman nerede vurur
 
@@ -166,9 +169,28 @@ sudo nfsidmap -c
 
 Bu düzeltmeden sonra sahiplik doğru *göründü* ve uyuşmazlık görünmez oldu: `ls -l` `alice` gösteriyordu, `ls -ln` `1914801105` gösteriyordu, TrueNAS ise `100001106` saklıyordu.
 
-### Belirti 2: `root:root 755` sahipliğinde yeni dataset
+### Belirti 2: sahip doğru, yine de `Permission denied`
 
-Başlangıçta share tüm erişimi tek kullanıcıya eziyordu (`mapall`) ve bu, sahiplik sorunlarını gizliyordu. Share'i `mapall` olmadan yalnızca Kerberos kabul edecek şekilde değiştirdikten sonra izolasyon tek bir şeye bağlı kaldı: her dataset'in sahibi, TrueNAS'ın kullanıcının principal'ını eşlediği UID'nin tam olarak kendisi olmalıydı.
+Başlangıçta share tüm erişimi tek bir kullanıcıya eziyordu (`mapall`) ve bu, sahiplik sorunlarını gizliyordu. `mapall`'ı kaldırıp share'i yalnızca Kerberos kabul edecek şekilde değiştirdikten sonra izolasyon tek bir şeye bağlı kaldı: her dataset'in sahibi, TrueNAS'ın kullanıcının principal'ını eşlediği UID'nin tam olarak kendisi olmalıydı.
+
+Bu değişiklikten sonraki ilk test şöyleydi:
+
+```text
+$ stat -c '%U %u' ~/nfs-home
+alice 1914801105
+$ touch ~/nfs-home/_t
+touch: cannot touch '/home/alice/nfs-home/_t': Permission denied
+```
+
+İstemci sahibi doğru kullanıcıya çözdü, çünkü idmapd ismi çeviriyordu. Sunucu ise yazmayı yine reddetti. Aynı anda üç şey yanlıştı ve her biri tek başına erişimi engellemeye yetiyordu:
+
+- **Sayılar farklıydı.** TrueNAS dosyaları kendi UID'siyle saklıyordu ve istemciler bu UID'yi hiç kullanmıyordu.
+- **İstemci kullanıcının biletini sunmuyordu.** Bilet önbelleğinin adında rastgele bir son ek vardı (`/tmp/krb5cc_1914801105_XXXXXX`) ve `rpc.gssd` onu bulamadı.
+- **Sunucu principal'ı `nobody`'ye eşliyordu.** İlk ikisi düzeltildikten sonra bile kullanıcı `ls: cannot open directory ...: Permission denied` aldı. Teşhis için dizini kısa bir süre `777` yaptık ve dizin açıldı. Kullanıcı içeri sahip olarak değil, "diğerleri" izniyle giriyordu. TrueNAS'ta `getent passwd 'EXAMPLE\alice'` çözülüyordu, ama domain'siz `getent passwd alice` boş dönüyordu.
+
+Çözüm bölümü üçünü de ele alıyor.
+
+### Belirti 3: `root:root 755` sahipliğinde yeni dataset
 
 Provisioning kodu izinleri isimle ayarlıyordu:
 
@@ -183,26 +205,30 @@ payload = {
 }
 ```
 
-Bizim TrueNAS sürümümüzde bu çağrı sahipliği uygulamadı ve yeni dataset'ler `root:root 755` olarak kaldı. Yalnızca Kerberos kabul eden bir share'de bu, sahibinin kendi ev dizinine yazamaması ve kimliği doğrulanmış diğer her kullanıcının o dizini okuyabilmesi demektir. Daha yeni TrueNAS API dokümanları `filesystem.setperm` için `user` ve `group` isim alanlarını listeliyor, yani isimle yapılan çağrı sizin sürümünüzde farklı davranabilir. Sayısal ID kullanmak bu soruyu tamamen ortadan kaldırır.
+Bizim TrueNAS sürümümüzde bu çağrı reddedildi ve yeni dataset'ler `root:root 755` olarak kaldı. Kimse fark etmedi, çünkü provisioning kodu hatayı yakalayıp "kritik değil" diye log'a yazdı ve devam etti. Eski dataset'ler yalnızca elle düzeltildikleri için doğru görünüyordu. Yalnızca Kerberos kabul eden bir share'de `root:root 755` bir dataset, sahibinin kendi ev dizinine yazamaması ve kimliği doğrulanmış diğer her kullanıcının o dizini okuyabilmesi demektir. Daha yeni TrueNAS API dokümanları `filesystem.setperm` için `user` ve `group` isim alanlarını listeliyor, yani isimle yapılan çağrı sizin sürümünüzde farklı davranabilir. Sayısal ID kullanmak bu soruyu tamamen ortadan kaldırır.
 
 ### Neden sessiz kalıyor
 
 Uyuşmazlık hiçbir zaman UID'lerden bahseden bir hata üretmedi:
 
 - Her sistem kendi kurallarına göre doğru çalışıyor ve her araç doğru *ismi* gösteriyor.
-- Belirtiler farklı katmanlarda farklı isimler taşıyor: `nobody`, `root:root 755`, `I have no name!`.
+- Belirtiler farklı katmanlarda farklı isimler taşıyor: `nobody`, sahibi olduğunuz dosyada `Permission denied`, `root:root 755`, `I have no name!`.
 - Kerberos sayıyı ağda gizliyor. Sayı ancak sınırı geçtiği yerde önem kazanıyor: bir izin API çağrısı, bir `sec=sys` mount'u, sayısal sahipliği koruyarak yapılan bir geri yükleme, istemciden yapılan bir `chown`.
 
 Uyuşmazlığı ancak iki sayıyı yan yana koyduğunuzda görürsünüz.
 
 ## Çözüm
 
-Çözüm iki parçadan oluştu. Önce her katmanın doğru kimliği taşımasını sağladık, sonra iki sayıyı eşitledik.
+Çözüm üç parçadan oluştu. Önce her katmanın doğru kimliği taşımasını sağladık, sonra iki sayıyı eşitledik, en son da kullanıcıyı hâlâ `nobody`'ye çeviren iki eşlemeyi düzelttik.
 
 ### 1. kısım: her adımda doğru kimlik
 
 1. **Ağda isimler.** Her istemcinin `idmapd.conf` dosyasına `Domain = example.local` yazılır ve `nfsidmap -c` çalıştırılır. Böylece TrueNAS'tan gelen sahip dizeleri SSSD üzerinden yerel kullanıcılara çevrilir.
-2. **Erişim için principal'lar.** Share yalnızca `KRB5` kabul eder, `mapall`/`maproot` yoktur. İstemciler `sec=krb5` ile bağlanır, `rpc.gssd` çalıştırır, bilet önbelleğini öngörülebilir bir yolda (`/tmp/krb5cc_%U`) tutar ve yeniler.
+2. **Erişim için principal'lar.** Share yalnızca `KRB5` kabul eder, `mapall`/`maproot` yoktur. İstemciler `sec=krb5` ile bağlanır, `rpc.gssd` çalıştırır, bilet önbelleğini öngörülebilir bir yolda (`/tmp/krb5cc_%U`) tutar ve yeniler. Share yalnızca Kerberos kabul eder hale geldikten sonra bunların her biri en az bir kez bozuldu:
+   - `pam_mount` seçeneklerinde `sec=krb5` yoktu, mount reddedildi.
+   - `rpc-gssd` her istemcide çalışmıyordu. Etkinleştirilmesi gerekir.
+   - `rpc.gssd` şu hatayı yazdı: `ERROR: unable to resolve 192.0.2.10 to hostname: Name or service not known`. Ters çözümleme olmadan sunucunun NFS servis principal'ını kuramaz ve mount başarısız olur. DNS'te bir PTR kaydı ya da `/etc/hosts`'a sunucunun FQDN'iyle bir satır bunu çözer.
+   - Bazı kullanıcılar `ls: cannot access '/home/alice/nfs-home/': Key has expired` aldı. SSSD KDC'ye ulaşamazken oturum açmışlardı. Geçerli bir biletleri yoktu ve onu yenileyen de olmadı. Yukarıda gösterilen yenileme ayarları bunu çözer, kullanıcının bir kez çıkış yapıp tekrar girmesi gerekir.
 3. **Container içinde kullanıcının UID'si.** `/workspace`'e dokunan her süreç `--user <host UID>:<host GID>` ile çalışır. Root işleri yalnızca container'ın kendi dosyalarına dokunan ayrı bir `--user 0` exec'iyle yapılır.
 4. **Sahiplik için sunucunun kendi çözümlemesi.** Provisioning, TrueNAS'a kullanıcı için hangi UID'yi kullandığını sorar ve sahipliği sayısal olarak ayarlar:
 
@@ -225,33 +251,69 @@ resp = self._post("/filesystem/setperm", payload)
 
 `user.get_user_obj`, bir kullanıcı için `struct passwd` alanlarını (`pw_uid` ve `pw_gid` dahil) döndürür ve Active Directory hesapları için de çalışır. TrueNAS API dokümanı `filesystem.setperm` içindeki `uid` ve `gid` alanlarını sayısal sahip kimlikleri olarak tanımlar. TrueNAS kullanıcıyı çözemezse provisioning durur ve root sahipliğinde bir dataset bırakmaz.
 
-### 2. kısım: TrueNAS aralığını kaydırarak UID'leri hizalamak
+### 2. kısım: TrueNAS aralığını taşıyarak UID'leri hizalamak
 
-İki motor da kullanıcının RID'ine sabit bir taban ekler. TrueNAS'ta bu taban `range_low - BASE_RID`, SSSD'de ise domain'in düştüğü dilimin başlangıcıdır. `sssd-ad(5)` sayfası `ldap_idmap_range_size` değerinin domain'deki en büyük RID'den küçük olmamasını şart koşar, yani her kullanıcı o tek dilime sığar. İki taraf da aynı RID'i eklediği için iki UID arasındaki fark domain'deki her kullanıcıda aynıdır. TrueNAS tabanını bu fark kadar kaydırırsanız sayılar eşitlenir.
+İki motor da kullanıcının RID'ine sabit bir taban ekler. TrueNAS'ta bu taban `range_low - BASE_RID`, SSSD'de ise domain'in düştüğü dilimin başlangıcıdır. `sssd-ad(5)` sayfası `ldap_idmap_range_size` değerinin domain'deki en büyük RID'den küçük olmamasını şart koşar, yani her kullanıcı o tek dilime sığar. TrueNAS aralığını aynı tabandan başlatırsa sayılar eşitlenir.
 
-Yaptığımız şey buydu:
+SSSD'nin tabanını, istemcideki UID'den RID'i çıkararak bulduk. Bunu bir kullanıcı ve iki grup için yaptık. Üçü de aynı sayıyı verdi, bu da istemcinin formülünün `taban + RID` olduğunu doğruladı:
 
-1. Bir kullanıcı seçip iki taraftaki UID'sine baktık: Ubuntu istemcide `id -u`, TrueNAS'ta kullanıcının UID'si.
-2. Deltayı hesapladık: istemci UID'si eksi TrueNAS UID'si.
-3. TrueNAS'ın Active Directory idmap ayarlarında domain kaydının **Range Low** ve **Range High** değerlerine deltayı ekledik.
-4. Diğer kullanıcıları kontrol ettik. Delta artık hepsinde sıfır olmalı.
-5. Mevcut dataset'lerin sahipliğini yeniden ayarladık, çünkü TrueNAS'taki bütün AD UID'leri değişmişti.
+```text
+alice          1914801105 - 1105 = 1914800000
+domain users   1914800513 -  513 = 1914800000
+başka bir grup 1914801158 - 1158 = 1914800000
+```
+
+Sonra TrueNAS tarafını değiştirdik:
+
+1. Domain'in Active Directory idmap ayarlarında **RID** backend'i kalır. **Range Low** tabana, **Range High** taban artı SSSD dilim boyutuna (200.000) ayarlanır. RID backend'inin SSSD uyumluluk seçeneği kapalı kalır, çünkü aralık zaten hizalıdır.
+2. TrueNAS, directory service etkinken idmap değişikliğini kaydetmedi. Directory service'i devre dışı bırakın, kaydedin, sonra tekrar etkinleştirin.
+3. Etkinleştirmek TrueNAS'ın domain'e yeniden katılmasına yol açar. Katılım için kullanılan hesabın TrueNAS'ın bilgisayar nesnesine yazma yetkisi olmalıdır. Yoksa katılım `LDB_MODIFY` sırasında `Insufficient access` hatasıyla başarısız olur. Bu adımda `KRB5KDC_ERR_PREAUTH_FAILED` görürseniz neden yanlış parola, yanlış UPN biçimi ya da Kerberos'un izin verdiğinden büyük bir saat farkıdır.
+4. Doğrulama: TrueNAS'ta `wbinfo -i 'EXAMPLE\alice'`, istemcideki `id -u alice` ile aynı UID'yi göstermelidir.
+5. Mevcut verinin sahipliğini yeniden ayarlayın, çünkü TrueNAS'taki bütün AD UID'leri değişti.
 
 Örnek sayılarla:
 
 ```text
 istemci (SSSD):   alice  RID 1105  ->  1914801105
-TrueNAS (RID):    alice  RID 1105  ->  100001106    (aralık 100000001-200000000)
-delta = 1914801105 - 100001106 = 1814799999
-
-yeni TrueNAS aralığı: 100000001 + delta = 1914800000
-                      200000000 + delta = 2014799999
-TrueNAS (RID):    alice  RID 1105  ->  1914801105   == istemci
+TrueNAS önce:     alice  RID 1105  ->  100001106    (aralık 100000001-200000000)
+TrueNAS sonra:    alice  RID 1105  ->  1914801105   (aralık 1914800000-1915000000)
 ```
+
+Sahipliği yeniden ayarlamak isteğe bağlı bir adım değil. ZFS sahibi sayı olarak saklar, bu yüzden mevcut her dataset hâlâ eski TrueNAS UID'lerini gösteriyordu. TrueNAS'ın eski ve yeni formülü ikisi de `taban + RID` olduğu için kayma her hesapta aynıdır: `1914800000 - 100000001 = 1814799999`. Önce özyinelemeli bir ZFS snapshot aldık, sonra eski aralıktaki her UID ve GID'ye bu kaymayı ekledik:
+
+```bash
+zfs snapshot -r pool/users@before-idmap-fix
+OLD_LOW=100000001; OLD_HIGH=200000000; DELTA=1814799999
+for U in $(find /mnt/pool/users -printf '%U\n' | sort -un); do
+  [ "$U" -ge "$OLD_LOW" ] && [ "$U" -le "$OLD_HIGH" ] &&
+    find /mnt/pool/users -uid "$U" -exec chown -h "$((U + DELTA))" {} +
+done
+# gruplar için aynı döngü: %G, -gid ve chgrp
+```
+
+Burada iki ayrıntı önemli. Her kullanıcının ev dizini ayrı bir child dataset'ti, bu yüzden `find` `-xdev` kullanmamalı, yoksa ilk dataset sınırında durur. Küçük UID'li yerel hesaplar eski aralığın dışında kaldığı için döngü onlara dokunmaz.
 
 Değişiklikten sonra kontrol ettiğimiz her kullanıcıda UID istemcide, container'da ve TrueNAS'ta aynıydı. `ls -ln` artık iki tarafta da aynı sayıyı gösteriyor. Bir sayı sınırı geçse bile doğru kişiyi gösteriyor.
 
-Sahipliği yeniden ayarlamak isteğe bağlı bir adım değil. ZFS sahibi sayı olarak saklar. Bu yüzden mevcut her dataset hâlâ eski TrueNAS UID'lerini gösteriyordu ve her birinin sahipliği, kullanıcısının yeni UID'sine taşınmak zorundaydı.
+### 3. kısım: hâlâ `nobody` döndüren iki eşleme
+
+Sayıların hizalanması yetmedi. Belirti 2'deki kullanıcı iki nedenle hâlâ `Permission denied` alıyordu.
+
+**İstemcide, `rpc.gssd`'nin bulabildiği bir bilet önbelleği.** SSSD bileti rastgele son ekli bir isimle yazmıştı: `/tmp/krb5cc_1914801105_XXXXXX`. `rpc.gssd` bu dosyayı kullanmadı. `krb5_ccname_template = FILE:%d/krb5cc_%U` ayarı (yukarıda gösterildi) önbelleğe sabit bir isim verdi. Ayarı her istemciye dağıtıp SSSD'yi yeniden başlattık. Ardından `klist` `/tmp/krb5cc_1914801105` gösterdi.
+
+**TrueNAS'ta "Use Default Domain".** Bu ayar kapalıyken TrueNAS yalnızca domain önekli ismi (`EXAMPLE\alice`) çözüyor, domain'siz `alice` boş dönüyordu. Gelen principal'lar `nobody`'ye düşüyordu. `777` testinde dizinin açılmasının nedeni buydu. Ayar açılınca domain'siz isim hizalanmış UID'ye çözüldü ve `0700` ev dizini sahibine açıldı.
+
+Bu ayarı değiştirmenin de bir püf noktası vardı. TrueNAS, Kerberos kullanıcı kimlik bilgisi tutarken directory service'i devre dışı bırakmayı reddetti: `Kerberos user credentials may not be stored for disabled directory services`. Önce kimlik bilgisini TrueNAS makine hesabının Kerberos principal'ına (keytab'ına) çevirdik, sonra devre dışı bırakıp ayarı değiştirdik ve tekrar etkinleştirdik. Bu, sonraki yeniden katılımlardaki parola ve `PREAUTH_FAILED` sorunlarını da ortadan kaldırdı.
+
+Eski eşlemeler iki tarafta da önbellekte durur, bu yüzden değişiklikten sonra onları temizledik:
+
+```bash
+# TrueNAS
+net cache flush
+nfsidmap -c
+midclt call service.restart nfs
+# istemciler: yeniden mount edin ya da çıkış yapıp tekrar girin
+```
 
 Bu yöntemin bazı sınırları var:
 
@@ -280,7 +342,7 @@ id 'EXAMPLE\alice'
 midclt call user.get_user_obj '{"username": "alice"}'
 ```
 
-`pw_uid` değerini istemcideki `id -u` çıktısıyla karşılaştırın. Farklıysa iki üç kullanıcı için deltayı hesaplayın. Delta hepsinde aynıysa yukarıdaki aralık kaydırma işe yarar.
+`pw_uid` değerini istemcideki `id -u` çıktısıyla karşılaştırın. Farklıysa iki üç hesap için istemcideki UID'den RID'i çıkarın. Sonuç hepsinde aynıysa o sayı istemcinin tabanıdır ve yukarıdaki aralık değişikliği işe yarar.
 
 **NFS mount'unu ve isim eşlemeyi kontrol edin:**
 
@@ -291,6 +353,8 @@ grep -E '^\s*Domain' /etc/idmapd.conf
 systemctl is-active rpc-gssd
 journalctl -t nfsidmap --since today       # "does not map into domain" = yanlış domain
 ```
+
+Share yalnızca Kerberos kabul ediyorsa ve sahibi olduğunuz bir dizinde yine `Permission denied` alıyorsanız, sunucunun domain'siz kullanıcı adını nasıl gördüğüne bakın (TrueNAS'ta domain olmadan `getent passwd alice`). `klist`'in rastgele son eki olmayan bir önbellek gösterdiğini de kontrol edin. Daha fazla ayrıntı için `rpc-gssd`'yi durdurup erişimi tekrarlarken `rpc.gssd -f -vvv` komutunu ön planda çalıştırın.
 
 **Sahipliği iki yönden kontrol edin:**
 
@@ -319,17 +383,17 @@ docker exec --user "$(id -u):$(id -g)" mybox sh -c 'id; whoami; ls -ln /workspac
 
 **İki UID alanıyla yaşamak.** Sayılar farklı bırakılır, Kerberos ve idmapd isimlerine güvenilir, sahiplik her zaman sunucunun kendi çözümlemesinden ayarlanır. Hiçbir şey taşınmaz, ama herkes istemcinin UID'sini asla sunucuya göndermemesi gerektiğini bilmelidir. Bu da `sec=sys`, NFSv3 ve sayısal sahipliği koruyan dikkatsiz yedeklemeleri dışarıda bırakır. Bir süre böyle çalıştık ve uyuşmazlık tam da bu yüzden gizli kaldı. (İstemcilerde SSSD yerine winbind kullanmak da iki tarafa aynı algoritmayı verir, ama kimlik altyapısını değiştirmeyi gerektirir.)
 
-**Uyguladığımız yaklaşım: TrueNAS RID aralığını kaydırmak.** Tek bir sunucuda tek bir ayar değişir, AD'ye ve istemcilere dokunulmaz. Bedeli, mevcut dataset'lerin sahipliğinin bir kez yeniden ayarlanması ve SSSD'nin dilimine bağımlı kalmaktır. SSSD'nin ID eşleme ayarları değişirse ya da bir istemci farklı bir dilime düşerse delta geri gelir. Tek NAS'lı ve istemcileri aynı yapılandırılmış bir laboratuvar için, her yerde kullanıcı başına tek UID elde etmenin en ucuz yolu buydu.
+**Uyguladığımız yaklaşım: TrueNAS RID aralığını taşımak.** Tek bir sunucuda tek bir ayar değişir, AD'ye ve istemcilere dokunulmaz. Bedeli, mevcut dataset'lerin sahipliğinin bir kez yeniden ayarlanması, NAS'ın domain'e yeniden katılması ve SSSD'nin dilimine bağımlı kalmaktır. SSSD'nin ID eşleme ayarları değişirse ya da bir istemci farklı bir dilime düşerse uyuşmazlık geri gelir. Tek NAS'lı ve istemcileri aynı yapılandırılmış bir laboratuvar için, her yerde kullanıcı başına tek UID elde etmenin en ucuz yolu buydu.
 
 ## Sonuç
 
-NFSv4 ve Kerberos ile ağdaki kimlik bir principal ve bir isim dizesinden oluşur. Sayısal UID yalnızca her sistemin kendi içinde vardır. Bu yüzden istemcilerimiz ve NAS, görünürde hiçbir sorun olmadan her kullanıcının UID'si konusunda anlaşamıyordu. Sorunlar, bir sayının ya da ismin bir sınırı geçtiği yerlerde ortaya çıktı: `localdomain` değerine düşen bir idmapd domain'i, sahipliği uygulamayan bir izin çağrısı ve klavyenin başındaki kişi yerine root ya da imajın kendi kullanıcısı olarak çalışan container'lar.
+NFSv4 ve Kerberos ile ağdaki kimlik bir principal ve bir isim dizesinden oluşur. Sayısal UID yalnızca her sistemin kendi içinde vardır. Bu yüzden istemcilerimiz ve NAS, görünürde hiçbir sorun olmadan her kullanıcının UID'si konusunda anlaşamıyordu. Sorunlar, bir sayının ya da ismin bir sınırı geçtiği yerlerde ortaya çıktı: `localdomain` değerine düşen bir idmapd domain'i, `rpc.gssd`'nin bulamadığı bir bilet önbelleği, domain'siz kullanıcı adını çözemeyen bir sunucu, sessizce başarısız olan bir izin çağrısı ve klavyenin başındaki kişi yerine root ya da imajın kendi kullanıcısı olarak çalışan container'lar.
 
 Bu olaydan üç kural çıktı:
 
 - Kerberos NFS'e dokunan container süreçlerini kullanıcının host'taki UID'siyle çalıştırın, root işlerini container içinde tutun.
 - Sunucudaki sahipliği, sunucunun kendi çözümlediği UID ile ayarlayın.
-- İstemcideki `id -u` değerini sunucunun aynı kullanıcı için kullandığı UID ile karşılaştırın. Aralarında sabit bir fark varsa sunucunun RID aralığını o kadar kaydırın ve verinin sahipliğini yeniden ayarlayın.
+- İstemcideki `id -u` değerini sunucunun aynı kullanıcı için kullandığı UID ile karşılaştırın. Farklıysa istemcinin tabanını (UID eksi RID) hesaplayın, sunucunun RID aralığını o tabandan başlatın ve verinin sahipliğini yeniden ayarlayın.
 
 ## Kaynaklar
 
