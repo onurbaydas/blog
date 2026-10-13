@@ -1,6 +1,6 @@
 ---
 title: "Bir Kullanıcı, İki UID: Domain'e Bağlı TrueNAS'ta NFSv4, Kerberos ve Docker"
-date: 2026-10-12
+date: 2026-10-13
 translationKey: "nfs-uid-mismatch"
 description: "SSSD ve TrueNAS aynı AD kullanıcısına farklı UID verdi. Bunun nobody, Permission denied, root:root 755 ve \"I have no name!\" olarak nasıl göründüğü ve onları nasıl hizaladık."
 tags: ["docker", "nfs", "kerberos", "truenas", "active-directory"]

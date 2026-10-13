@@ -1,6 +1,6 @@
 ---
 title: "One User, Two UIDs: NFSv4, Kerberos, and Docker on a Domain-Joined TrueNAS"
-date: 2026-10-12
+date: 2026-10-13
 url: "/posts/nfs-uid-mismatch-en/"
 translationKey: "nfs-uid-mismatch"
 description: "SSSD and TrueNAS gave the same AD user different UIDs. How that showed up as nobody, Permission denied, root:root 755, and \"I have no name!\", and how we aligned them."
