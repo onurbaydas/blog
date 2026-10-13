@@ -16,16 +16,16 @@ sorumluluğunuzda olduğu ortamlar.
 
 ## Neler üzerinde çalışıyorum
 
-- **Sanallaştırma ve depolama:** Ceph'li Proxmox VE cluster'ları, VMware vCenter/ESXi,
-  hiper-yakınsak platformlar, TrueNAS/ZFS.
-- **GPU altyapısı:** Yapay zekâ ve araştırma iş yükleri için NVIDIA GPU sunucuları,
-  MIG ve vGPU ile GPU bölümleme, Slurm ile iş zamanlama.
+- **Virtualization ve storage:** Cluster tabanlı virtualization, software-defined
+  storage, hyperconverged infrastructure (HCI), enterprise NAS ve ZFS tabanlı depolama.
+- **GPU altyapısı:** Yapay zekâ ve araştırma iş yükleri için GPU sunucuları,
+  GPU partitioning ve virtual GPU, HPC job scheduling.
 - **Çok kullanıcılı platformlar:** Paylaşımlı, çok kullanıcılı Linux sistemleri:
   kullanıcı izolasyonu, container erişim kontrolü ve günlük operasyon.
-- **Container güvenliği:** Paylaşımlı makinelerde Docker'ı kısıtlamak, OPA/Rego ile
-  authorization policy'leri ve bu policy'lerin kapatamadığı açıklar.
-- **Kimlik ve operasyon:** Samba tabanlı Active Directory, Kerberos/NFS ev dizinleri,
-  merkezi loglama ve yedekleme izleme.
+- **Container güvenliği:** Paylaşımlı makinelerde container runtime'ı kısıtlamak,
+  policy-as-code ile authorization ve bu policy'lerin kapatamadığı açıklar.
+- **Kimlik ve operasyon:** Directory services ve identity management, Kerberos
+  ile kimlik doğrulama, ağ üzerinden ev dizinleri, merkezi loglama ve yedekleme izleme.
 
 ## Ne yazıyorum
 

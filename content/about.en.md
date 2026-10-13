@@ -16,16 +16,16 @@ every layer, from storage to scheduling, is your responsibility.
 
 ## What I work on
 
-- **Virtualization and storage:** Proxmox VE clusters with Ceph, VMware vCenter/ESXi,
-  hyperconverged platforms, TrueNAS/ZFS.
-- **GPU infrastructure:** NVIDIA GPU servers for AI and research workloads, GPU
-  partitioning with MIG and vGPU, job scheduling with Slurm.
+- **Virtualization and storage:** Clustered virtualization, software-defined
+  storage, hyperconverged infrastructure (HCI), enterprise NAS and ZFS-based storage.
+- **GPU infrastructure:** GPU servers for AI and research workloads, GPU
+  partitioning and virtual GPUs, HPC job scheduling.
 - **Multi-user platforms:** Shared Linux systems for many users: user isolation,
   container access control, and day-to-day operations.
-- **Container security:** Restricting Docker on shared machines, authorization
-  policies with OPA/Rego, and the gaps those policies can't close.
-- **Identity and operations:** Samba-based Active Directory, Kerberos/NFS home
-  directories, centralized logging, and backup monitoring.
+- **Container security:** Restricting the container runtime on shared machines,
+  policy-as-code authorization, and the gaps those policies can't close.
+- **Identity and operations:** Directory services and identity management, Kerberos
+  authentication, network home directories, centralized logging, and backup monitoring.
 
 ## What I write about
 
