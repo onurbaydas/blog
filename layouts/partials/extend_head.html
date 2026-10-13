@@ -1,4 +1,5 @@
-{{- if .Store.Get "hasMermaid" }}
+{{- /* head.html is not cached (footer is partialCached), so the check is per page */ -}}
+{{- if and .IsPage (strings.Contains (string .Content) "class=\"mermaid\"") }}
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
   mermaid.initialize({
