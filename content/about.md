@@ -52,11 +52,6 @@ dokümantasyon ve dokümanın söylemediğini kaynak kodun nasıl söylediği. H
 gerçek bir olaya dayanıyor, canlı sistemde test ediliyor ve kaynak linkleriyle
 destekleniyor.
 
-## Yazı işleri
-
-Altyapı, Linux, sanallaştırma, container güvenliği ve GPU/yapay zekâ altyapısı
-konularında freelance teknik yazı işlerine açığım.
-
 ## İletişim
 
 - E-posta: onurbaydas@gmail.com

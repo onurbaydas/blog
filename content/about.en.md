@@ -53,11 +53,6 @@ misleading documentation, and what the source code says when the docs don't.
 Every post is based on a real incident, tested on a live system, and backed by
 links to the source.
 
-## Writing work
-
-I'm open to freelance technical writing on infrastructure, Linux, virtualization,
-container security, and GPU/AI infrastructure topics.
-
 ## Contact
 
 - Email: onurbaydas@gmail.com
