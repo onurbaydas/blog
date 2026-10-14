@@ -112,7 +112,10 @@
 
     <div class="defcon-footer">
       <span>HOTKEY: <kbd>Alt + D</kbd> // TOGGLE DEFCON CONSOLE</span>
-      <span>STATUS: <strong class="text-alert">WARFARE_SIMULATION_READY</strong></span>
+      <button type="button" id="defcon-auto-toggle-btn" class="defcon-auto-toggle-btn" title="{{ if $is_en }}Toggle autonomous random harassment engine{{ else }}Otomatik ziyaretçi rahatsız etme motorunu aç/kapat{{ end }}">
+        <span>⚡ {{ if $is_en }}AUTONOMOUS_HARASSMENT:{{ else }}OTOMATİK_RAHATSIZLIK:{{ end }}</span>
+        <strong id="auto-harass-status" class="text-neon">{{ if $is_en }}ARMED & ACTIVE (RNG){{ else }}AKTİF (RASTGELE TETİKLEME){{ end }}</strong>
+      </button>
     </div>
   </div>
 </div>
@@ -1563,6 +1566,189 @@
   }, 36000);
 
   // ==========================================
+  // AUTONOMOUS CHAOS & VISITOR HARASSMENT ENGINE
+  // "bu defcondaki şeyler kendiliğinden rast gele olsun amaç userı rahatsız etmek zaten sfadsadasdas :DDDD"
+  // ==========================================
+  let isAutoHarassmentActive = true;
+  let autoHarassTimer = null;
+  const autoHarassStatusEl = document.getElementById('auto-harass-status');
+  const autoHarassBtn = document.getElementById('defcon-auto-toggle-btn');
+
+  function updateAutoHarassStatusUI() {
+    if (!autoHarassStatusEl) return;
+    if (isAutoHarassmentActive) {
+      autoHarassStatusEl.textContent = isEn ? 'ARMED & ACTIVE (RNG)' : 'AKTİF (RASTGELE TETİKLEME)';
+      autoHarassStatusEl.className = 'text-neon';
+    } else {
+      autoHarassStatusEl.textContent = isEn ? 'DISARMED / PAUSED' : 'DURDURULDU / PASİF';
+      autoHarassStatusEl.className = 'text-alert';
+    }
+  }
+
+  function toggleAutoHarassment(forceState = null) {
+    if (typeof forceState === 'boolean') {
+      isAutoHarassmentActive = forceState;
+    } else {
+      isAutoHarassmentActive = !isAutoHarassmentActive;
+    }
+    updateAutoHarassStatusUI();
+    showSecurityToast(isAutoHarassmentActive 
+      ? (isEn ? '[CHAOS_ENGINE] Autonomous harassment re-armed!' : '[OTOMATİK_RAHATSIZLIK] Ziyaretçi rahatsız etme motoru tekrar devrede!')
+      : (isEn ? '[CHAOS_ENGINE] Autonomous harassment disarmed.' : '[OTOMATİK_RAHATSIZLIK] Ziyaretçi rahatsız etme motoru durduruldu.')
+    );
+    return isAutoHarassmentActive;
+  }
+
+  if (autoHarassBtn) {
+    autoHarassBtn.addEventListener('click', () => toggleAutoHarassment());
+  }
+
+  function isAnyModalOrOverlayBlocking() {
+    const defconModal = document.getElementById('defcon-crisis-modal');
+    if (defconModal && defconModal.style.display !== 'none') return true;
+
+    const panicModal = document.getElementById('kernel-panic-modal');
+    if (panicModal && panicModal.style.display !== 'none') return true;
+
+    const captchaModal = document.getElementById('captcha-hell-modal');
+    if (captchaModal && captchaModal.style.display !== 'none') return true;
+
+    const selinuxModal = document.getElementById('selinux-modal');
+    if (selinuxModal && selinuxModal.style.display !== 'none') return true;
+
+    const nukeOverlay = document.getElementById('nuke-overlay');
+    if (nukeOverlay && nukeOverlay.style.display !== 'none') return true;
+
+    const clownOverlay = document.getElementById('clown-overlay');
+    if (clownOverlay && clownOverlay.style.display !== 'none') return true;
+
+    return false;
+  }
+
+  const chaosDisasters = [
+    {
+      name: 'QUAKE',
+      weight: 3.0,
+      toastEn: '[SEISMIC_EVENT] Spontaneous tectonic earthquake shook the viewport :D',
+      toastTr: '[DEPREM_ALARM] Tektonik deprem sarsıntısı ekranı salladı :D',
+      action: triggerQuake
+    },
+    {
+      name: 'BUGS',
+      weight: 4.0,
+      toastEn: '[BIO_HAZARD] Server room pest swarm scurrying with pitter-patter feet :D',
+      toastTr: '[BÖCEK_ALARM] Sunucu odası haşereleri pıtı pıtı koşuşturuyor :D',
+      action: () => triggerBugSwarm(Math.floor(5 + Math.random() * 5))
+    },
+    {
+      name: 'CLOWN',
+      weight: 2.8,
+      toastEn: '[CVE-666-CACKLE] Demonic jester cackle & phantom glitch appeared :D',
+      toastTr: '[KORKUNÇ_PALYAÇO] Şeytani palyaço kahkahası ve hayaleti belirdi :D',
+      action: triggerClown
+    },
+    {
+      name: 'DELTA_FAN',
+      weight: 2.5,
+      toastEn: '[DELTA_TURBINE] 1U Delta fan spun to 15,000 RPM high pitch scream :D',
+      toastTr: '[DELTA_FAN] 15.000 RPM 1U Delta sunucu fanı jet motoru gibi bağırdı :D',
+      action: triggerDeltaFan
+    },
+    {
+      name: 'NUKE',
+      weight: 2.2,
+      toastEn: '[NUCLEAR_FALLOUT] Tactical detonation shockwave & whiteout blast :D',
+      toastTr: '[NÜKLEER_FLAŞ] Taktiksel patlama ve kör edici radyasyon flaşı :D',
+      action: triggerNuke
+    },
+    {
+      name: 'SIREN',
+      weight: 2.2,
+      toastEn: '[AIR_RAID] Civil defense emergency siren sounded across sector :D',
+      toastTr: '[SİVİL_SAVUNMA] Hava taarruz alarmı sivil savunma sireni çaldı :D',
+      action: triggerSiren
+    },
+    {
+      name: 'THERMAL',
+      weight: 2.0,
+      toastEn: '[THERMAL_104C] CPU junction hit 104°C molten silicon meltdown :D',
+      toastTr: '[TERMAL_ERİME] İşlemci 104°C sıcaklığa ulaştı, ekran akkor kızıla büründü :D',
+      action: triggerThermal
+    },
+    {
+      name: 'DAEMON',
+      weight: 2.5,
+      toastEn: '[EVIL_DAEMON] ASCII Clippy nightmare spawned offering to corrupt filesystem :D',
+      toastTr: '[KÖTÜ_SYSADMIN] ASCII şeytani asistan belirdi :D',
+      action: triggerDaemon
+    },
+    {
+      name: 'FINGER_POKE',
+      weight: 2.5,
+      toastEn: '[SURVEILLANCE_PROBE] Surveillance drone pointing finger poked you :D',
+      toastTr: '[DÜRTME] Gezen eldivenli parmak seni işaret edip dürttü :D',
+      action: () => {
+        toggleSurveillanceDrone(true);
+        setTimeout(pokeFinger, 400);
+      }
+    },
+    {
+      name: 'CAPTCHA',
+      weight: 1.6,
+      toastEn: '[SYSADMIN_CAPTCHA] Surprise 5-second chmod / iptables challenge :D',
+      toastTr: '[ACİL_CAPTCHA] Cehennemden çıkma 5 saniyelik sysadmin sorusu :D',
+      action: triggerCaptcha
+    },
+    {
+      name: 'SELINUX',
+      weight: 1.6,
+      toastEn: '[SELINUX_EPERM] Kernel AVC denied privileged user space action :D',
+      toastTr: '[SELINUX_ENGEL] SELinux Enforcing modu izinsiz eylemi derhal kesti :D',
+      action: triggerSelinuxAlert
+    },
+    {
+      name: 'KERNEL_PANIC',
+      weight: 1.2,
+      toastEn: '[KERNEL_OOPS] Simulated Linux 6.12 Kernel Panic & Register Dump :D',
+      toastTr: '[KERNEL_PANIC] Linux çekirdek kilitlenmesi Call Trace dökümü :D',
+      action: triggerPanic
+    }
+  ];
+
+  function pickRandomChaosDisaster() {
+    const totalWeight = chaosDisasters.reduce((acc, d) => acc + d.weight, 0);
+    let r = Math.random() * totalWeight;
+    for (const disaster of chaosDisasters) {
+      if (r < disaster.weight) return disaster;
+      r -= disaster.weight;
+    }
+    return chaosDisasters[0];
+  }
+
+  function runAutonomousChaosTick() {
+    clearTimeout(autoHarassTimer);
+
+    if (isAutoHarassmentActive && !document.hidden) {
+      // Only fire if there is no fullscreen blocking modal currently demanding focus
+      if (!isAnyModalOrOverlayBlocking()) {
+        const item = pickRandomChaosDisaster();
+        try {
+          showSecurityToast(isEn ? item.toastEn : item.toastTr);
+          item.action();
+        } catch(e) {}
+      }
+    }
+
+    // Next random catastrophe interval: 20 to 42 seconds (so user gets a brief calm before the next storm)
+    const nextInterval = 20000 + Math.random() * 22000;
+    autoHarassTimer = setTimeout(runAutonomousChaosTick, nextInterval);
+  }
+
+  // First surprise catastrophe launches 12-18 seconds after user enters the site!
+  const initialDelay = 12000 + Math.random() * 7000;
+  autoHarassTimer = setTimeout(runAutonomousChaosTick, initialDelay);
+
+  // ==========================================
   // EXPORT GLOBAL API FOR TERMINAL & PALETTE
   // ==========================================
   window.ObCrisisEngine = {
@@ -1582,7 +1768,8 @@
     toggleSurveillanceDrone,
     pokeFinger,
     spawnBug,
-    triggerBugSwarm
+    triggerBugSwarm,
+    toggleAutoHarassment
   };
 })();
 </script>

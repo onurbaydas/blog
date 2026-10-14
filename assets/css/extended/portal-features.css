@@ -1914,6 +1914,29 @@
   justify-content: space-between;
   font-size: 0.78rem;
   color: #71717a;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.defcon-auto-toggle-btn {
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  color: #d4d4d8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.defcon-auto-toggle-btn:hover {
+  background: #27272a;
+  border-color: #ef4444;
 }
 
 /* Air-Raid Siren Flashing State */

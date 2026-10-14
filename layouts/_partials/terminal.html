@@ -124,6 +124,7 @@ Available system commands:
   selinux           Trigger SELinux AVC EPERM denial dialog
   dossier           Deploy floating visitor surveillance drone & finger :D
   bugs / pests      Release server room insect infestation (pitter-patter feet) :D
+  chaos / harass    Toggle autonomous random DEFCON harassment engine :D
   clear             Clear terminal screen
   exit              Close terminal session
 `,
@@ -249,6 +250,14 @@ Emergency Production Runbooks (SOP):
     pests: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.triggerBugSwarm(8);
       return '[BIO_HAZARD] Server room pest swarm released. Watch your step!';
+    },
+    chaos: () => {
+      const active = window.ObCrisisEngine?.toggleAutoHarassment();
+      return active ? '[CHAOS_ENGINE] Autonomous harassment is ARMED. Disasters will strike randomly :D' : '[CHAOS_ENGINE] Autonomous harassment DISARMED.';
+    },
+    harass: () => {
+      const active = window.ObCrisisEngine?.toggleAutoHarassment();
+      return active ? '[CHAOS_ENGINE] Autonomous harassment is ARMED. Disasters will strike randomly :D' : '[CHAOS_ENGINE] Autonomous harassment DISARMED.';
     },
     exit: () => {
       toggleTerminal();

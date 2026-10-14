@@ -72,7 +72,8 @@
     { title: isEn ? 'Catastrophe: Summon Evil Sysadmin Daemon' : 'Muziplik: Kötü Ruhlu Sysadmin Asistanını Çağır', action: 'crisis_daemon', cat: 'DRILL', tag: 'DAEMON' },
     { title: isEn ? 'Catastrophe: Open DEFCON-1 Emergency Switchboard' : 'Kontrol: DEFCON-1 Acil Durum Santralini Aç', action: 'crisis_defcon', cat: 'DRILL', tag: 'DEFCON' },
     { title: isEn ? 'Catastrophe: Floating Snooping Visitor Dossier :D' : 'Muziplik: Gezen Eldivenli Ziyaretçi Künyesi :D', action: 'crisis_dossier', cat: 'DRILL', tag: 'DRONE' },
-    { title: isEn ? 'Catastrophe: Server Room Pest Infestation (Pitter-Patter)' : 'Muziplik: Sunucu Odası Haşere İstilası (Pıtı Pıtı Ayak Sesleri)', action: 'crisis_bugs', cat: 'DRILL', tag: 'BUGS' }
+    { title: isEn ? 'Catastrophe: Server Room Pest Infestation (Pitter-Patter)' : 'Muziplik: Sunucu Odası Haşere İstilası (Pıtı Pıtı Ayak Sesleri)', action: 'crisis_bugs', cat: 'DRILL', tag: 'BUGS' },
+    { title: isEn ? 'Settings: Toggle Autonomous Random Harassment Engine' : 'Ayar: Otomatik Ziyaretçi Rahatsız Etme Motorunu Aç/Kapat', action: 'toggle_harass', cat: 'DRILL', tag: 'CHAOS' }
   ];
 
   let activeIdx = 0;
@@ -164,6 +165,8 @@
       if (window.ObCrisisEngine) window.ObCrisisEngine.toggleSurveillanceDrone(true);
     } else if (it.action === 'crisis_bugs') {
       if (window.ObCrisisEngine) window.ObCrisisEngine.triggerBugSwarm(8);
+    } else if (it.action === 'toggle_harass') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.toggleAutoHarassment();
     }
   }
 
