@@ -458,8 +458,14 @@
         themeBtn.addEventListener("click", () => {
             playRelayClick(380, 0.04, 0.12);
             const html = document.querySelector("html");
-            const newTheme = html.dataset.theme === "dark" ? "light" : "dark";
+            const isDark = html.dataset.theme === "dark" || document.body.classList.contains("dark");
+            const newTheme = isDark ? "light" : "dark";
             html.dataset.theme = newTheme;
+            if (newTheme === "dark") {
+                document.body.classList.add("dark");
+            } else {
+                document.body.classList.remove("dark");
+            }
             localStorage.setItem("pref-theme", newTheme);
         });
     }

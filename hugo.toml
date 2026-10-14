@@ -59,7 +59,7 @@ enableRobotsTXT = true
 [params]
   author = 'Onur Baydaş'
   description = 'Teknik yazılar'
-  defaultTheme = 'auto'
+  defaultTheme = 'dark'
   ShowReadingTime = true
   ShowPostNavLinks = true
   ShowBreadCrumbs = true
