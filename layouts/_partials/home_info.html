@@ -1,0 +1,137 @@
+{{- $is_en := eq site.Language.Lang "en" }}
+{{- with site.Params.homeInfoParams }}
+<article class="first-entry home-info brutal-home-chassis anti-design-hero fracture-container">
+    {{- /* Corner mechanical mounting crosshairs */ -}}
+    <span class="chassis-bolt bolt-tl" aria-hidden="true">+</span>
+    <span class="chassis-bolt bolt-tr" aria-hidden="true">+</span>
+    <span class="chassis-bolt bolt-bl" aria-hidden="true">+</span>
+    <span class="chassis-bolt bolt-br" aria-hidden="true">+</span>
+
+    {{- /* Physical Mechanical Breakaway Shards ("sağdan soldan tık diye kırılan parçalar") */ -}}
+    <div class="card-shatter-system hero-shatter" aria-hidden="true">
+      <span class="breakaway-chunk chunk-tl"></span>
+      <span class="breakaway-chunk chunk-tr"></span>
+      <span class="breakaway-chunk chunk-bl"></span>
+      <span class="breakaway-chunk chunk-br"></span>
+      <span class="debris-particle dp-1"></span>
+      <span class="debris-particle dp-2"></span>
+      <span class="debris-particle dp-3"></span>
+      <span class="fracture-crack-seam"></span>
+    </div>
+
+    {{- /* Dystopian Anti-Design Warning Stickers */ -}}
+    <div class="hero-sticker sticker-hazard-volt" aria-hidden="true">
+        <span>⚠ VOLTAGE: 380V // UNGROUNDED</span>
+    </div>
+    <div class="hero-sticker sticker-audit" aria-hidden="true">
+        <span>FAIL-OPEN: UNCONTAINED</span>
+    </div>
+    <div class="hero-sticker sticker-acid-punk" aria-hidden="true">
+        <span>☣ 0xDEADBEEF // DECAY</span>
+    </div>
+    <div class="hero-sticker sticker-redacted" aria-hidden="true">
+        <span>[ LEVEL-5 RESTRICTED ]</span>
+    </div>
+
+    {{- /* Top Industrial Machine Stamped Plate */ -}}
+    <div class="chassis-top-plate">
+        <div class="spec-id-tag">
+            <span class="spec-icon">■</span>
+            <span class="spec-label">APPARATUS:</span>
+            <span class="spec-code">OB-1000 // {{ if $is_en }}SECTOR-EN{{ else }}SECTOR-TR{{ end }}</span>
+        </div>
+        <div class="hazard-ribbon" title="Industrial System Specification">
+            <span class="hazard-stripes"></span>
+            <span class="hazard-text">{{ if $is_en }}ANOMALY_MONITORING{{ else }}ANOMALİ_GÖZLEMİ{{ end }}</span>
+        </div>
+    </div>
+
+    {{- /* VT100 Terminal Memory Dump Display */ -}}
+    <div class="ascii-art-screen" aria-hidden="true">
+        <div class="ascii-bar">
+            <span class="ascii-title">TTY1 - VT100 // KERNEL FAULT DUMP [ADDR: 0x080491A0]</span>
+            <span class="ascii-status">PANIC: UID_MISMATCH</span>
+        </div>
+        <pre class="ascii-code">
+ ╔═══════════════════════════════════════════════════════════╗
+ ║ [0x0000007E] KERNEL_THREAD_PRIORITY_NOT_LESS_OR_EQUAL    ║
+ ║ TARGET: SSSD -> Active Directory SID -> TrueNAS RID map   ║
+ ║ AUTHZ: OPA Docker Plugin Silent Fail-Open Detected        ║
+ ║ BUFFER DECAY: 89.4% ██████████████████░░░ [LEAK AT RING0] ║
+ ╚═══════════════════════════════════════════════════════════╝
+        </pre>
+    </div>
+
+    <header class="entry-header brutal-hero-header">
+        {{- /* Deconstructivist Dadaist Monogram Header */ -}}
+        <div class="dadaist-ransom-title">
+            <div class="ransom-word word-ob">
+                <span class="r-letter l-o">O</span>
+                <span class="r-letter l-b">B</span>
+            </div>
+            <div class="apparatus-box">
+                <span class="app-tag">SYS_SPEC</span>
+                <span class="app-id">#1000-KERNEL</span>
+            </div>
+            <div class="redacted-block" title="PERSONNEL DATA CLASSIFIED">
+                <span class="redacted-text">OPERATOR_IDENTITY_REDACTED</span>
+            </div>
+            <div class="ransom-badge">v3.2_CORRUPT</div>
+        </div>
+
+        <div class="hero-subtitle-bar">
+            <span class="subtitle-bracket">&gt;&gt;&gt;</span>
+            <span class="subtitle-text">
+                {{- if $is_en -}}
+                SYSTEMS ARCHITECTURE · LINUX KERNEL INTERNALS · CONTAINER ATTACK SURFACE
+                {{- else -}}
+                SİSTEM MİMARİSİ · LINUX ÇEKİRDEK İÇ MEKANİZMALARI · KONTEYNER GÜVENLİĞİ
+                {{- end -}}
+            </span>
+            <span class="subtitle-bracket">&lt;&lt;&lt;</span>
+        </div>
+    </header>
+
+    <div class="entry-content md-content brutal-hero-content">
+        <p class="hero-lead">
+            {{- if $is_en -}}
+            In-depth systems engineering dissections on Linux kernel UID mappings, multi-user workstation architectures, Active Directory SSSD integration, NFSv4 & Kerberos storage security, and Docker authorization policy fail-open behaviors.
+            {{- else -}}
+            Linux çekirdeği, çok kullanıcılı sistem mimarileri, Active Directory/SSSD entegrasyonu, NFSv4 & Kerberos depolama güvenliği ve Docker yetkilendirme (OPA) mekanizmalarındaki sessiz açıklar üzerine derinlemesine mühendislik notları.
+            {{- end -}}
+        </p>
+
+        {{- /* Technical Engineering Chips */ -}}
+        <div class="tech-spec-grid">
+            <div class="spec-chip chip-red">
+                <span class="chip-idx">01</span>
+                <span class="chip-title">LINUX & KERNEL UID</span>
+            </div>
+            <div class="spec-chip chip-acid">
+                <span class="chip-idx">02</span>
+                <span class="chip-title">DOCKER FAIL-OPEN</span>
+            </div>
+            <div class="spec-chip chip-cyan">
+                <span class="chip-idx">03</span>
+                <span class="chip-title">NFSv4 & KERBEROS</span>
+            </div>
+            <div class="spec-chip chip-orange">
+                <span class="chip-idx">04</span>
+                <span class="chip-title">TRUENAS ACLs</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="entry-footer brutal-hero-footer">
+        <div class="hero-footer-bar">
+            <div class="social-panel">
+                <span class="panel-label">COMM_CHANNELS //</span>
+                {{ partial "social_icons.html" (dict "align" site.Params.homeInfoParams.AlignSocialIconsTo) }}
+            </div>
+            <div class="status-stamp stamp-audit">
+                <span class="stamp-border">INCIDENT_ANALYSIS // UNRESOLVED</span>
+            </div>
+        </div>
+    </footer>
+</article>
+{{- end -}}

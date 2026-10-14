@@ -1,0 +1,101 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<article class="post-single brutal-single-docket fracture-container">
+  {{- /* Top Industrial Classification Bar */ -}}
+  <div class="single-spec-bar">
+    <div class="spec-classification">
+      <span class="sec-dot">■</span>
+      <span class="sec-label">{{ if $is_en }}DOCUMENT_SPEC:{{ else }}DOKÜMAN_TÜRÜ:{{ end }}</span>
+      <span class="sec-id">INCIDENT_ANALYSIS // {{ if not .Date.IsZero }}{{ .Date | time.Format "2006-01-02" }}{{ else }}CURRENT{{ end }}</span>
+    </div>
+    <div class="spec-status-pill">
+      <span class="status-indicator"></span>
+      <span class="status-name">{{ if $is_en }}AUDIT_UNRESOLVED // RING-0{{ else }}GÜVENLİK_ANOMALİSİ{{ end }}</span>
+    </div>
+  </div>
+
+  <header class="post-header brutal-post-header">
+    {{ partial "breadcrumbs.html" . }}
+    
+    <h1 class="post-title entry-hint-parent brutal-single-title glitch-title" data-text="{{ .Title }}">
+      {{ .Title }}
+      {{- if .Draft }}
+      <span class="entry-hint brutal-draft-hint" title="Draft">
+        [DRAFT]
+      </span>
+      {{- end }}
+    </h1>
+
+    {{- if .Description }}
+    <div class="post-description brutal-single-desc">
+      <span class="desc-bracket">/*</span>
+      <span class="desc-text">{{ .Description }}</span>
+      <span class="desc-bracket">*/</span>
+    </div>
+    {{- end }}
+
+    {{- if not (.Param "hideMeta") }}
+    <div class="post-meta brutal-single-meta">
+      {{- partial "post_meta.html" . -}}
+      {{- partial "translation_list.html" . -}}
+      {{- partial "edit_post.html" . -}}
+      {{- partial "post_canonical.html" . -}}
+    </div>
+    {{- end }}
+  </header>
+
+  {{- $isHidden := (.Param "cover.hiddenInSingle") | default (.Param "cover.hidden") | default false }}
+  {{- partial "cover.html" (dict "cxt" . "IsSingle" true "isHidden" $isHidden) }}
+
+  {{- if (.Param "ShowToc") }}
+  <div class="brutal-toc-container">
+    {{- partial "toc.html" . }}
+  </div>
+  {{- end }}
+
+  {{- if .Content }}
+  <div class="post-content md-content brutal-single-content">
+    {{- if not (.Param "disableAnchoredHeadings") }}
+    {{- partial "anchored_headings.html" .Content -}}
+    {{- else }}{{ .Content }}{{ end }}
+  </div>
+  {{- end }}
+
+  {{- partial "extend_post_content.html" . }}
+
+  <footer class="post-footer brutal-single-footer">
+    {{- $tags := .Language.Params.Taxonomies.tag | default "tags" }}
+    <div class="post-tags-container">
+      <span class="tags-header-label">[ {{ if $is_en }}CLASSIFIED_TAGS{{ else }}ENVANTER_ETİKETLERİ{{ end }} ]</span>
+      <ul class="post-tags brutal-tags-list">
+        {{- range ($.GetTerms $tags) }}
+        <li class="brutal-tag-item">
+          <a href="{{ .Permalink }}" class="brutal-tag-link">
+            <span class="tag-hash">#</span>{{ .LinkTitle }}
+          </a>
+        </li>
+        {{- end }}
+      </ul>
+    </div>
+
+    {{- if (.Param "ShowPostNavLinks") }}
+    <div class="brutal-nav-links-wrap">
+      {{- partial "post_nav_links.html" . }}
+    </div>
+    {{- end }}
+
+    {{- if (and site.Params.ShowShareButtons (ne .Params.disableShare true)) }}
+    <div class="brutal-share-container">
+      <span class="share-header-label">{{ if $is_en }}BROADCAST_TELEMETRY //{{ else }}TELEMETRİ_YAYINI //{{ end }}</span>
+      {{- partial "share_icons.html" . -}}
+    </div>
+    {{- end }}
+  </footer>
+
+  {{- if (.Param "comments") }}
+  {{- partial "comments.html" . }}
+  {{- end }}
+</article>
+
+{{- end }}{{/* end main */}}

@@ -1,0 +1,41 @@
+{{- define "main" }}
+
+<div class="brutal-taxonomy-wrap">
+  {{- if .Title }}
+  <header class="page-header brutal-page-header">
+      <div class="header-blueprint-badge">
+          <span class="badge-dot">■</span>
+          <span class="badge-text">INDEX // TAXONOMY_REGISTRY</span>
+      </div>
+      <h1 class="brutal-section-title">{{ .Title }}</h1>
+      {{- if .Description }}
+      <div class="post-description brutal-section-desc">
+          {{ .Description }}
+      </div>
+      {{- end }}
+  </header>
+  {{- end }}
+
+  <div class="taxonomy-control-plate">
+      <span class="plate-title">INDEXED_TERMS // TOTAL: {{ len .Data.Terms }}</span>
+  </div>
+
+  <ul class="terms-tags brutal-terms-grid">
+      {{- $type := .Type }}
+          {{- range $key, $value := .Data.Terms.Alphabetical }}
+              {{- $name := .Name }}
+              {{- $count := .Count }}
+              {{- with site.GetPage (printf "/%s/%s" $type $name) }}
+              <li class="brutal-term-card">
+                  <a href="{{ .Permalink }}" class="term-link">
+                      <span class="term-tag-hash">#</span>
+                      <span class="term-name">{{ .LinkTitle }}</span>
+                      <span class="term-count-badge">x{{ if lt $count 10 }}0{{ end }}{{ $count }}</span>
+                  </a>
+              </li>
+          {{- end }}
+      {{- end }}
+  </ul>
+</div>
+
+{{- end }}{{/* end main */ -}}

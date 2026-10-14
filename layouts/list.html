@@ -1,0 +1,187 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+{{- if not .IsHome | and .Title }}
+<header class="page-header brutal-page-header">
+  <div class="header-blueprint-badge">
+    <span class="badge-dot">■</span>
+    <span class="badge-text">{{ if $is_en }}REGISTRY // ARCHIVE_{{ .Type | upper }}{{ else }}ARŞİV // BÖLÜM_{{ .Type | upper }}{{ end }}</span>
+  </div>
+  {{- partial "breadcrumbs.html" . }}
+  <h1 class="brutal-section-title glitch-title" data-text="{{ .Title }}">
+    {{ .Title }}
+    {{- if and (or (eq .Kind `term`) (eq .Kind `section`)) (.Param "ShowRssButtonInSectionTermList") }}
+    {{- with .OutputFormats.Get "rss" }}
+    <a href="{{ .RelPermalink }}" class="brutal-rss-link" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+        stroke-linecap="round" stroke-linejoin="round" height="16" width="16">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+      <span class="rss-tag">RSS_STREAM</span>
+    </a>
+    {{- end }}
+    {{- end }}
+  </h1>
+  {{- if .Description }}
+  <div class="post-description brutal-section-desc">
+    {{ .Description | markdownify }}
+  </div>
+  {{- end }}
+</header>
+{{- end }}
+
+{{- if .Content }}
+<div class="post-content md-content brutal-page-content">
+  {{- if not (.Param "disableAnchoredHeadings") }}
+  {{- partial "anchored_headings.html" .Content -}}
+  {{- else }}{{ .Content }}{{ end }}
+</div>
+{{- end }}
+
+{{- $pages := union .RegularPages .Sections }}
+
+{{- if .IsHome }}
+{{- $pages = where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- $pages = where $pages "Params.hiddenInHomeList" "!=" "true"  }}
+{{- end }}
+
+{{- $paginator := .Paginate $pages }}
+
+{{- if and .IsHome site.Params.homeInfoParams (eq $paginator.PageNumber 1) }}
+{{- partial "home_info.html" . }}
+<div class="post-feed-divider">
+  <div class="divider-line"></div>
+  <div class="divider-stamp stamp-dystopian-banner">
+    <span class="stamp-pulse">☣</span>
+    <span class="stamp-text">{{ if $is_en }}CLASSIFIED_DOSSIERS [{{ len $pages }}]{{ else }}KAYITLI_DOSYALAR [{{ len $pages }}] // CRITICAL{{ end }}</span>
+  </div>
+  <div class="divider-line"></div>
+</div>
+{{- end }}
+
+<div class="brutal-posts-stream">
+{{- $term := .Data.Term }}
+{{- range $index, $page := $paginator.Pages }}
+
+{{- $class := "post-entry brutal-card-docket anti-design-card fracture-card" }}
+{{- $user_preferred := or site.Params.disableSpecial1stPost site.Params.homeInfoParams }}
+{{- if (and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) (not $user_preferred)) }}
+  {{- $class = "post-entry brutal-card-docket anti-design-card fracture-card first-entry" }}
+{{- else if $term }}
+  {{- $class = "post-entry brutal-card-docket anti-design-card fracture-card tag-entry" }}
+{{- end }}
+
+<article class="{{ $class }}">
+  {{- /* Physical Mechanical Breakaway Shards ("sağdan soldan tık diye kırılan parçalar") */ -}}
+  <div class="card-shatter-system" aria-hidden="true">
+    <span class="breakaway-chunk chunk-tl"></span>
+    <span class="breakaway-chunk chunk-tr"></span>
+    <span class="breakaway-chunk chunk-bl"></span>
+    <span class="breakaway-chunk chunk-br"></span>
+    <span class="debris-particle dp-1"></span>
+    <span class="debris-particle dp-2"></span>
+    <span class="debris-particle dp-3"></span>
+    <span class="fracture-crack-seam"></span>
+  </div>
+
+  <div class="shatter-corner-tag" aria-hidden="true">
+    <span>[ RESTRICTED // #0{{ add $index 1 }} ]</span>
+  </div>
+
+  {{- /* Top Docket Strip */ -}}
+  <div class="docket-header-strip">
+    <div class="docket-id-box">
+      <span class="docket-prefix">DOSSIER</span>
+      <span class="docket-num">#0{{ add $index 1 }}</span>
+    </div>
+    <div class="docket-hatch-pattern" aria-hidden="true"></div>
+    <div class="docket-status-badge">
+      <span class="status-pip"></span>
+      <span class="status-name">ARCHIVE // INCIDENT</span>
+    </div>
+  </div>
+
+  {{- $isHidden := (.Param "cover.hiddenInList") | default (.Param "cover.hidden") | default false }}
+  {{- partial "cover.html" (dict "cxt" . "IsSingle" false "isHidden" $isHidden) }}
+
+  <div class="docket-body">
+    <header class="entry-header brutal-entry-header">
+      <h2 class="entry-hint-parent brutal-card-title">
+        <a href="{{ .Permalink }}" class="title-direct-link glitch-hover">{{- .Title }}</a>
+        {{- if .Draft }}
+        <span class="entry-hint brutal-draft-hint" title="Draft">
+          [DRAFT]
+        </span>
+        {{- end }}
+      </h2>
+    </header>
+
+    {{- if (ne (.Param "hideSummary") true) }}
+    <div class="entry-content brutal-card-summary">
+      <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
+    </div>
+    {{- end }}
+
+    {{- /* Card Tags if available */ -}}
+    {{- with .Params.tags }}
+    <div class="docket-tags-row">
+      {{- range . }}
+      <span class="docket-tag-pill">#{{ . }}</span>
+      {{- end }}
+    </div>
+    {{- end }}
+  </div>
+
+  {{- if not (.Param "hideMeta") }}
+  <footer class="entry-footer brutal-card-footer">
+    <div class="footer-meta-col">
+      {{- partial "post_meta.html" . -}}
+    </div>
+    <div class="footer-action-col">
+      <a class="docket-action-btn" href="{{ .Permalink }}" aria-label="{{ .Title }}">
+        <span class="btn-text">{{ if $is_en }}INSPECT_DOSSIER{{ else }}DOSYAYI_AÇ{{ end }}</span>
+        <span class="btn-arrow">→</span>
+      </a>
+    </div>
+  </footer>
+  {{- end }}
+</article>
+{{- end }}
+</div>
+
+{{- if gt $paginator.TotalPages 1 }}
+<footer class="page-footer brutal-pagination-wrap">
+  <nav class="pagination brutal-pagination">
+    {{- if $paginator.HasPrev }}
+    <a class="prev brutal-page-btn" href="{{ $paginator.Prev.URL | absURL }}">
+      <span class="btn-bracket">[</span>
+      «&nbsp;{{ if $is_en }}PREV_BLOCK{{ else }}ÖNCEKİ_BLOK{{ end }}
+      {{- if (.Param "ShowPageNums") }}
+      &nbsp;({{ sub $paginator.PageNumber 1 }}/{{ $paginator.TotalPages }})
+      {{- end }}
+      <span class="btn-bracket">]</span>
+    </a>
+    {{- end }}
+    
+    <div class="pagination-indicator">
+      <span class="pg-label">BLK</span>
+      <span class="pg-num">{{ $paginator.PageNumber }} / {{ $paginator.TotalPages }}</span>
+    </div>
+
+    {{- if $paginator.HasNext }}
+    <a class="next brutal-page-btn" href="{{ $paginator.Next.URL | absURL }}">
+      <span class="btn-bracket">[</span>
+      {{ if $is_en }}NEXT_BLOCK{{ else }}SONRAKİ_BLOK{{ end }}&nbsp;»
+      {{- if (.Param "ShowPageNums") }}
+      &nbsp;({{ add 1 $paginator.PageNumber }}/{{ $paginator.TotalPages }})
+      {{- end }}
+      <span class="btn-bracket">]</span>
+    </a>
+    {{- end }}
+  </nav>
+</footer>
+{{- end }}
+
+{{- end }}{{- /* end main */ -}}

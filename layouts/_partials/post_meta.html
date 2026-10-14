@@ -1,0 +1,30 @@
+{{- /* Industrial Telemetry Metadata Badges */ -}}
+<div class="brutal-meta-badges">
+    {{- if not .Date.IsZero -}}
+    <span class="meta-badge meta-date" title="Timestamp: {{ .Date }}">
+        <span class="badge-key">DATE//</span>
+        <span class="badge-val">{{ .Date | time.Format "2006-01-02" }}</span>
+    </span>
+    {{- end -}}
+
+    {{- if (.Param "ShowReadingTime") -}}
+    <span class="meta-badge meta-time">
+        <span class="badge-key">READ//</span>
+        <span class="badge-val">{{ .ReadingTime }} MIN</span>
+    </span>
+    {{- end -}}
+
+    {{- if (.Param "ShowWordCount") -}}
+    <span class="meta-badge meta-words">
+        <span class="badge-key">WORDS//</span>
+        <span class="badge-val">{{ .WordCount }}</span>
+    </span>
+    {{- end -}}
+
+    {{- if not (.Param "hideAuthor") -}}
+    <span class="meta-badge meta-author">
+        <span class="badge-key">OPERATOR//</span>
+        <span class="badge-val">OB</span>
+    </span>
+    {{- end -}}
+</div>

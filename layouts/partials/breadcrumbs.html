@@ -1,0 +1,17 @@
+{{- if (.Param "ShowBreadCrumbs") -}}
+<nav class="breadcrumbs brutal-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <span class="prompt-user">operator@ob-node-07</span><span class="prompt-colon">:</span><span class="prompt-path">~</span><span class="prompt-dollar">$</span>
+    <span class="prompt-cmd">cat</span>
+    {{- $ancestors := .Ancestors.Reverse -}}
+    {{- range $i, $bc := $ancestors }}
+        {{- if eq $i 0 }}
+            <a href="{{ $bc.RelPermalink }}" class="bc-link">/sys</a>
+        {{- else }}
+            <span class="bc-slash">/</span>
+            <a href="{{ $bc.RelPermalink }}" class="bc-link">{{ $bc.Title | lower }}</a>
+        {{- end }}
+    {{- end }}
+    <span class="bc-slash">/</span>
+    <span class="bc-current">{{ .Title | lower | truncate 30 }}</span>
+</nav>
+{{- end -}}

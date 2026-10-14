@@ -1,0 +1,2127 @@
+/* ==========================================================================
+   FRACTURED DYSTOPIAN CYBER-BRUTALISM & MECHANICAL DECAY ENGINE
+   DESIGN SYSTEM FOR OB // ONUR BAYDAŞ
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. RAW PALETTES & SYSTEM VARIABLES
+   -------------------------------------------------------------------------- */
+:root {
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Syne', 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', 'VT323', monospace;
+  --font-industrial: 'Chakra Petch', 'Space Grotesk', monospace;
+  
+  --nav-width: 1140px;
+  --main-width: 900px;
+  --radius: 0px !important;
+
+  /* LIGHT MODE (Bleached Blueprint, Clinical Decay, Concrete Void) */
+  --bg-canvas: #ebe8de;
+  --bg-surface: #ffffff;
+  --bg-inset: #ded9cd;
+  
+  --border-thick: 3.5px solid #000000;
+  --border-raw: #000000;
+  --border-width: 3.5px;
+  
+  --text-main: #000000;
+  --text-dim: #2a2d34;
+  --text-ghost: #606676;
+  
+  --c-acid: #ccff00;
+  --c-blood: #ff003c;
+  --c-toxic: #ff4800;
+  --c-cyan: #00d9ff;
+  --c-concrete: #b5b1a4;
+  
+  --shadow-hard: 6px 6px 0px #000000;
+  --shadow-hard-lg: 10px 10px 0px #000000;
+  
+  --hazard-stripe: repeating-linear-gradient(-45deg, #ff4800, #ff4800 12px, #000000 12px, #000000 24px);
+  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #ccff00, #ccff00 12px, #000000 12px, #000000 24px);
+  --grid-pattern: radial-gradient(#000000 1.2px, transparent 1.2px);
+
+  --theme: var(--bg-canvas);
+  --entry: var(--bg-surface);
+  --primary: var(--text-main);
+  --secondary: var(--text-dim);
+  --tertiary: var(--border-raw);
+  --content: var(--text-main);
+  --border: var(--border-raw);
+  --code-block-bg: #07080b;
+  --code-bg: #d7d3c5;
+  
+  color-scheme: light;
+}
+
+:root[data-theme="dark"], body.dark {
+  /* DARK MODE (Suffocating Obsidian Void, Radioactive Voltage, Blur Decay) */
+  --bg-canvas: #040507;
+  --bg-surface: #0a0d13;
+  --bg-inset: #06080c;
+  
+  --border-thick: 3.5px solid #232b3b;
+  --border-raw: #232b3b;
+  --border-width: 3.5px;
+  
+  --text-main: #f0f4fc;
+  --text-dim: #9aa7be;
+  --text-ghost: #505c72;
+  
+  --c-acid: #ddff00;
+  --c-blood: #ff003c;
+  --c-toxic: #ff4800;
+  --c-cyan: #00ffff;
+  --c-concrete: #1a202c;
+  
+  --shadow-hard: 6px 6px 0px var(--c-acid);
+  --shadow-hard-lg: 10px 10px 0px var(--c-acid);
+  
+  --hazard-stripe: repeating-linear-gradient(-45deg, #ddff00, #ddff00 12px, #040507 12px, #040507 24px);
+  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #ff003c, #ff003c 12px, #040507 12px, #040507 24px);
+  --grid-pattern: radial-gradient(rgba(221, 255, 0, 0.14) 1.2px, transparent 1.2px);
+
+  --theme: var(--bg-canvas);
+  --entry: var(--bg-surface);
+  --primary: var(--text-main);
+  --secondary: var(--text-dim);
+  --tertiary: var(--border-raw);
+  --content: var(--text-main);
+  --border: var(--border-raw);
+  --code-block-bg: #030406;
+  --code-bg: #111520;
+  
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------
+   02. BASE RESETS & CRT INTERFERENCE OVERLAYS
+   -------------------------------------------------------------------------- */
+* {
+  border-radius: 0 !important;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-mono);
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  background-image: var(--grid-pattern);
+  background-size: 24px 24px;
+  letter-spacing: -0.015em;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Surveillance CRT Scanline Overlay */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.12) 0px,
+    rgba(0, 0, 0, 0.12) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.85;
+}
+
+:root[data-theme="dark"] body::after {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.28) 0px,
+    rgba(0, 0, 0, 0.28) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
+
+/* Oppressive Dystopian Watermark Overlay */
+body::before {
+  content: "RESTRICTED ACCESS // LEVEL-5 BIO-CYBERNETIC HAZARD // SURVEILLANCE FEED // CLASSIFIED OPERATOR: OB // PROTOCOL-7";
+  position: fixed;
+  top: 36%;
+  left: -20%;
+  width: 140%;
+  font-family: var(--font-industrial);
+  font-size: clamp(24px, 4.5vw, 56px);
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.038);
+  transform: rotate(-16deg);
+  pointer-events: none;
+  z-index: 0;
+  white-space: nowrap;
+  letter-spacing: 0.22em;
+}
+
+:root[data-theme="dark"] body::before {
+  color: rgba(221, 255, 0, 0.032);
+}
+
+/* Surveillance Camera Corner HUD */
+.surveillance-hud-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.hud-corner-tag {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.82);
+  border: 1.5px solid rgba(221, 255, 0, 0.35);
+  color: rgba(221, 255, 0, 0.7);
+  padding: 3px 8px;
+  backdrop-filter: blur(2px);
+  z-index: 9998;
+}
+
+.hud-corner-tag.hud-tl { top: 38px; left: 14px; color: var(--c-blood); border-color: rgba(255, 0, 60, 0.5); }
+.hud-corner-tag.hud-tr { top: 38px; right: 14px; }
+.hud-corner-tag.hud-bl { bottom: 12px; left: 14px; }
+.hud-corner-tag.hud-br { bottom: 12px; right: 14px; }
+
+@media (max-width: 900px) {
+  .surveillance-hud-overlay { display: none; }
+}
+
+::selection {
+  background: var(--c-blood);
+  color: #ffffff;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+  border-left: 3px solid var(--border-raw);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--c-acid);
+  border: 2px solid #000;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-blood);
+}
+
+/* --------------------------------------------------------------------------
+   03. MARQUEE INSTABILITY TICKER
+   -------------------------------------------------------------------------- */
+.hazard-ticker-tape {
+  background: #000000;
+  color: var(--c-acid);
+  border-bottom: 3.5px solid #000000;
+  font-family: var(--font-industrial);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  padding: 5px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+}
+
+.ticker-content {
+  display: inline-block;
+  animation: tickerScroll 24s linear infinite;
+}
+
+.ticker-content span {
+  display: inline-block;
+  padding-right: 40px;
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* --------------------------------------------------------------------------
+   04. HUD BAR & LIVE DECAY CLOCK
+   -------------------------------------------------------------------------- */
+.sys-hud-ribbon {
+  background: #000000;
+  color: #ffffff;
+  border-bottom: 3.5px solid var(--border-raw);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 18px;
+  text-transform: uppercase;
+}
+
+.sys-hud-inner {
+  max-width: var(--nav-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-item {
+  color: #888888;
+}
+
+.hud-val {
+  color: var(--c-acid);
+  font-weight: 900;
+}
+
+.text-alert {
+  color: var(--c-blood) !important;
+  text-shadow: 0 0 6px var(--c-blood);
+}
+
+.hud-sep {
+  color: var(--c-blood);
+  font-weight: 900;
+}
+
+.hud-led-pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--c-blood);
+  box-shadow: 0 0 10px var(--c-blood);
+  animation: ledFault 1s infinite steps(2, start);
+}
+
+@keyframes ledFault {
+  50% { opacity: 0.15; }
+}
+
+/* Decay Engine Trigger Button */
+.chaos-trigger-btn {
+  background: var(--c-blood);
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 2px 2px 0px #000;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+.chaos-trigger-btn:hover {
+  background: var(--c-acid);
+  color: #000;
+  transform: translate(-2px, -2px) rotate(-1deg);
+  box-shadow: 4px 4px 0px #fff;
+}
+
+.chaos-warn {
+  font-size: 13px;
+  color: var(--c-acid);
+}
+.chaos-trigger-btn:hover .chaos-warn { color: #000; }
+
+.hud-time {
+  background: #111;
+  color: var(--c-toxic);
+  border: 1px solid var(--c-toxic);
+  padding: 2px 6px;
+  font-weight: 900;
+}
+
+/* --------------------------------------------------------------------------
+   05. HEADER (SINGLE NAME MENTION & OB GLYPH LOGO)
+   -------------------------------------------------------------------------- */
+.brutal-header {
+  background: var(--bg-surface);
+  border-bottom: 4px solid var(--border-raw);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 6px 0px rgba(0,0,0,0.15);
+}
+
+.brutal-nav {
+  max-width: var(--nav-width);
+  margin: 0 auto;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brutal-logo-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brutal-logo-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-box {
+  background: #000000;
+  color: #ffffff;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-industrial);
+  font-weight: 900;
+  font-size: 19px;
+  border: 3.5px solid #000000;
+  box-shadow: var(--shadow-hard);
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+:root[data-theme="dark"] .logo-box {
+  background: #0c0f16;
+  border-color: var(--c-acid);
+  box-shadow: 5px 5px 0px var(--c-acid);
+}
+
+.logo-box:hover {
+  transform: translate(-3px, -3px) rotate(-1.5deg);
+  box-shadow: 8px 8px 0px var(--c-blood);
+  filter: contrast(130%);
+}
+
+.header-logo-svg {
+  flex-shrink: 0;
+  border: 1px solid var(--c-acid);
+}
+
+.logo-bracket {
+  color: var(--c-acid);
+  font-weight: 900;
+  font-size: 17px;
+}
+
+.logo-prefix {
+  background: var(--c-blood);
+  color: #ffffff;
+  padding: 2px 7px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.logo-sep {
+  color: var(--c-acid);
+  font-weight: 900;
+}
+
+.logo-node-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  color: #9aa7be;
+  letter-spacing: 0.08em;
+}
+
+:root[data-theme="dark"] .logo-node-tag {
+  color: var(--c-acid);
+}
+
+.terminal-cursor {
+  color: var(--c-acid);
+  font-weight: 900;
+  animation: blinkCursor 0.7s infinite steps(2, start);
+}
+
+@keyframes blinkCursor {
+  to { visibility: hidden; }
+}
+
+/* Control Switches */
+.brutal-switches {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brutal-btn-toggle {
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border: 3px solid var(--border-raw);
+  box-shadow: 3px 3px 0px var(--border-raw);
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.brutal-btn-toggle:hover {
+  background: var(--c-acid);
+  color: #000;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--border-raw);
+}
+
+.breaker-label { color: var(--c-blood); }
+
+.lang-selector-box {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 900;
+  gap: 4px;
+}
+
+.lang-current {
+  background: var(--c-blood);
+  color: #ffffff;
+  padding: 4px 8px;
+  border: 2px solid var(--border-raw);
+}
+
+.brutal-lang-menu {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: inline-flex;
+  gap: 4px;
+}
+
+.brutal-lang-link {
+  text-decoration: none;
+  color: var(--text-main);
+  border: 2px solid var(--border-raw);
+  padding: 4px 8px;
+  background: var(--bg-canvas);
+  font-weight: 900;
+  box-shadow: 2px 2px 0px var(--border-raw);
+}
+
+.brutal-lang-link:hover {
+  background: var(--c-acid);
+  color: #000;
+  transform: translate(-1px, -1px);
+}
+
+/* Menu Items (Swiss Punk / Industrial Tabs) */
+.brutal-menu {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.brutal-menu-link {
+  text-decoration: none;
+  color: var(--text-main);
+  font-family: var(--font-industrial);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border: 3px solid var(--border-raw);
+  background: var(--bg-canvas);
+  box-shadow: 3px 3px 0px var(--border-raw);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s ease;
+}
+
+.brutal-menu-link .menu-idx {
+  color: var(--c-blood);
+  font-size: 11px;
+}
+
+.brutal-menu-link:hover {
+  background: var(--c-acid);
+  color: #000000;
+  transform: translate(-3px, -3px) rotate(-1.5deg);
+  box-shadow: 6px 6px 0px var(--border-raw);
+}
+
+.brutal-menu-link:hover .menu-idx { color: #000000; }
+
+.brutal-menu-link.active {
+  background: var(--c-blood);
+  color: #ffffff;
+  box-shadow: inset 3px 3px 0px rgba(0,0,0,0.5);
+}
+
+.brutal-menu-link.active .menu-idx { color: var(--c-acid); }
+
+/* --------------------------------------------------------------------------
+   06. FRACTURED HERO CHASSIS & MECHANICAL CRACK SHARDS
+   -------------------------------------------------------------------------- */
+.fracture-container {
+  position: relative;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.anti-design-hero {
+  background: var(--bg-surface);
+  border: 4px solid var(--border-raw);
+  box-shadow: var(--shadow-hard-lg);
+  padding: 34px 30px;
+  margin: 36px 0 46px 0;
+  position: relative;
+  overflow: visible;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+}
+
+:root[data-theme="dark"] .anti-design-hero {
+  border-color: #2e384c;
+  box-shadow: 8px 8px 0px var(--c-acid);
+}
+
+/* Mechanical Corner Mounting Bolts */
+.chassis-bolt {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--border-raw);
+  line-height: 1;
+  pointer-events: none;
+}
+.bolt-tl { top: 10px; left: 12px; }
+.bolt-tr { top: 10px; right: 28px; }
+.bolt-bl { bottom: 10px; left: 12px; }
+.bolt-br { bottom: 10px; right: 12px; }
+
+/* "Sağdan soldan tık diye kırılıp dökülen" Fracture Shards */
+.shatter-shard {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: var(--c-blood);
+  border: 2px solid #000;
+  z-index: 30;
+  transition: transform 0.12s cubic-bezier(0.1, 0.9, 0.2, 1);
+  pointer-events: none;
+}
+.shard-tl { top: -8px; left: -8px; transform: rotate(-5deg); }
+.shard-tr { top: -8px; right: -8px; transform: rotate(12deg); background: var(--c-acid); }
+.shard-bl { bottom: -8px; left: -8px; transform: rotate(8deg); background: var(--c-toxic); }
+.shard-br { bottom: -8px; right: -8px; transform: rotate(-15deg); }
+
+/* Shatter snap trigger on hover: "tık" diye düşer */
+.anti-design-hero:hover .shard-tl {
+  transform: translate(-10px, -6px) rotate(-24deg);
+}
+.anti-design-hero:hover .shard-tr {
+  transform: translate(12px, -8px) rotate(32deg);
+}
+.anti-design-hero:hover .shard-bl {
+  transform: translate(-8px, 12px) rotate(18deg);
+}
+.anti-design-hero:hover .shard-br {
+  transform: translate(14px, 14px) rotate(-35deg);
+}
+
+/* Dystopian Warning Stickers */
+.hero-sticker {
+  position: absolute;
+  font-family: var(--font-industrial);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0px #000000;
+  z-index: 25;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.sticker-hazard-volt {
+  top: -14px;
+  right: 50px;
+  background: var(--hazard-stripe);
+  color: #ffffff;
+  transform: rotate(-3deg);
+}
+
+.sticker-audit {
+  bottom: -13px;
+  right: 170px;
+  background: var(--c-blood);
+  color: #ffffff;
+  transform: rotate(3deg);
+}
+
+.sticker-acid-punk {
+  top: 50%;
+  right: -16px;
+  background: var(--c-acid);
+  color: #000000;
+  transform: rotate(90deg);
+}
+
+.sticker-redacted {
+  bottom: -14px;
+  left: 36px;
+  background: #000000;
+  color: var(--c-blood);
+  border: 2px dashed var(--c-blood);
+  transform: rotate(-2deg);
+}
+
+/* Top Plate */
+.chassis-top-plate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--border-raw);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.spec-id-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spec-icon { color: var(--c-blood); }
+
+.spec-code {
+  background: #000;
+  color: var(--c-acid);
+  padding: 3px 8px;
+  border: 1px solid var(--border-raw);
+}
+
+.hazard-ribbon {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid var(--border-raw);
+  background: #000;
+}
+
+.hazard-stripes {
+  width: 32px;
+  height: 24px;
+  background: var(--hazard-yellow-stripe);
+}
+
+.hazard-text {
+  font-family: var(--font-industrial);
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffffff;
+  padding: 3px 10px;
+}
+
+/* VT100 Terminal Fault Dump Display */
+.ascii-art-screen {
+  background: #040508;
+  border: 3px solid #000000;
+  box-shadow: inset 0 0 20px rgba(0, 255, 100, 0.12);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+:root[data-theme="dark"] .ascii-art-screen {
+  border-color: #273144;
+}
+
+.ascii-bar {
+  background: #0c0f16;
+  border-bottom: 2px solid #1a2233;
+  color: #72829c;
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ascii-status {
+  color: var(--c-blood);
+  font-weight: 900;
+}
+
+.ascii-code {
+  color: #00ff66;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 1.35vw, 12.5px);
+  line-height: 1.25;
+  padding: 12px 14px;
+  margin: 0;
+  overflow-x: auto;
+  text-shadow: 0 0 6px rgba(0, 255, 102, 0.5);
+  white-space: pre;
+}
+
+/* Deconstructivist Dadaist Monogram Header (OB) */
+.dadaist-ransom-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+
+.ransom-word {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.r-letter {
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 6vw, 68px);
+  font-weight: 900;
+  line-height: 1;
+  padding: 8px 16px;
+  border: 4px solid #000000;
+  box-shadow: 5px 5px 0px #000000;
+  display: inline-block;
+  text-transform: uppercase;
+  transition: transform 0.1s ease;
+}
+
+.l-o { background: var(--c-acid); color: #000; transform: rotate(-3deg); }
+.l-b { background: var(--c-blood); color: #fff; transform: rotate(3deg); }
+
+.r-letter:hover {
+  transform: scale(1.18) rotate(0deg) !important;
+  z-index: 10;
+}
+
+.apparatus-box {
+  background: #000000;
+  color: #ffffff;
+  padding: 6px 12px;
+  border: 3px solid var(--border-raw);
+  font-family: var(--font-industrial);
+  font-size: 14px;
+  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 3px 3px 0px var(--c-blood);
+  transform: rotate(-2deg);
+}
+
+.app-tag { color: var(--c-acid); font-size: 10px; }
+
+/* Redacted Bar (Hover to De-redact) */
+.redacted-block {
+  background: #000000;
+  color: #000000;
+  padding: 8px 14px;
+  border: 2px solid var(--c-blood);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  user-select: none;
+  cursor: help;
+  transition: all 0.15s ease;
+  transform: rotate(1.5deg);
+}
+
+.redacted-block:hover {
+  background: var(--c-blood);
+  color: #ffffff;
+  transform: scale(1.05) rotate(0deg);
+  box-shadow: 4px 4px 0px var(--c-acid);
+}
+
+.ransom-badge {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 900;
+  background: var(--c-toxic);
+  color: #ffffff;
+  border: 2.5px solid #000;
+  padding: 4px 8px;
+  box-shadow: 3px 3px 0px #000;
+  transform: rotate(-5deg);
+}
+
+/* Subtitle & Lead */
+.hero-subtitle-bar {
+  font-family: var(--font-industrial);
+  font-size: clamp(12px, 1.8vw, 14px);
+  font-weight: 900;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.subtitle-bracket { color: var(--c-blood); font-weight: 900; }
+
+.hero-lead {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-main);
+  margin-bottom: 26px;
+  max-width: 760px;
+}
+
+/* Tech Spec Chips */
+.tech-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.spec-chip {
+  background: var(--bg-inset);
+  border: 3px solid var(--border-raw);
+  box-shadow: 3px 3px 0px var(--border-raw);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.12s ease;
+}
+
+.spec-chip:hover {
+  transform: translate(-3px, -3px) rotate(-1deg);
+  box-shadow: 6px 6px 0px var(--border-raw);
+}
+
+.chip-red { border-left: 8px solid var(--c-blood); }
+.chip-acid { border-left: 8px solid var(--c-acid); }
+.chip-cyan { border-left: 8px solid var(--c-cyan); }
+.chip-orange { border-left: 8px solid var(--c-toxic); }
+
+.spec-chip .chip-idx {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  background: #000;
+  color: #fff;
+  padding: 2px 6px;
+}
+
+.spec-chip .chip-title {
+  font-family: var(--font-industrial);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: var(--text-main);
+}
+
+/* Hero Footer */
+.hero-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 3px solid var(--border-raw);
+  padding-top: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.social-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: var(--bg-canvas);
+  border: 3px solid var(--border-raw);
+  box-shadow: 3px 3px 0px var(--border-raw);
+  color: var(--text-main);
+  transition: all 0.1s ease;
+}
+
+.social-icons a:hover {
+  background: var(--c-acid);
+  color: #000;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--border-raw);
+}
+
+.stamp-audit {
+  font-family: var(--font-industrial);
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--c-blood);
+  border: 3px solid var(--c-blood);
+  padding: 6px 14px;
+  transform: rotate(-2deg);
+  box-shadow: 3px 3px 0px var(--c-blood);
+}
+
+/* --------------------------------------------------------------------------
+   07. POST FEED DIVIDER
+   -------------------------------------------------------------------------- */
+.post-feed-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0 28px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 3px;
+  background: var(--border-raw);
+}
+
+.stamp-dystopian-banner {
+  background: var(--c-blood);
+  color: #ffffff;
+  border: 3px solid var(--border-raw);
+  padding: 6px 16px;
+  font-family: var(--font-industrial);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  box-shadow: 4px 4px 0px var(--border-raw);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stamp-dystopian-banner .stamp-pulse {
+  color: var(--c-acid);
+  font-size: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   08. DECONSTRUCTIVIST FRACTURE DOSSIER CARDS
+   -------------------------------------------------------------------------- */
+.brutal-posts-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  margin-bottom: 48px;
+}
+
+.fracture-card {
+  background: var(--bg-surface);
+  border: 3.5px solid var(--border-raw);
+  box-shadow: var(--shadow-hard);
+  position: relative;
+  transition: transform 0.1s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.1s ease, filter 0.12s ease;
+  overflow: visible;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+}
+
+/* Ghost Chromatic Motion Blur behind Card on Hover */
+.fracture-card::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  background: var(--c-blood);
+  z-index: -2;
+  opacity: 0;
+  filter: blur(14px);
+  transform: translate(0, 0);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+
+.fracture-card:hover::before {
+  opacity: 0.38;
+  transform: translate(-10px, -10px) rotate(-1.5deg);
+}
+
+:root[data-theme="dark"] .fracture-card:hover::before {
+  background: var(--c-acid);
+  opacity: 0.32;
+}
+
+/* "Sağdan soldan tık diye kırılıp dökülen" mekanik parçalanma */
+.fracture-card:hover {
+  transform: translate(-6px, -6px) rotate(-0.6deg);
+  box-shadow: var(--shadow-hard-lg);
+  filter: contrast(125%);
+}
+
+/* PHYSICAL MECHANICAL BREAKAWAY SHARDS */
+.card-shatter-system {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 15;
+}
+
+.breakaway-chunk {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #000;
+  z-index: 25;
+  transition: transform 0.08s cubic-bezier(0.2, 0.9, 0.3, 1.3), box-shadow 0.08s ease;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.chunk-tl { top: -6px; left: -6px; transform: rotate(-8deg); background: var(--c-acid); }
+.chunk-tr { top: -6px; right: -6px; transform: rotate(14deg); background: var(--c-blood); }
+.chunk-bl { bottom: -6px; left: -6px; transform: rotate(6deg); background: var(--c-toxic); }
+.chunk-br { bottom: -6px; right: -6px; transform: rotate(-12deg); background: var(--c-cyan); }
+
+/* Shatter snap trigger: "tık" diye sağdan soldan fırlar */
+.fracture-card:hover .chunk-tr,
+.anti-design-hero:hover .chunk-tr {
+  transform: translate(26px, 42px) rotate(48deg) scale(0.92);
+  box-shadow: 6px 6px 0px rgba(0,0,0,0.85);
+}
+
+.fracture-card:hover .chunk-tl,
+.anti-design-hero:hover .chunk-tl {
+  transform: translate(-22px, 34px) rotate(-38deg) scale(0.85);
+  box-shadow: -4px 6px 0px rgba(0,0,0,0.85);
+}
+
+.fracture-card:hover .chunk-bl,
+.anti-design-hero:hover .chunk-bl {
+  transform: translate(-20px, 16px) rotate(28deg);
+}
+
+.fracture-card:hover .chunk-br,
+.anti-design-hero:hover .chunk-br {
+  transform: translate(24px, 22px) rotate(-42deg);
+}
+
+/* Falling Debris Particles ("dökülen parçalar") */
+.debris-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--c-acid);
+  border: 1px solid #000;
+  opacity: 0;
+  pointer-events: none;
+}
+.dp-1 { top: 0; right: 26px; }
+.dp-2 { top: 16px; right: 0; background: var(--c-blood); width: 8px; height: 5px; }
+.dp-3 { top: -4px; right: 14px; background: #000; }
+
+.fracture-card:hover .dp-1,
+.anti-design-hero:hover .dp-1 {
+  animation: debrisCrumble 0.5s forwards cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+.fracture-card:hover .dp-2,
+.anti-design-hero:hover .dp-2 {
+  animation: debrisCrumble 0.6s 0.05s forwards cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+.fracture-card:hover .dp-3,
+.anti-design-hero:hover .dp-3 {
+  animation: debrisCrumble 0.45s 0.08s forwards cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+@keyframes debrisCrumble {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+  100% { opacity: 0; transform: translate(18px, 80px) rotate(140deg); }
+}
+
+/* Jagged crack line seam across the card */
+.fracture-crack-seam {
+  position: absolute;
+  top: 0;
+  right: 56px;
+  width: 2.5px;
+  height: 42px;
+  background: repeating-linear-gradient(
+    0deg,
+    var(--c-blood),
+    var(--c-blood) 4px,
+    transparent 4px,
+    transparent 7px
+  );
+  transform: rotate(28deg);
+  opacity: 0.65;
+  pointer-events: none;
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+.fracture-card:hover .fracture-crack-seam,
+.anti-design-hero:hover .fracture-crack-seam {
+  opacity: 1;
+  transform: rotate(38deg) scaleY(1.4);
+  background: var(--c-acid);
+}
+
+.shatter-corner-tag {
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  background: var(--c-blood);
+  color: #ffffff;
+  border: 2px solid #000;
+  padding: 3px 10px;
+  font-family: var(--font-industrial);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  transform: rotate(2.5deg);
+  box-shadow: 3px 3px 0px #000;
+  z-index: 10;
+  transition: transform 0.08s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+.fracture-card:hover .shatter-corner-tag {
+  transform: translate(12px, -8px) rotate(12deg);
+  background: var(--c-acid);
+  color: #000;
+}
+
+:root[data-theme="dark"] .fracture-card {
+  border-color: #273144;
+  box-shadow: 6px 6px 0px #111722;
+}
+
+:root[data-theme="dark"] .fracture-card:hover {
+  border-color: var(--c-acid);
+  box-shadow: 9px 9px 0px var(--c-acid);
+}
+
+/* Card Header Strip */
+.docket-header-strip {
+  background: #000000;
+  color: #ffffff;
+  border-bottom: 3px solid var(--border-raw);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.docket-id-box {
+  font-family: var(--font-industrial);
+  font-size: 12px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.docket-prefix { color: var(--c-acid); }
+
+.docket-num {
+  background: var(--c-blood);
+  color: #ffffff;
+  padding: 2px 8px;
+}
+
+.docket-hatch-pattern {
+  flex: 1;
+  height: 12px;
+  background: var(--hazard-stripe);
+  border-left: 2px solid #fff;
+  border-right: 2px solid #fff;
+}
+
+.docket-status-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-pip {
+  width: 8px;
+  height: 8px;
+  background: var(--c-blood);
+}
+
+/* Card Body */
+.docket-body {
+  padding: 24px 26px 18px 26px;
+}
+
+.brutal-card-title {
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 3.2vw, 28px);
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px 0;
+}
+
+.title-direct-link {
+  text-decoration: none;
+  color: var(--text-main);
+  transition: all 0.12s ease;
+}
+
+.title-direct-link:hover {
+  color: var(--c-blood);
+  text-shadow: 2px 2px 0px var(--c-acid);
+}
+
+.brutal-draft-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  background: var(--c-blood);
+  color: #ffffff;
+  padding: 2px 6px;
+  border: 1px solid #000;
+}
+
+.brutal-card-summary {
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+.brutal-card-summary p { margin: 0; }
+
+/* Tags */
+.docket-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.docket-tag-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border: 2px solid var(--border-raw);
+  padding: 3px 8px;
+  box-shadow: 2px 2px 0px var(--border-raw);
+}
+
+/* Card Footer */
+.brutal-card-footer {
+  background: var(--bg-inset);
+  border-top: 3px solid var(--border-raw);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brutal-meta-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-raw);
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--text-main);
+  box-shadow: 2px 2px 0px var(--border-raw);
+}
+
+.badge-key {
+  color: var(--c-blood);
+  font-size: 10px;
+}
+
+.docket-action-btn {
+  font-family: var(--font-industrial);
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  background: #000000;
+  color: #ffffff;
+  border: 3px solid #000000;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 3px 3px 0px var(--c-acid);
+  transition: all 0.12s ease;
+}
+
+:root[data-theme="dark"] .docket-action-btn {
+  background: var(--c-acid);
+  color: #000000;
+  border-color: var(--c-acid);
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.fracture-card:hover .docket-action-btn {
+  background: var(--c-blood);
+  color: #ffffff;
+  border-color: var(--c-blood);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--border-raw);
+}
+
+/* --------------------------------------------------------------------------
+   09. SINGLE POST VIEW
+   -------------------------------------------------------------------------- */
+.brutal-single-docket {
+  background: var(--bg-surface);
+  border: 4px solid var(--border-raw);
+  box-shadow: var(--shadow-hard-lg);
+  margin-top: 28px;
+  margin-bottom: 56px;
+  position: relative;
+}
+
+:root[data-theme="dark"] .brutal-single-docket {
+  border-color: #2b3548;
+  box-shadow: 8px 8px 0px var(--c-acid);
+}
+
+.single-spec-bar {
+  background: #000000;
+  color: #ffffff;
+  border-bottom: 3px solid var(--border-raw);
+  padding: 10px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-family: var(--font-industrial);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.spec-classification {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sec-dot { color: var(--c-blood); }
+
+.sec-id {
+  background: var(--c-acid);
+  color: #000;
+  padding: 2px 8px;
+}
+
+.spec-status-pill {
+  background: var(--c-blood);
+  color: #fff;
+  padding: 3px 10px;
+  border: 1px solid #fff;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #00ff66;
+  margin-right: 6px;
+}
+
+.brutal-post-header {
+  padding: 28px 32px 20px 32px;
+  border-bottom: 3px solid var(--border-raw);
+}
+
+.brutal-breadcrumbs {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.prompt-user { color: var(--c-blood); }
+.prompt-path { color: var(--c-acid); }
+.prompt-cmd { color: var(--c-toxic); }
+
+.brutal-single-title {
+  font-family: var(--font-heading);
+  font-size: clamp(30px, 4.5vw, 46px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin: 0 0 16px 0;
+  border-left: 10px solid var(--c-blood);
+  padding-left: 18px;
+}
+
+.glitch-title {
+  position: relative;
+  text-shadow: 2px 0 var(--c-blood), -2px 0 var(--c-cyan);
+}
+
+.brutal-single-desc {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  background: var(--bg-inset);
+  border: 2px solid var(--border-raw);
+  padding: 12px 18px;
+  margin-bottom: 18px;
+}
+
+.desc-bracket { color: var(--c-blood); font-weight: 900; }
+
+.brutal-single-content {
+  padding: 36px 34px;
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  line-height: 1.75;
+  color: var(--text-main);
+}
+
+.brutal-single-content h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 3.5vw, 32px);
+  font-weight: 900;
+  border-bottom: 3px solid var(--border-raw);
+  padding-bottom: 8px;
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brutal-single-content h2::before {
+  content: '§';
+  color: var(--c-blood);
+  font-size: 26px;
+}
+
+.brutal-single-content h3 {
+  font-family: var(--font-heading);
+  font-size: clamp(20px, 2.8vw, 24px);
+  font-weight: 900;
+  margin-top: 1.8em;
+}
+
+.brutal-single-content h3::before {
+  content: '>>';
+  color: var(--c-toxic);
+  margin-right: 8px;
+}
+
+.brutal-single-content a {
+  color: var(--text-main);
+  text-decoration: underline 3px var(--c-toxic);
+  text-underline-offset: 4px;
+  font-weight: 800;
+}
+
+.brutal-single-content a:hover {
+  background: var(--c-acid);
+  color: #000;
+  text-decoration: none;
+}
+
+/* Blockquotes */
+.brutal-single-content blockquote {
+  background: var(--bg-inset);
+  border: 3px solid var(--border-raw);
+  border-left: 12px solid var(--c-blood);
+  padding: 18px 24px;
+  margin: 2.2em 0;
+  font-family: var(--font-mono);
+  box-shadow: 4px 4px 0px var(--border-raw);
+}
+
+.brutal-single-content blockquote::before {
+  content: '⚠ WARNING // SAFETY FAULT DIRECTIVE:';
+  display: block;
+  font-weight: 900;
+  font-size: 12px;
+  color: var(--c-blood);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+/* Tables */
+.brutal-single-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  margin: 2em 0;
+  border: 3.5px solid var(--border-raw);
+  box-shadow: 4px 4px 0px var(--border-raw);
+}
+
+.brutal-single-content th {
+  background: #000000;
+  color: var(--c-acid);
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 900;
+  border: 1.5px solid var(--border-raw);
+}
+
+.brutal-single-content td {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-raw);
+  background: var(--bg-surface);
+}
+
+/* Code Blocks */
+.post-content pre,
+.post-content .highlight {
+  margin: 2em 0;
+  border: 3.5px solid var(--border-raw) !important;
+  box-shadow: 6px 6px 0px var(--border-raw) !important;
+  background: var(--code-block-bg) !important;
+  position: relative;
+}
+
+:root[data-theme="dark"] .post-content pre,
+:root[data-theme="dark"] .post-content .highlight {
+  border-color: #2b3548 !important;
+  box-shadow: 6px 6px 0px #000000 !important;
+}
+
+.post-content code {
+  font-family: var(--font-mono) !important;
+  font-size: 14px;
+}
+
+p code, li code {
+  background: var(--code-bg);
+  border: 2px solid var(--border-raw);
+  padding: 2px 7px;
+  font-size: 13px !important;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.brutal-copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 20;
+  background: #000000;
+  color: var(--c-acid);
+  border: 2.5px solid var(--c-acid);
+  box-shadow: 3px 3px 0px #000;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.brutal-copy-btn:hover {
+  background: var(--c-blood);
+  color: #fff;
+  border-color: #fff;
+  transform: translate(-1px, -1px);
+}
+
+/* Table of Contents */
+.brutal-toc-container { margin: 28px 32px; }
+
+.toc {
+  background: var(--bg-inset);
+  border: 3px solid var(--border-raw);
+  box-shadow: 5px 5px 0px var(--border-raw);
+  padding: 16px 22px;
+}
+
+.toc summary {
+  cursor: pointer;
+  font-family: var(--font-industrial);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+/* Tags List */
+.brutal-single-footer {
+  border-top: 4px solid var(--border-raw);
+  background: var(--bg-inset);
+  padding: 28px 32px;
+}
+
+.tags-header-label {
+  font-family: var(--font-industrial);
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--c-blood);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.brutal-tags-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.brutal-tag-link {
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--text-main);
+  background: var(--bg-surface);
+  border: 2.5px solid var(--border-raw);
+  box-shadow: 3px 3px 0px var(--border-raw);
+  padding: 5px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.1s ease;
+}
+
+.brutal-tag-link:hover {
+  background: var(--c-acid);
+  color: #000;
+  transform: translate(-2px, -2px) rotate(-1deg);
+  box-shadow: 5px 5px 0px var(--border-raw);
+}
+
+.tag-hash { color: var(--c-blood); }
+
+/* --------------------------------------------------------------------------
+   10. SEARCH PAGE (UNIX SHELL GREP)
+   -------------------------------------------------------------------------- */
+.brutal-search-wrap { margin-top: 28px; }
+
+.terminal-search-shell {
+  background: #000000;
+  border: 4px solid var(--border-raw);
+  box-shadow: var(--shadow-hard-lg);
+  margin-top: 24px;
+  margin-bottom: 48px;
+}
+
+.terminal-shell-bar {
+  background: #0c0f16;
+  border-bottom: 3px solid var(--border-raw);
+  color: #fff;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.shell-dots { display: flex; gap: 6px; }
+.shell-dots .dot { width: 10px; height: 10px; border: 1.5px solid #000; }
+.d-red { background: #ff3333; }
+.d-yel { background: #ffcc00; }
+.d-grn { background: #00ee44; }
+
+.shell-status {
+  background: var(--c-acid);
+  color: #000;
+  padding: 2px 8px;
+  font-weight: 900;
+}
+
+.brutal-searchbox { padding: 24px; }
+
+.search-prompt-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0d0f18;
+  border: 3px solid var(--border-raw);
+  padding: 8px 16px;
+}
+
+.search-prompt-sym {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--c-acid);
+}
+
+.brutal-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.search-prompt-kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--c-toxic);
+  border: 1px solid var(--c-toxic);
+  padding: 2px 6px;
+}
+
+.brutal-search-results li {
+  background: #101420;
+  border: 3px solid var(--border-raw);
+  box-shadow: 4px 4px 0px var(--border-raw);
+  margin-bottom: 14px;
+  padding: 16px 20px;
+}
+
+.brutal-search-results li:hover {
+  background: var(--c-acid);
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0px var(--border-raw);
+}
+
+.brutal-search-results li:hover a { color: #000000; }
+
+/* --------------------------------------------------------------------------
+   11. TAXONOMY REGISTRY
+   -------------------------------------------------------------------------- */
+.brutal-taxonomy-wrap { margin-top: 28px; }
+
+.taxonomy-control-plate {
+  font-family: var(--font-industrial);
+  font-size: 12px;
+  font-weight: 900;
+  background: var(--c-blood);
+  color: #ffffff;
+  padding: 8px 16px;
+  margin-bottom: 24px;
+  display: inline-block;
+  box-shadow: 3px 3px 0px var(--border-raw);
+}
+
+.brutal-terms-grid {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 48px;
+}
+
+.brutal-term-card {
+  background: var(--bg-surface);
+  border: 3.5px solid var(--border-raw);
+  box-shadow: 4px 4px 0px var(--border-raw);
+  transition: all 0.12s ease;
+}
+
+.brutal-term-card:hover {
+  transform: translate(-3px, -3px) rotate(-1deg);
+  background: var(--c-acid);
+  box-shadow: 7px 7px 0px var(--border-raw);
+}
+
+.term-link {
+  text-decoration: none;
+  color: var(--text-main);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-industrial);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.brutal-term-card:hover .term-link { color: #000; }
+
+.term-count-badge {
+  background: #000000;
+  color: #ffffff;
+  font-size: 11px;
+  padding: 2px 7px;
+  font-weight: 900;
+}
+
+.brutal-term-card:hover .term-count-badge {
+  background: var(--c-blood);
+}
+
+/* --------------------------------------------------------------------------
+   12. MACHINE CHASSIS FOOTER
+   -------------------------------------------------------------------------- */
+.brutal-footer {
+  margin-top: 70px;
+  background: #000000;
+  color: #ffffff;
+  border-top: 4px solid var(--border-raw);
+  padding: 0;
+}
+
+.footer-hazard-tape {
+  display: flex;
+  align-items: center;
+  background: var(--c-toxic);
+  color: #000000;
+  border-bottom: 3px solid #000000;
+}
+
+.tape-stripes {
+  width: 48px;
+  height: 28px;
+  background: var(--hazard-yellow-stripe);
+}
+
+.tape-label {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-industrial);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  padding: 4px 14px;
+}
+
+.footer-chassis-grid {
+  max-width: var(--nav-width);
+  margin: 0 auto;
+  padding: 36px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+
+.footer-block .block-title {
+  color: var(--c-acid);
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.t-line .t-key { color: #888888; }
+.t-line .t-val { color: #ffffff; font-weight: 900; }
+
+.barcode-text {
+  color: var(--c-acid);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  margin-top: 6px;
+}
+
+.audit-stamp-seal {
+  display: inline-block;
+  border: 3px solid var(--c-blood);
+  color: var(--c-blood);
+  padding: 4px 10px;
+  font-family: var(--font-industrial);
+  font-size: 11px;
+  font-weight: 900;
+  margin-top: 10px;
+  transform: rotate(-3deg);
+}
+
+.brutal-link {
+  color: var(--c-acid);
+  text-decoration: underline;
+  font-weight: 900;
+}
+
+.brutal-link:hover {
+  background: var(--c-blood);
+  color: #fff;
+}
+
+/* Mechanical Elevator Button */
+.brutal-top-link {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  background: var(--c-acid);
+  color: #000000;
+  border: 3.5px solid #000000;
+  box-shadow: 4px 4px 0px #000000;
+  padding: 10px 14px;
+  font-family: var(--font-industrial);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.1s ease;
+}
+
+.brutal-top-link:hover {
+  background: var(--c-blood);
+  color: #ffffff;
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px #000000;
+}
+
+/* --------------------------------------------------------------------------
+   13. BLUR DECAY & MECHANICAL FRACTURE ENGINE (CHAOS MODE)
+   -------------------------------------------------------------------------- */
+body.decay-active {
+  animation: phosphorSmear 4s infinite alternate;
+}
+
+@keyframes phosphorSmear {
+  0% { filter: blur(0px) contrast(100%); }
+  92% { filter: blur(0px) contrast(100%); }
+  94% { filter: blur(1.5px) contrast(140%) hue-rotate(15deg); }
+  96% { filter: blur(0px) contrast(100%); }
+  98% { filter: blur(2.5px) contrast(160%) hue-rotate(-20deg); }
+  100% { filter: blur(0px) contrast(100%); }
+}
+
+body.decay-active h1,
+body.decay-active h2,
+body.decay-active .r-letter {
+  text-shadow: 4px 0 var(--c-blood), -4px 0 var(--c-cyan) !important;
+}
+
+body.decay-active .fracture-card {
+  animation: mechanicalTremor 2.8s infinite ease-in-out;
+}
+
+body.decay-active .fracture-card:nth-child(even) {
+  transform: rotate(-1.2deg);
+}
+
+body.decay-active .fracture-card:nth-child(odd) {
+  transform: rotate(1deg);
+}
+
+@keyframes mechanicalTremor {
+  0%, 94% { transform: translate(0, 0); }
+  95% { transform: translate(-4px, 3px) rotate(1deg); }
+  97% { transform: translate(5px, -3px) rotate(-1.5deg); }
+  99% { transform: translate(-2px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Dynamic Phosphor Blur Smear Glitch on Hover */
+.title-direct-link:hover,
+.brutal-card-title:hover,
+.brutal-section-title:hover,
+.logo-box:hover .logo-prefix,
+.brutal-menu-link:hover .menu-name {
+  animation: phosphorSmearWave 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes phosphorSmearWave {
+  0% { filter: blur(0px) contrast(100%); }
+  22% { filter: blur(5px) contrast(220%) hue-rotate(60deg); transform: skewX(-3deg); }
+  50% { filter: blur(2px) contrast(160%) hue-rotate(-30deg); transform: skewX(1deg); }
+  75% { filter: blur(3.5px) contrast(190%); }
+  100% { filter: blur(0px) contrast(100%); transform: none; }
+}
+
+/* Ambient Optical Defocus Wave (Surveillance Camera Lens Degrade) */
+.hud-val, .docket-id-box, .ticker-content span {
+  animation: opticalDefocus 8s infinite ease-in-out;
+}
+
+@keyframes opticalDefocus {
+  0%, 93% { filter: blur(0); }
+  94% { filter: blur(2px) contrast(150%); }
+  96% { filter: blur(0); }
+  98% { filter: blur(3px) contrast(190%); }
+  100% { filter: blur(0); }
+}
+
+/* Interactive Classified Redacted Block */
+.redacted-block {
+  background: #000000;
+  color: #000000;
+  padding: 3px 10px;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  user-select: none;
+  cursor: pointer;
+  border: 1.5px solid var(--c-acid);
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.redacted-block .redacted-text {
+  filter: blur(4px);
+  opacity: 0.3;
+  transition: filter 0.15s, opacity 0.15s;
+}
+
+.redacted-block:hover,
+.redacted-block.revealed {
+  background: var(--c-blood);
+  color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.redacted-block:hover .redacted-text,
+.redacted-block.revealed .redacted-text {
+  filter: blur(0px);
+  opacity: 1;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   14. RESPONSIVE BREAKPOINTS
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .anti-design-hero { padding: 22px 16px; margin: 20px 0; }
+  .r-letter { font-size: 32px; padding: 4px 10px; border-width: 3px; }
+  .hero-sticker { display: none; }
+  .tech-spec-grid { grid-template-columns: 1fr; }
+  .brutal-single-content { padding: 20px 16px; }
+  .brutal-post-header { padding: 20px 16px; }
+  .footer-chassis-grid { grid-template-columns: 1fr; }
+}

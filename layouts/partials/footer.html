@@ -1,0 +1,193 @@
+{{- $is_en := eq site.Language.Lang "en" }}
+{{- if not (.Param "hideFooter") }}
+<footer class="footer brutal-footer">
+    {{- /* Hazard Stripe Divider across the bottom */ -}}
+    <div class="footer-hazard-tape" aria-hidden="true">
+        <span class="tape-stripes"></span>
+        <span class="tape-label">⚠ DECAY_LEVEL_MAX // DISPATCH_STREAM_END // VOLTAGE: 380V // DO NOT TOUCH ⚠</span>
+        <span class="tape-stripes"></span>
+    </div>
+
+    <div class="footer-chassis-grid">
+        <div class="footer-block spec-block">
+            <div class="block-title">[ {{ if $is_en }}HARDWARE & SYS TELEMETRY{{ else }}DONANIM & TELEMETRİ GÖZLEMİ{{ end }} ]</div>
+            <div class="telemetry-lines">
+                <div class="t-line"><span class="t-key">HOST_NODE:</span> <span class="t-val">TR-IST-07 // EDGE</span></div>
+                <div class="t-line"><span class="t-key">INTEGRITY:</span> <span class="t-val text-alert">COMPROMISED (FAIL-OPEN)</span></div>
+                <div class="t-line"><span class="t-key">ENTROPY:</span> <span class="t-val">99.8% // UNSTABLE</span></div>
+                <div class="t-line"><span class="t-key">APPARATUS:</span> <span class="t-val">OB-1000</span></div>
+            </div>
+        </div>
+
+        <div class="footer-block stamp-block">
+            <div class="industrial-barcode" aria-hidden="true">
+                <span class="b-bar b-3"></span><span class="b-bar b-1"></span><span class="b-bar b-4"></span>
+                <span class="b-bar b-2"></span><span class="b-bar b-1"></span><span class="b-bar b-5"></span>
+                <span class="b-bar b-2"></span><span class="b-bar b-4"></span><span class="b-bar b-1"></span>
+                <span class="b-bar b-3"></span><span class="b-bar b-2"></span><span class="b-bar b-6"></span>
+                <span class="b-bar b-1"></span><span class="b-bar b-3"></span><span class="b-bar b-2"></span>
+            </div>
+            <div class="barcode-text">OB-SYS-SPEC-1000-INCIDENT</div>
+            <div class="audit-stamp-seal">
+                <span class="seal-inner">CLASSIFIED // INCIDENT UNRESOLVED</span>
+            </div>
+        </div>
+
+        <div class="footer-block cred-block">
+            <div class="copyright-line">
+                &copy; {{ now.Year }} <strong class="author-name">OB</strong> // SEC-07
+            </div>
+
+            {{- with site.Params.footer.text }}
+                <div class="custom-footer-text">{{ . | markdownify }}</div>
+            {{- end }}
+
+            <div class="engine-credit">
+                <span>ENGINE: <a href="https://gohugo.io/" rel="noopener" target="_blank" class="brutal-link">HUGO</a></span>
+                <span class="sep">//</span>
+                <span>BASE: <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank" class="brutal-link">PAPERMOD</a></span>
+            </div>
+        </div>
+    </div>
+</footer>
+{{- end }}
+
+{{- if (not site.Params.disableScrollToTop) }}
+<a href="#top" id="top-link" class="top-link brutal-top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <span class="top-arrow">▲</span>
+    <span class="top-text">TOP</span>
+</a>
+{{- end }}
+
+{{- partial "extend_footer.html" . }}
+
+{{- /* Core scripts & Brutalist Enhancements */ -}}
+<script>
+    // Live Telemetry UTC Clock
+    function updateSysClock() {
+        const el = document.getElementById('sys-clock');
+        if (!el) return;
+        const now = new Date();
+        const hrs = String(now.getUTCHours()).padStart(2, '0');
+        const min = String(now.getUTCMinutes()).padStart(2, '0');
+        const sec = String(now.getUTCSeconds()).padStart(2, '0');
+        el.textContent = `UTC ${hrs}:${min}:${sec}`;
+    }
+    updateSysClock();
+    setInterval(updateSysClock, 1000);
+
+    // Mechanical Relay Audio Solenoid Click (Synthesized via Web Audio API)
+    let audioCtx = null;
+    function playRelayClick() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(380, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.035);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.035);
+        } catch(e) {}
+    }
+
+    // Chaos Mode Toggle (Decay & Glitch & Mechanical Fracture trigger)
+    const chaosBtn = document.getElementById('chaos-btn');
+    if (chaosBtn) {
+        if (localStorage.getItem('decay-mode') === 'true') {
+            document.body.classList.add('decay-active');
+        }
+        chaosBtn.addEventListener('click', () => {
+            playRelayClick();
+            document.body.classList.toggle('decay-active');
+            const isActive = document.body.classList.contains('decay-active');
+            localStorage.setItem('decay-mode', isActive);
+        });
+    }
+
+    // Scroll to Top threshold
+    const toplink = document.getElementById("top-link");
+    if (toplink) {
+        window.onscroll = function () {
+            const scrollThreshold = 350;
+            if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+                toplink.classList.remove("hidden");
+            } else {
+                toplink.classList.add("hidden");
+            }
+        };
+        toplink.addEventListener('click', playRelayClick);
+    }
+
+    // Theme toggle handling
+    const themeBtn = document.getElementById("theme-toggle");
+    if (themeBtn) {
+        themeBtn.addEventListener("click", () => {
+            playRelayClick();
+            const html = document.querySelector("html");
+            const newTheme = html.dataset.theme === "dark" ? "light" : "dark";
+            html.dataset.theme = newTheme;
+            localStorage.setItem("pref-theme", newTheme);
+        });
+    }
+
+    // Interactive Classified Redacted Blocks
+    document.querySelectorAll('.redacted-block').forEach(blk => {
+        blk.addEventListener('click', () => {
+            playRelayClick();
+            blk.classList.toggle('revealed');
+        });
+    });
+
+    // Mechanical snap on card hover/click
+    document.querySelectorAll('.fracture-card').forEach(c => {
+        c.addEventListener('mouseenter', () => {
+            // Subtle random glitch jitter
+            if (Math.random() > 0.6) playRelayClick();
+        });
+    });
+
+    // Code copy buttons
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code', 'brutal-copy-btn');
+        copybutton.innerHTML = '<span class="copy-lbl">[ DUMP_CODE ]</span>';
+
+        function copyingDone() {
+            copybutton.innerHTML = '<span class="copy-lbl copied">[ BUFFER_SAVED ]</span>';
+            setTimeout(() => {
+                copybutton.innerHTML = '<span class="copy-lbl">[ DUMP_CODE ]</span>';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', () => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { }
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else {
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>

@@ -1,0 +1,48 @@
+{{- define "main" }}
+
+<div class="brutal-search-wrap">
+    <header class="page-header brutal-page-header">
+        <div class="header-blueprint-badge">
+            <span class="badge-dot">■</span>
+            <span class="badge-text">TELEMETRY_QUERY // SYSTEM_INDEX</span>
+        </div>
+        <h1 class="brutal-section-title">
+            {{- (printf "%s" .Title ) | htmlUnescape -}}
+        </h1>
+        {{- if .Description }}
+        <div class="post-description brutal-section-desc">
+            {{ .Description }}
+        </div>
+        {{- end }}
+        {{- if not (.Param "hideMeta") }}
+        <div class="post-meta">
+            {{- partial "translation_list.html" . -}}
+        </div>
+        {{- end }}
+    </header>
+
+    <div class="terminal-search-shell">
+        <div class="terminal-shell-bar">
+            <div class="shell-dots">
+                <span class="dot d-red"></span>
+                <span class="dot d-yel"></span>
+                <span class="dot d-grn"></span>
+            </div>
+            <div class="shell-title">sh -c "grep --stream --color=auto"</div>
+            <div class="shell-status">FUSE_READY</div>
+        </div>
+
+        <div id="searchbox" class="searchbox brutal-searchbox">
+            <div class="search-prompt-line">
+                <span class="search-prompt-sym">&gt;</span>
+                <input id="searchInput" class="brutal-search-input" disabled 
+                    placeholder="{{ .Params.placeholder | default "grep /var/posts/ --query..." }}"
+                    aria-label="search" type="search" autocomplete="off" maxlength="64">
+                <span class="search-prompt-kbd">[ ↵ ENTER ]</span>
+            </div>
+            <ul id="searchResults" class="searchResults brutal-search-results" aria-label="search results"></ul>
+        </div>
+    </div>
+</div>
+
+{{- end }}{{/* end main */}}

@@ -1,0 +1,145 @@
+{{- /* SURVEILLANCE CAMERA HUD OVERLAY (Dystopian Sensor Feeds) */ -}}
+<div class="surveillance-hud-overlay" aria-hidden="true">
+    <div class="hud-corner-tag hud-tl">[REC ● 00:48:19:02] CAM_04 // SUBTERRANEAN</div>
+    <div class="hud-corner-tag hud-tr">OPTICAL_DECAY: 88.4% // CRT_PHOSPHOR</div>
+    <div class="hud-corner-tag hud-bl">FAILSAFE: NULL // OPERATOR: OB</div>
+    <div class="hud-corner-tag hud-br">ANOMALY_INDEX: CRITICAL // SECTOR-07</div>
+</div>
+
+{{- /* DYSTOPIAN ENTROPY & SYSTEM INSTABILITY MARQUEE HAZARD TICKER */ -}}
+<div class="hazard-ticker-tape" aria-hidden="true">
+    <div class="ticker-content">
+        <span>⚠ SYSTEM INSTABILITY // 0x0000007E KERNEL_THREAD_PRIORITY_NOT_LESS_OR_EQUAL ⚠ FAIL-OPEN AUDIT: UNCONTAINED ⚠ ENTROPY: 99.8% ⚠ REDACTED NODE // SECTOR-07 ⚠ HIGH VOLTAGE 380V ⚠ MEMORY DECAY DETECTED ⚠ BUFFER OVERFLOW AT 0x7FFF00 ⚠ DO NOT TOUCH THE EXPOSED CORE ⚠</span>
+        <span>⚠ SYSTEM INSTABILITY // 0x0000007E KERNEL_THREAD_PRIORITY_NOT_LESS_OR_EQUAL ⚠ FAIL-OPEN AUDIT: UNCONTAINED ⚠ ENTROPY: 99.8% ⚠ REDACTED NODE // SECTOR-07 ⚠ HIGH VOLTAGE 380V ⚠ MEMORY DECAY DETECTED ⚠ BUFFER OVERFLOW AT 0x7FFF00 ⚠ DO NOT TOUCH THE EXPOSED CORE ⚠</span>
+    </div>
+</div>
+
+{{- /* INDUSTRIAL SYSTEM TELEMETRY HUD BAR */ -}}
+<div class="sys-hud-ribbon" aria-hidden="true">
+    <div class="sys-hud-inner">
+        <div class="hud-group">
+            <span class="hud-item"><span class="hud-led-pulse"></span><span class="hud-label">REACTOR:</span> <strong class="hud-val">UNSTABLE_98%</strong></span>
+            <span class="hud-sep">//</span>
+            <span class="hud-item"><span class="hud-label">NODE:</span> <strong class="hud-val">TR-IST-07</strong></span>
+            <span class="hud-sep">//</span>
+            <span class="hud-item"><span class="hud-label">APPARATUS:</span> <strong class="hud-val">OB-1000</strong></span>
+            <span class="hud-sep hud-hide-mobile">//</span>
+            <span class="hud-item hud-hide-mobile"><span class="hud-label">FAILSAFE:</span> <strong class="hud-val text-alert">DISABLED</strong></span>
+        </div>
+        <div class="hud-group hud-time-group">
+            <button id="chaos-btn" class="chaos-trigger-btn" title="Toggle Mechanical Shatter & Glitch Mode" type="button">
+                <span class="chaos-warn">☣</span>
+                <span class="chaos-text">DECAY_ENGINE</span>
+            </button>
+            <span class="hud-item hud-time" id="sys-clock">UTC 00:00:00</span>
+        </div>
+    </div>
+</div>
+
+<header class="header brutal-header">
+    <nav class="header-nav brutal-nav">
+        <div class="logo brutal-logo-area">
+            <a href="{{ "" | absLangURL }}" class="brutal-logo-link" accesskey="h" title="OB // Systems (Alt + H)">
+                <div class="logo-box glitch-logo" data-text="OB">
+                    <svg class="header-logo-svg" viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+                        <rect width="64" height="64" fill="#050609" stroke="#ddff00" stroke-width="4"/>
+                        <!-- Top-Right Red Hazard Triangle -->
+                        <polygon points="38,0 64,0 64,26" fill="#ff003c"/>
+                        <!-- Heavy Stencil "O" -->
+                        <path d="M10,14 L28,14 L28,50 L10,50 Z" fill="none" stroke="#ddff00" stroke-width="5"/>
+                        <rect x="15" y="24" width="8" height="16" fill="#050609"/>
+                        <!-- Heavy Stencil "B" -->
+                        <path d="M34,14 L50,14 L54,20 L50,30 L54,40 L50,50 L34,50 Z" fill="none" stroke="#ddff00" stroke-width="5"/>
+                        <line x1="34" y1="30" x2="50" y2="30" stroke="#ddff00" stroke-width="4"/>
+                        <!-- Broken connection breach -->
+                        <line x1="28" y1="30" x2="34" y2="30" stroke="#ff003c" stroke-width="3" stroke-dasharray="2 1"/>
+                    </svg>
+                    <span class="logo-bracket">[</span>
+                    <span class="logo-prefix">OB</span>
+                    <span class="logo-bracket">]</span>
+                    <span class="logo-sep">//</span>
+                    <span class="logo-node-tag">KERNEL_SYS</span>
+                    <span class="terminal-cursor">_</span>
+                </div>
+            </a>
+
+            {{- $lsenabled := (or (not site.Params.disableThemeToggle) (and (not site.Params.disableLangToggle) (hugo.IsMultilingual))) }}
+            {{- if $lsenabled }}
+            <div class="logo-switches brutal-switches">
+                {{- if (not site.Params.disableThemeToggle) }}
+                <button id="theme-toggle" class="theme-toggle brutal-btn-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <span class="breaker-label">PWR/</span>
+                    <span class="toggle-mode-text">380V</span>
+                    <span class="toggle-icon-wrap">
+                        <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </span>
+                </button>
+                {{- end }}
+                
+                {{- if (not site.Params.disableLangToggle) }}
+                    {{- $lang := .Lang}}
+                    {{- with site.Home.Translations }}
+                    <div class="lang-selector-box">
+                        <span class="lang-current">[{{ $lang | upper }}]</span>
+                        <ul class="lang-menu brutal-lang-menu">
+                            {{- range . -}}
+                            {{- if ne $lang .Lang }}
+                            <li>
+                                <a href="{{- .Permalink -}}" class="brutal-lang-link"
+                                    title="{{ .Language.Params.languageAltTitle | default (.Language.LanguageName | emojify) | default (.Lang | title) }}"
+                                    aria-label="{{ .Language.LanguageName | default (.Lang | title) }}">
+                                    [{{- .Lang | upper -}}]
+                                </a>
+                            </li>
+                            {{- end -}}
+                            {{- end}}
+                        </ul>
+                    </div>
+                    {{- end }}
+                {{- end }}
+            </div>
+            {{- end }}
+        </div>
+        
+        {{- $currentPage := . }}
+        <ul id="menu" class="menu brutal-menu">
+            {{- range $idx, $item := site.Menus.main }}
+            {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL) ) | absLangURL }}
+            {{- $page_url:= $currentPage.Permalink | absLangURL }}
+            {{- $is_search := eq (site.GetPage .KeyName).Layout `search` }}
+            <li class="brutal-menu-item">
+                <a href="{{ .URL | absLangURL }}" class="brutal-menu-link {{- if eq $menu_item_url $page_url }} active{{- end }}"
+                    title="{{ .Title | default .Name }} {{- cond $is_search (" (Alt + /)" | safeHTMLAttr) ("" | safeHTMLAttr ) }}"
+                    {{- cond $is_search (" accesskey=/" | safeHTMLAttr) ("" | safeHTMLAttr ) }}>
+                    <span class="menu-idx">#0{{ add $idx 1 }}</span>
+                    <span class="menu-name">{{ .Name }}</span>
+                    {{- if (findRE "://" .URL) }}&nbsp;
+                    <svg class="external-icon" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" height="11" width="11">
+                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                        <path d="M15 3h6v6"></path>
+                        <path d="M10 14L21 3"></path>
+                    </svg>
+                    {{- end }}
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+    </nav>
+</header>
