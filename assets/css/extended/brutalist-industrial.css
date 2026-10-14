@@ -664,8 +664,16 @@ body::before {
   border: 2px solid var(--border-raw);
   box-shadow: 3px 3px 0px #040603;
   z-index: 25;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
   white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hero-sticker:hover {
+  filter: brightness(1.15);
+  box-shadow: 5px 5px 0px #040603;
 }
 
 .sticker-hazard-volt {
@@ -2579,4 +2587,178 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ==========================================================================
+   MECHANICAL HINGE SNAP, PENDULUM SWAY & GRAVITY PLUMMET SYSTEM
+   "Asılı kalıp sallanan ve kırılıp düşen butonlar / paneller"
+   ========================================================================== */
+
+/* Rattling bolt pre-snap tremor */
+@keyframes boltRattleTremor {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-2px, 1px) rotate(-1.5deg); }
+  40% { transform: translate(2px, -1px) rotate(1.5deg); }
+  60% { transform: translate(-1.5px, -1.5px) rotate(-1deg); }
+  80% { transform: translate(1.5px, 1px) rotate(1deg); }
+}
+
+.rattle-loose {
+  animation: boltRattleTremor 0.18s infinite !important;
+}
+
+/* Snap off right hinge, swing down hanging by top-left bolt */
+@keyframes hingeSnapSwingLeft {
+  0% { transform: rotate(0deg); }
+  16% { transform: rotate(44deg); }
+  32% { transform: rotate(15deg); }
+  48% { transform: rotate(34deg); }
+  64% { transform: rotate(22deg); }
+  80% { transform: rotate(29deg); }
+  100% { transform: rotate(26deg); }
+}
+
+@keyframes perpetualDangleLeft {
+  0% { transform: rotate(23deg); }
+  50% { transform: rotate(29deg); }
+  100% { transform: rotate(23deg); }
+}
+
+/* Snap off left hinge, swing down hanging by top-right bolt */
+@keyframes hingeSnapSwingRight {
+  0% { transform: rotate(0deg); }
+  16% { transform: rotate(-44deg); }
+  32% { transform: rotate(-15deg); }
+  48% { transform: rotate(-34deg); }
+  64% { transform: rotate(-22deg); }
+  80% { transform: rotate(-29deg); }
+  100% { transform: rotate(-26deg); }
+}
+
+@keyframes perpetualDangleRight {
+  0% { transform: rotate(-23deg); }
+  50% { transform: rotate(-29deg); }
+  100% { transform: rotate(-23deg); }
+}
+
+/* Cable / Wire dangle for functional buttons */
+@keyframes wireDangleSwing {
+  0% { transform: translateY(2px) rotate(0deg); }
+  20% { transform: translateY(9px) rotate(24deg); }
+  40% { transform: translateY(7px) rotate(-14deg); }
+  60% { transform: translateY(9px) rotate(16deg); }
+  80% { transform: translateY(8px) rotate(-7deg); }
+  100% { transform: translateY(8px) rotate(10deg); }
+}
+
+@keyframes perpetualWireSway {
+  0% { transform: translateY(8px) rotate(7deg); }
+  50% { transform: translateY(8px) rotate(13deg); }
+  100% { transform: translateY(8px) rotate(7deg); }
+}
+
+/* Gravity drop into the void */
+@keyframes gravityPlummetFall {
+  0% {
+    transform: translateY(0) rotate(var(--fall-rot, 25deg));
+    opacity: 1;
+  }
+  15% {
+    transform: translateY(35px) rotate(calc(var(--fall-rot, 25deg) + 20deg));
+  }
+  40% {
+    transform: translateY(200px) rotate(calc(var(--fall-rot, 25deg) + 70deg));
+  }
+  75% {
+    transform: translateY(550px) rotate(calc(var(--fall-rot, 25deg) + 140deg));
+  }
+  100% {
+    transform: translateY(125vh) rotate(calc(var(--fall-rot, 25deg) + 230deg));
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* Snapped left hinge state: swings freely from top-left point */
+.loose-hinge-left {
+  transform-origin: 6px 4px !important;
+  animation: hingeSnapSwingLeft 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+             perpetualDangleLeft 3.4s ease-in-out 0.85s infinite !important;
+  box-shadow: 4px 6px 0px #040603 !important;
+  z-index: 70 !important;
+  cursor: grab !important;
+}
+
+.loose-hinge-left:hover {
+  animation-play-state: paused !important;
+  transform: rotate(34deg) !important;
+  transition: transform 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+/* Snapped right hinge state: swings freely from top-right point */
+.loose-hinge-right {
+  transform-origin: calc(100% - 6px) 4px !important;
+  animation: hingeSnapSwingRight 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+             perpetualDangleRight 3.4s ease-in-out 0.85s infinite !important;
+  box-shadow: -4px 6px 0px #040603 !important;
+  z-index: 70 !important;
+  cursor: grab !important;
+}
+
+.loose-hinge-right:hover {
+  animation-play-state: paused !important;
+  transform: rotate(-34deg) !important;
+  transition: transform 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+/* Dangling by exposed cable/wire (for HUD switches and buttons) */
+.dangling-wire {
+  transform-origin: 25% -4px !important;
+  animation: wireDangleSwing 1s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+             perpetualWireSway 3.6s ease-in-out 1s infinite !important;
+  box-shadow: 3px 8px 0px #040603 !important;
+  position: relative !important;
+  z-index: 99 !important;
+  border-style: dashed !important;
+}
+
+.dangling-wire::before {
+  content: '⚡';
+  position: absolute;
+  top: -15px;
+  left: 20%;
+  font-size: 11px;
+  color: var(--text-dim);
+  animation: sparkFlicker 0.35s infinite;
+  pointer-events: none;
+}
+
+.dangling-wire:hover {
+  animation-play-state: paused !important;
+  transform: translateY(9px) rotate(18deg) !important;
+  transition: transform 0.2s ease;
+}
+
+/* Accelerating downward plummet */
+.plummet-fall {
+  animation: gravityPlummetFall 0.85s cubic-bezier(0.45, 0, 0.9, 0.5) forwards !important;
+  pointer-events: none !important;
+}
+
+/* Snapped bolt placeholder */
+.snapped-bolt-indicator {
+  position: relative;
+}
+
+.snapped-bolt-indicator::after {
+  content: '×';
+  position: absolute;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--text-dim);
+  top: -8px;
+  right: -8px;
+  line-height: 1;
+  pointer-events: none;
+}
+
 

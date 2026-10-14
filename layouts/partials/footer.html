@@ -437,7 +437,218 @@
             document.body.classList.toggle('decay-active');
             const isActive = document.body.classList.contains('decay-active');
             localStorage.setItem('decay-mode', isActive);
+            if (isActive) {
+                applyDecayPhysics(true);
+            } else {
+                repairAllPanels();
+            }
         });
+    }
+
+    // ==========================================
+    // PHYSICAL HINGE SNAP, PENDULUM SWING & GRAVITY DROP
+    // "Asılı kalıp sallanan ve kırılıp düşen butonlar / paneller"
+    // ==========================================
+    function playHingeSnapSound() {
+        try {
+            initAudio();
+            // Snap crack
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(680, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(140, audioCtx.currentTime + 0.045);
+            gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.045);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.045);
+
+            // Metallic spring resonance rattle
+            setTimeout(() => {
+                try {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(320, audioCtx.currentTime);
+                    osc2.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.08);
+                    gain2.gain.setValueAtTime(0.07, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.08);
+                } catch(e) {}
+            }, 30);
+        } catch(e) {}
+    }
+
+    function playPlummetSound() {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.16);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.16);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.16);
+        } catch(e) {}
+    }
+
+    function playPneumaticReboltSound() {
+        try {
+            initAudio();
+            [0, 50, 100].forEach((delay, idx) => {
+                setTimeout(() => {
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sawtooth';
+                        const f = 350 + idx * 160;
+                        osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(f - 100, audioCtx.currentTime + 0.035);
+                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.035);
+                    } catch(e) {}
+                }, delay);
+            });
+        } catch(e) {}
+    }
+
+    // Interactive Decorative Panels & Stickers (1st click: Dangle / 2nd click: Plummet)
+    const physicalPanels = document.querySelectorAll('.hero-sticker, .spec-chip, .dossier-stamp-seal, .audit-stamp-seal, .ransom-badge, .status-stamp, .chassis-bolt');
+    physicalPanels.forEach(el => {
+        el.setAttribute('title', '⚠ REINFORCED BOLT // Click to snap hinge or dislodge');
+        el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (el.classList.contains('plummet-fall')) return;
+
+            if (el.classList.contains('loose-hinge-left') || el.classList.contains('loose-hinge-right')) {
+                // Second click: Completely breaks off and falls!
+                playPlummetSound();
+                el.classList.remove('loose-hinge-left', 'loose-hinge-right');
+                el.classList.add('plummet-fall');
+                setTimeout(() => {
+                    el.style.visibility = 'hidden';
+                }, 850);
+            } else {
+                // First click: One bolt snaps, panel hangs and swings!
+                playHingeSnapSound();
+                const hingeSide = Math.random() > 0.5 ? 'loose-hinge-left' : 'loose-hinge-right';
+                el.classList.add(hingeSide, 'snapped-bolt-indicator');
+                el.setAttribute('title', '⚠ HANGING ON SINGLE BOLT // Click again to dislodge completely');
+            }
+        });
+    });
+
+    // Functional Buttons (Audio, Theme, Chaos, TopLink) - Double-click or Shift-Click to dangle by wire!
+    const functionalButtons = [
+        document.getElementById('audio-btn'),
+        document.getElementById('chaos-btn'),
+        document.getElementById('theme-toggle'),
+        document.getElementById('top-link')
+    ].filter(Boolean);
+
+    functionalButtons.forEach(btn => {
+        let clickCount = 0;
+        let clickTimer = null;
+
+        // Double click: Snap bracket, dangle by high-voltage cable
+        btn.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerButtonHangOrDrop(btn);
+        });
+
+        // Also allow Shift+Click as alternative shortcut
+        btn.addEventListener('click', (e) => {
+            if (e.shiftKey || e.altKey) {
+                e.preventDefault();
+                e.stopPropagation();
+                triggerButtonHangOrDrop(btn);
+                return;
+            }
+
+            // Rapid 3 clicks stress mechanic
+            clickCount++;
+            clearTimeout(clickTimer);
+            if (clickCount >= 3) {
+                clickCount = 0;
+                triggerButtonHangOrDrop(btn);
+            } else {
+                clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+            }
+        });
+    });
+
+    function triggerButtonHangOrDrop(btn) {
+        if (btn.classList.contains('plummet-fall')) return;
+
+        if (btn.classList.contains('dangling-wire')) {
+            // Cable breaks! Drops into the void!
+            playPlummetSound();
+            btn.classList.remove('dangling-wire');
+            btn.classList.add('plummet-fall');
+            setTimeout(() => {
+                btn.style.visibility = 'hidden';
+            }, 850);
+        } else {
+            // Mounting bracket breaks! Dangles by wire!
+            playHingeSnapSound();
+            btn.classList.add('dangling-wire');
+            btn.setAttribute('title', '⚠ MOUNTING BRACKET BROKEN // Dangling by live wire. Dbl-click to drop');
+        }
+    }
+
+    // DECAY ENGINE Integration: Toggling decay engine causes random elements to loosen and dangle!
+    function applyDecayPhysics(isActive) {
+        if (isActive) {
+            const available = Array.from(document.querySelectorAll('.hero-sticker, .spec-chip')).filter(x => !x.classList.contains('loose-hinge-left') && !x.classList.contains('loose-hinge-right') && !x.classList.contains('plummet-fall'));
+            const count = Math.min(3, available.length);
+            for (let i = 0; i < count; i++) {
+                const target = available[Math.floor(Math.random() * available.length)];
+                if (target) {
+                    setTimeout(() => {
+                        const side = Math.random() > 0.5 ? 'loose-hinge-left' : 'loose-hinge-right';
+                        target.classList.add(side, 'snapped-bolt-indicator');
+                        playHingeSnapSound();
+                    }, i * 250);
+                }
+            }
+        }
+    }
+
+    // Emergency Repair / Re-bolt all panels
+    function repairAllPanels() {
+        playPneumaticReboltSound();
+        document.querySelectorAll('.loose-hinge-left, .loose-hinge-right, .dangling-wire, .plummet-fall').forEach(el => {
+            el.classList.remove('loose-hinge-left', 'loose-hinge-right', 'dangling-wire', 'plummet-fall', 'snapped-bolt-indicator');
+            el.style.visibility = 'visible';
+            el.style.display = '';
+        });
+        const reactor = document.querySelector('.hud-val');
+        if (reactor) {
+            reactor.textContent = 'RESTABILIZED';
+            setTimeout(() => { reactor.textContent = 'UNSTABLE_98%'; }, 2500);
+        }
+    }
+
+    // Clicking reactor status or HUD label repairs everything!
+    const repairTrigger = document.querySelector('.spec-id-tag') || document.querySelector('.hud-group');
+    if (repairTrigger) {
+        repairTrigger.style.cursor = 'pointer';
+        repairTrigger.setAttribute('title', 'PNEUMATIC WRENCH: Click to re-bolt and repair dislodged panels');
+        repairTrigger.addEventListener('click', repairAllPanels);
     }
 
     const toplink = document.getElementById("top-link");
