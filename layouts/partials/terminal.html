@@ -122,6 +122,7 @@ Available system commands:
   thermal           Trigger CPU 104°C thermal junction meltdown
   daemon            Spawn evil sysadmin ASCII assistant
   selinux           Trigger SELinux AVC EPERM denial dialog
+  dossier           Deploy floating visitor surveillance drone & finger :D
   clear             Clear terminal screen
   exit              Close terminal session
 `,
@@ -231,6 +232,10 @@ Emergency Production Runbooks (SOP):
     selinux: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.triggerSelinuxAlert();
       return '[SELINUX_AVC] Access denied by kernel security policy.';
+    },
+    dossier: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.toggleSurveillanceDrone(true);
+      return '[DRONE_DEPLOYED] Floating snooping dossier dispatched with pointing finger :D';
     },
     defcon: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.openDefconModal();
@@ -380,7 +385,7 @@ Visit ${isEn ? '/en/radar/' : '/radar/'} for live grep filtering.
     } else if (e.key === 'Tab') {
       e.preventDefault();
       const current = cliInput.value.toLowerCase().trim();
-      const known = ['help', 'uname', 'uname -a', 'whoami', 'uptime', 'posts', 'radar', 'tools', 'lab', 'runbooks', 'canary', 'pgp', 'cat', 'cve', 'ping', 'dmesg', 'defcon', 'siren', 'nuke', 'quake', 'clown', 'panic', 'captcha', 'delta', 'thermal', 'daemon', 'selinux', 'clear', 'exit'];
+      const known = ['help', 'uname', 'uname -a', 'whoami', 'uptime', 'posts', 'radar', 'tools', 'lab', 'runbooks', 'canary', 'pgp', 'cat', 'cve', 'ping', 'dmesg', 'defcon', 'siren', 'nuke', 'quake', 'clown', 'panic', 'captcha', 'delta', 'thermal', 'daemon', 'selinux', 'dossier', 'clear', 'exit'];
       const match = known.find(k => k.startsWith(current));
       if (match) cliInput.value = match;
     }

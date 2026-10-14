@@ -96,6 +96,12 @@
         <strong class="defcon-label">{{ if $is_en }}TRIGGER SELINUX EPERM DENIAL{{ else }}SELINUX EPERM ERİŞİM ENGELİ{{ end }}</strong>
         <span class="defcon-hint">{{ if $is_en }}Red military AVC audit denial alert{{ else }}Kırmızı ölümcül AVC reddi uyarısı{{ end }}</span>
       </button>
+
+      <button type="button" class="defcon-btn btn-dossier" id="act-dossier">
+        <span class="defcon-code">[11 // SPY_DRONE]</span>
+        <strong class="defcon-label">{{ if $is_en }}FLOATING SNOOPING VISITOR DOSSIER{{ else }}GEZEN ELDİVENLİ ZİYARETÇİ KÜNYESİ{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Exposes IP, GPU, CPU, battery with pointing finger :D{{ else }}IP, GPU, CPU, pil ve tüm verileri gösterip gezen kutu :D{{ end }}</span>
+      </button>
     </div>
 
     <div class="defcon-footer">
@@ -259,6 +265,95 @@
 
 {{- /* 9. LIVE SECURITY AUDIT LOG TOAST STACK */ -}}
 <div id="security-toast-stack" class="security-toast-stack" aria-live="polite"></div>
+
+{{- /* 10. FLOATING SURVEILLANCE DOSSIER DRONE WITH POINTING GLOVED FINGER */ -}}
+<div id="surveillance-drone-apparatus" class="surveillance-drone-apparatus" style="display: none;">
+  <!-- The Animated Gloved Finger Pointer -->
+  <div id="gloved-finger-pointer" class="gloved-finger-pointer" title="{{ if $is_en }}Target Locked On You! Click hand to poke back :D{{ else }}Hedef kilitlendi! Parmağa tıklayarak dürtebilirsin :D{{ end }}">
+    <div class="finger-bubble" id="finger-speech-bubble" style="display: none;">
+      {{ if $is_en }}"🫵 YES YOU! WE SEE EVERYTHING! :D"{{ else }}"🫵 EVET SEN! BÜTÜN BİLGİLERİN BURADA! :D"{{ end }}
+    </div>
+    <svg viewBox="0 0 120 120" class="gloved-finger-svg" width="75" height="75" aria-hidden="true">
+      <defs>
+        <filter id="laser-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Glove Sleeve / Cuff -->
+      <path d="M 12 75 L 26 95 L 42 85 L 28 65 Z" fill="#eab308" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+      <!-- Palm and Knuckles -->
+      <path d="M 28 65 C 32 50 42 42 56 46 C 68 50 72 65 65 78 C 58 88 42 88 32 82 Z" fill="#fef08a" stroke="#000" stroke-width="3"/>
+      <!-- Folded Middle, Ring, Pinky Fingers -->
+      <path d="M 48 58 C 55 52 64 56 62 64 C 60 70 52 70 48 66" fill="#facc15" stroke="#000" stroke-width="2.5"/>
+      <path d="M 44 66 C 50 62 58 65 56 72 C 54 77 47 77 44 73" fill="#facc15" stroke="#000" stroke-width="2.5"/>
+      <!-- Thumb -->
+      <path d="M 38 52 C 40 44 48 42 52 48 C 54 52 48 58 44 58 Z" fill="#fef08a" stroke="#000" stroke-width="2.5"/>
+      <!-- Extended Pointing Index Finger -->
+      <path d="M 52 48 L 102 24 C 108 20 114 26 108 32 L 64 54 Z" fill="#fef08a" stroke="#000" stroke-width="3"/>
+      <!-- Glove Stitch Lines on Wrist -->
+      <line x1="22" y1="72" x2="30" y2="78" stroke="#a16207" stroke-width="2"/>
+      <line x1="26" y1="78" x2="34" y2="84" stroke="#a16207" stroke-width="2"/>
+      <!-- Laser Beam & Dot from Index Fingertip -->
+      <circle cx="112" cy="22" r="5" fill="#ef4444" filter="url(#laser-glow)" class="laser-dot-pulse"/>
+      <line x1="106" y1="25" x2="116" y2="21" stroke="#f87171" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- The Telemetry Dossier Chassis Box -->
+  <div class="drone-dossier-card" id="drone-dossier-card">
+    <div class="drone-header">
+      <div class="drone-head-left">
+        <span class="drone-rec-led">●</span>
+        <strong class="drone-title">{{ if $is_en }}TARGET_EXPOSURE_DOSSIER // COMPROMISED{{ else }}ZİYARETÇİ_TELEMETRİ_KÜNYESİ // DEŞİFRE{{ end }}</strong>
+      </div>
+      <div class="drone-controls">
+        <button type="button" id="drone-pause-btn" class="drone-btn" title="Pause / Resume Floating Patrol">⏸</button>
+        <button type="button" id="drone-min-btn" class="drone-btn" title="Minimize / Dock">_</button>
+        <button type="button" id="drone-close-btn" class="drone-btn" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <div class="drone-badge-strip">
+      <span class="dossier-badge-crit">SURVEILLANCE_ACTIVE</span>
+      <span class="dossier-badge-sub" id="drone-patrol-status">DRONE_PATROL: MOVING</span>
+    </div>
+
+    <!-- Data Telemetry Grid -->
+    <div class="drone-grid" id="drone-data-grid">
+      <div class="d-cell"><span class="d-key">IP_ADDRESS:</span> <strong class="d-val text-alert" id="d-ip">PROBING_GATEWAY...</strong></div>
+      <div class="d-cell"><span class="d-key">GEO_LOCATION:</span> <strong class="d-val text-neon" id="d-geo">TRIANGULATING...</strong></div>
+      <div class="d-cell"><span class="d-key">ISP_ROUTING:</span> <span class="d-val" id="d-isp">QUERYING_BGP...</span></div>
+      <div class="d-cell"><span class="d-key">GPU_RENDERER:</span> <strong class="d-val text-amber" id="d-gpu">SCANNING_WEBGL...</strong></div>
+      <div class="d-cell"><span class="d-key">CPU_HARDWARE:</span> <span class="d-val" id="d-cpu">DETECTING...</span></div>
+      <div class="d-cell"><span class="d-key">DEVICE_MEMORY:</span> <span class="d-val" id="d-ram">CALCULATING...</span></div>
+      <div class="d-cell"><span class="d-key">OPERATING_SYS:</span> <span class="d-val" id="d-os">FINGERPRINTING...</span></div>
+      <div class="d-cell"><span class="d-key">BROWSER_ENGINE:</span> <span class="d-val" id="d-browser">PARSING_UA...</span></div>
+      <div class="d-cell"><span class="d-key">DISPLAY_METRICS:</span> <span class="d-val" id="d-screen">MEASURING...</span></div>
+      <div class="d-cell"><span class="d-key">VIEWPORT_SIZE:</span> <span class="d-val" id="d-viewport">MEASURING...</span></div>
+      <div class="d-cell"><span class="d-key">BATTERY_POWER:</span> <strong class="d-val text-neon" id="d-battery">PROBING...</strong></div>
+      <div class="d-cell"><span class="d-key">SYSTEM_TIMEZONE:</span> <span class="d-val" id="d-tz">LOCATING...</span></div>
+      <div class="d-cell"><span class="d-key">LANG_PREFERENCES:</span> <span class="d-val" id="d-lang">CHECKING...</span></div>
+      <div class="d-cell"><span class="d-key">NETWORK_BANDWIDTH:</span> <span class="d-val" id="d-net">TESTING...</span></div>
+      <div class="d-cell"><span class="d-key">TOUCH_CAPABILITY:</span> <span class="d-val" id="d-touch">CHECKING...</span></div>
+      <div class="d-cell"><span class="d-key">DO_NOT_TRACK:</span> <span class="d-val text-alert" id="d-dnt">IGNORED_BY_DRONE</span></div>
+      <div class="d-cell"><span class="d-key">TRAFFIC_REFERRER:</span> <span class="d-val" id="d-ref">DIRECT_OR_BOOKMARK</span></div>
+    </div>
+
+    <div class="drone-footer-ticker">
+      <span class="d-scan-line">DRONE PATROL: SNOOPING RUNTIME TELEMETRY // ESCAPE IS FUTILE</span>
+    </div>
+  </div>
+
+  <!-- Minimized Dock Badge -->
+  <button type="button" id="drone-dock-pill" class="drone-dock-pill" style="display: none;">
+    <span class="dock-dot">●</span>
+    <span class="dock-lbl">🫵 [TARGET_DOSSIER_EXPOSED]</span>
+  </button>
+</div>
 
 {{- /* SCRIPT LOGIC FOR SOUNDS, MODALS, & TRIPPERS */ -}}
 <script>
@@ -731,6 +826,7 @@
   document.getElementById('act-thermal')?.addEventListener('click', () => { closeDefconModal(); triggerThermal(); });
   document.getElementById('act-daemon')?.addEventListener('click', () => { closeDefconModal(); triggerDaemon(); });
   document.getElementById('act-selinux')?.addEventListener('click', () => { closeDefconModal(); triggerSelinuxAlert(); });
+  document.getElementById('act-dossier')?.addEventListener('click', () => { closeDefconModal(); toggleSurveillanceDrone(true); });
 
   // Escape hotkey for modals
   document.addEventListener('keydown', (e) => {
@@ -898,6 +994,288 @@
   }, 32000);
 
   // ==========================================
+  // FLOATING SURVEILLANCE DRONE & GLOVED POINTING FINGER
+  // ==========================================
+  const droneApparatus = document.getElementById('surveillance-drone-apparatus');
+  const droneCard = document.getElementById('drone-dossier-card');
+  const glovedFinger = document.getElementById('gloved-finger-pointer');
+  const speechBubble = document.getElementById('finger-speech-bubble');
+  const dronePauseBtn = document.getElementById('drone-pause-btn');
+  const droneMinBtn = document.getElementById('drone-min-btn');
+  const droneCloseBtn = document.getElementById('drone-close-btn');
+  const droneDockPill = document.getElementById('drone-dock-pill');
+  const dronePatrolStatus = document.getElementById('drone-patrol-status');
+
+  let droneX = 60;
+  let droneY = 120;
+  let droneVx = 0.95;
+  let droneVy = 0.70;
+  let isDronePaused = false;
+  let isDroneHovered = false;
+  let isDroneVisible = false;
+
+  function populateDossierMetrics() {
+    // 1. Screen & Viewport
+    const screenEl = document.getElementById('d-screen');
+    if (screenEl) screenEl.textContent = `${window.screen.width}x${window.screen.height} (${window.screen.colorDepth}-bit color)`;
+    const vpEl = document.getElementById('d-viewport');
+    if (vpEl) vpEl.textContent = `${window.innerWidth}x${window.innerHeight} @ ${window.devicePixelRatio || 1}x DPR`;
+
+    // 2. CPU Hardware
+    const cpuEl = document.getElementById('d-cpu');
+    if (cpuEl) cpuEl.textContent = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} Logical Threads` : 'Protected Architecture';
+
+    // 3. RAM Memory
+    const ramEl = document.getElementById('d-ram');
+    if (ramEl) ramEl.textContent = navigator.deviceMemory ? `~${navigator.deviceMemory} GB Hardware RAM` : 'Sandbox Shielded';
+
+    // 4. GPU WebGL
+    const gpuEl = document.getElementById('d-gpu');
+    if (gpuEl) {
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl) {
+          const ext = gl.getExtension('WEBGL_debug_renderer_info');
+          if (ext) {
+            const renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+            gpuEl.textContent = renderer || 'Generic GPU Core';
+          } else {
+            gpuEl.textContent = gl.getParameter(gl.RENDERER) || 'WebGL Accelerated';
+          }
+        } else {
+          gpuEl.textContent = 'Hardware WebGL Disabled';
+        }
+      } catch(e) {
+        gpuEl.textContent = 'Protected Graphics Context';
+      }
+    }
+
+    // 5. OS & Architecture
+    const osEl = document.getElementById('d-os');
+    const ua = navigator.userAgent;
+    let os = 'Unknown OS';
+    if (ua.indexOf('Win') !== -1) os = 'Windows NT 10.0/11.0 (x86_64)';
+    else if (ua.indexOf('Mac') !== -1) os = 'macOS (Darwin Architecture)';
+    else if (ua.indexOf('Linux') !== -1) os = 'GNU/Linux (POSIX Kernel)';
+    else if (ua.indexOf('Android') !== -1) os = 'Android OS (Mobile Subnet)';
+    else if (ua.indexOf('like Mac') !== -1) os = 'Apple iOS / iPadOS';
+    if (osEl) osEl.textContent = os;
+
+    // 6. Browser Engine
+    const browserEl = document.getElementById('d-browser');
+    let browser = 'Web Browser';
+    if (ua.indexOf('Firefox') !== -1) browser = 'Mozilla Firefox (Gecko)';
+    else if (ua.indexOf('Edg') !== -1) browser = 'Microsoft Edge (Chromium)';
+    else if (ua.indexOf('Chrome') !== -1) browser = 'Google Chrome / Chromium Engine';
+    else if (ua.indexOf('Safari') !== -1) browser = 'Apple Safari (WebKit)';
+    if (browserEl) browserEl.textContent = browser;
+
+    // 7. Timezone & Clock
+    const tzEl = document.getElementById('d-tz');
+    if (tzEl) {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      const offset = -new Date().getTimezoneOffset() / 60;
+      tzEl.textContent = `${tz} (UTC${offset >= 0 ? '+' : ''}${offset})`;
+    }
+
+    // 8. Language Preferences
+    const langEl = document.getElementById('d-lang');
+    if (langEl) langEl.textContent = navigator.languages ? navigator.languages.join(', ') : (navigator.language || 'tr-TR, en-US');
+
+    // 9. Network Connection
+    const netEl = document.getElementById('d-net');
+    if (netEl) {
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (conn) {
+        netEl.textContent = `${conn.effectiveType ? conn.effectiveType.toUpperCase() : 'LAN'} / ${conn.downlink || 10} Mbps (${conn.rtt || 20}ms RTT)`;
+      } else {
+        netEl.textContent = 'Gigabit Ethernet / Fiber Line';
+      }
+    }
+
+    // 10. Battery Status
+    const batEl = document.getElementById('d-battery');
+    if (batEl && navigator.getBattery) {
+      navigator.getBattery().then(bat => {
+        const pct = Math.round(bat.level * 100);
+        batEl.textContent = `${pct}% [${bat.charging ? 'CHARGING ⚡' : 'ON BATTERY'}]`;
+      }).catch(() => {
+        if (batEl) batEl.textContent = 'Mains Power [DESKTOP AC]';
+      });
+    } else if (batEl) {
+      batEl.textContent = 'Mains Power [DESKTOP AC]';
+    }
+
+    // 11. Touchscreen Points
+    const touchEl = document.getElementById('d-touch');
+    if (touchEl) touchEl.textContent = navigator.maxTouchPoints > 0 ? `${navigator.maxTouchPoints} Touchpoints Active` : '0 (Precise Mouse Pointer)';
+
+    // 12. Do Not Track
+    const dntEl = document.getElementById('d-dnt');
+    if (dntEl) dntEl.textContent = navigator.doNotTrack === '1' ? 'ACTIVE [IGNORED BY SNOOPER :D]' : 'UNRESTRICTED TELEMETRY';
+
+    // 13. Referrer
+    const refEl = document.getElementById('d-ref');
+    if (refEl) refEl.textContent = document.referrer ? new URL(document.referrer).hostname : 'DIRECT_ENTRY / BOOKMARK';
+
+    // 14. Async IP & Geolocation Fetch
+    fetchLiveIpAndGeo();
+  }
+
+  async function fetchLiveIpAndGeo() {
+    const ipEl = document.getElementById('d-ip');
+    const geoEl = document.getElementById('d-geo');
+    const ispEl = document.getElementById('d-isp');
+
+    // Attempt 1: ipapi.co
+    try {
+      const r = await fetch('https://ipapi.co/json/');
+      if (r.ok) {
+        const data = await r.json();
+        if (ipEl) ipEl.textContent = data.ip || '127.0.0.1 (NAT)';
+        if (geoEl) geoEl.textContent = `${data.city || 'Unknown'}, ${data.region_code || ''} ${data.country_name || ''} [${data.latitude || 0}, ${data.longitude || 0}]`;
+        if (ispEl) ispEl.textContent = `${data.org || data.asn || 'Internet Service Provider'}`;
+        return;
+      }
+    } catch(e) {}
+
+    // Attempt 2: ipify
+    try {
+      const r2 = await fetch('https://api.ipify.org?format=json');
+      if (r2.ok) {
+        const data2 = await r2.json();
+        if (ipEl) ipEl.textContent = data2.ip;
+        if (geoEl) geoEl.textContent = 'Coordinates Protected by Proxy';
+        if (ispEl) ispEl.textContent = 'Autonomous System Transit BGP';
+        return;
+      }
+    } catch(e) {}
+
+    // Fallback: Local gateway simulation
+    if (ipEl) ipEl.textContent = '192.168.1.137 [EGRESS_ROUTER]';
+    if (geoEl) geoEl.textContent = 'Sector-07 Edge Substation [41.0082, 28.9784]';
+    if (ispEl) ispEl.textContent = 'Backbone Fiber Uplink (AS9121)';
+  }
+
+  function dronePatrolLoop() {
+    if (isDroneVisible && !isDronePaused && !isDroneHovered && droneApparatus && droneCard.style.display !== 'none') {
+      const cardRect = droneCard.getBoundingClientRect();
+      const droneW = cardRect.width || 380;
+      const droneH = cardRect.height || 420;
+
+      droneX += droneVx;
+      droneY += droneVy;
+
+      // Viewport collision bounce physics
+      if (droneX <= 15) {
+        droneX = 15;
+        droneVx = Math.abs(droneVx);
+        if (glovedFinger) glovedFinger.style.transform = 'scaleX(1)';
+      } else if (droneX + droneW >= window.innerWidth - 20) {
+        droneX = window.innerWidth - droneW - 20;
+        droneVx = -Math.abs(droneVx);
+        if (glovedFinger) glovedFinger.style.transform = 'scaleX(-1)';
+      }
+
+      if (droneY <= 65) {
+        droneY = 65;
+        droneVy = Math.abs(droneVy);
+      } else if (droneY + droneH >= window.innerHeight - 25) {
+        droneY = window.innerHeight - droneH - 25;
+        droneVy = -Math.abs(droneVy);
+      }
+
+      droneApparatus.style.transform = `translate3d(${droneX}px, ${droneY}px, 0)`;
+    }
+    requestAnimationFrame(dronePatrolLoop);
+  }
+
+  function toggleSurveillanceDrone(forceOpen = false) {
+    if (!droneApparatus) return;
+    if (forceOpen || !isDroneVisible) {
+      droneApparatus.style.display = 'block';
+      droneCard.style.display = 'flex';
+      droneDockPill.style.display = 'none';
+      isDroneVisible = true;
+      populateDossierMetrics();
+      showSecurityToast(isEn ? '[DRONE_DEPLOYED] Visitor surveillance dossier launched on patrol.' : '[DRONE_AKTİF] Gezen eldivenli ziyaretçi künyesi devriyeye çıktı :D');
+    } else {
+      droneApparatus.style.display = 'none';
+      isDroneVisible = false;
+    }
+  }
+
+  // Gloved finger poke reaction
+  function pokeFinger() {
+    if (typeof playRelayClick === 'function') {
+      playRelayClick(880, 0.05, 0.16);
+    }
+    if (speechBubble) {
+      speechBubble.style.display = 'block';
+      setTimeout(() => {
+        speechBubble.style.display = 'none';
+      }, 2600);
+    }
+    if (glovedFinger) {
+      glovedFinger.classList.add('finger-poking');
+      setTimeout(() => glovedFinger.classList.remove('finger-poking'), 500);
+    }
+  }
+
+  if (glovedFinger) {
+    glovedFinger.addEventListener('click', pokeFinger);
+  }
+
+  if (droneCard) {
+    droneCard.addEventListener('mouseenter', () => {
+      isDroneHovered = true;
+      if (dronePatrolStatus) dronePatrolStatus.textContent = isEn ? 'DRONE_PATROL: INSPECTING' : 'DRONE_DEVRİYE: İNCELENİYOR';
+    });
+    droneCard.addEventListener('mouseleave', () => {
+      isDroneHovered = false;
+      if (dronePatrolStatus) dronePatrolStatus.textContent = isEn ? 'DRONE_PATROL: MOVING' : 'DRONE_DEVRİYE: GEZİYOR :D';
+    });
+  }
+
+  if (dronePauseBtn) {
+    dronePauseBtn.addEventListener('click', () => {
+      isDronePaused = !isDronePaused;
+      dronePauseBtn.textContent = isDronePaused ? '▶' : '⏸';
+      if (dronePatrolStatus) dronePatrolStatus.textContent = isDronePaused ? 'DRONE_PATROL: PAUSED' : 'DRONE_PATROL: MOVING';
+    });
+  }
+
+  if (droneMinBtn) {
+    droneMinBtn.addEventListener('click', () => {
+      droneCard.style.display = 'none';
+      glovedFinger.style.display = 'none';
+      droneDockPill.style.display = 'inline-flex';
+    });
+  }
+
+  if (droneDockPill) {
+    droneDockPill.addEventListener('click', () => {
+      droneCard.style.display = 'flex';
+      glovedFinger.style.display = 'block';
+      droneDockPill.style.display = 'none';
+    });
+  }
+
+  if (droneCloseBtn) {
+    droneCloseBtn.addEventListener('click', () => {
+      droneApparatus.style.display = 'none';
+      isDroneVisible = false;
+    });
+  }
+
+  // Start Drone Patrol loop & Auto-spawn after 2.5 seconds!
+  requestAnimationFrame(dronePatrolLoop);
+  setTimeout(() => {
+    toggleSurveillanceDrone(true);
+  }, 2500);
+
+  // ==========================================
   // EXPORT GLOBAL API FOR TERMINAL & PALETTE
   // ==========================================
   window.ObCrisisEngine = {
@@ -913,7 +1291,9 @@
     triggerSelinuxAlert,
     openDefconModal,
     closeDefconModal,
-    showSecurityToast
+    showSecurityToast,
+    toggleSurveillanceDrone,
+    pokeFinger
   };
 })();
 </script>

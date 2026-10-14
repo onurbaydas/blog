@@ -70,7 +70,8 @@
     { title: isEn ? 'Catastrophe: 15,000 RPM 1U Delta Fan Whine' : 'Akustik: 15.000 RPM Delta Sunucu Fanı Çığlığı', action: 'crisis_delta', cat: 'DRILL', tag: 'DELTA' },
     { title: isEn ? 'Catastrophe: CPU 104°C Thermal Meltdown' : 'Kriz: Aşırı Isınma & Termal Erime (104°C)', action: 'crisis_thermal', cat: 'DRILL', tag: 'THERMAL' },
     { title: isEn ? 'Catastrophe: Summon Evil Sysadmin Daemon' : 'Muziplik: Kötü Ruhlu Sysadmin Asistanını Çağır', action: 'crisis_daemon', cat: 'DRILL', tag: 'DAEMON' },
-    { title: isEn ? 'Catastrophe: Open DEFCON-1 Emergency Switchboard' : 'Kontrol: DEFCON-1 Acil Durum Santralini Aç', action: 'crisis_defcon', cat: 'DRILL', tag: 'DEFCON' }
+    { title: isEn ? 'Catastrophe: Open DEFCON-1 Emergency Switchboard' : 'Kontrol: DEFCON-1 Acil Durum Santralini Aç', action: 'crisis_defcon', cat: 'DRILL', tag: 'DEFCON' },
+    { title: isEn ? 'Catastrophe: Floating Snooping Visitor Dossier :D' : 'Muziplik: Gezen Eldivenli Ziyaretçi Künyesi :D', action: 'crisis_dossier', cat: 'DRILL', tag: 'DRONE' }
   ];
 
   let activeIdx = 0;
@@ -158,6 +159,8 @@
       if (window.ObCrisisEngine) window.ObCrisisEngine.triggerDaemon();
     } else if (it.action === 'crisis_defcon') {
       if (window.ObCrisisEngine) window.ObCrisisEngine.openDefconModal();
+    } else if (it.action === 'crisis_dossier') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.toggleSurveillanceDrone(true);
     }
   }
 

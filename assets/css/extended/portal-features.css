@@ -2476,3 +2476,254 @@ body.thermal-meltdown {
   font-weight: 600;
 }
 
+/* ==========================================================================
+   9. FLOATING SNOOPING SURVEILLANCE DRONE & GLOVED POINTING FINGER
+   ========================================================================== */
+.surveillance-drone-apparatus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  transition: transform 0.04s linear;
+  user-select: none;
+}
+
+.gloved-finger-pointer {
+  position: absolute;
+  top: -46px;
+  right: -24px;
+  z-index: 10001;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: finger-poke-loop 0.85s infinite ease-in-out;
+  transition: transform 0.15s ease;
+  filter: drop-shadow(4px 4px 0px #000);
+}
+
+.gloved-finger-pointer:hover {
+  transform: scale(1.15) !important;
+}
+
+.gloved-finger-pointer.finger-poking {
+  animation: finger-rapid-poke 0.4s ease-in-out !important;
+}
+
+@keyframes finger-poke-loop {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-10px, -6px) rotate(-8deg); }
+}
+
+@keyframes finger-rapid-poke {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-22px, -12px) scale(1.2) rotate(-14deg); }
+  50% { transform: translate(-4px, -2px) scale(0.95); }
+  75% { transform: translate(-18px, -10px) scale(1.15) rotate(-10deg); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+.laser-dot-pulse {
+  animation: pulse-terminal-led 0.4s infinite;
+}
+
+.finger-bubble {
+  position: absolute;
+  bottom: 80px;
+  right: -10px;
+  background: #facc15;
+  color: #000;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  white-space: nowrap;
+  animation: bounce-in-speech 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.finger-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 28px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #facc15;
+}
+
+@keyframes bounce-in-speech {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.drone-dossier-card {
+  width: 370px;
+  background: #09090b;
+  border: 2px solid #facc15;
+  box-shadow: 8px 8px 0px #000;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.drone-dossier-card:hover {
+  border-color: #ef4444;
+  box-shadow: 10px 10px 0px #000;
+}
+
+.drone-header {
+  background: #18181b;
+  border-bottom: 2px solid #27272a;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drone-head-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drone-rec-led {
+  color: #ef4444;
+  font-size: 0.8rem;
+  animation: pulse-terminal-led 0.6s infinite;
+}
+
+.drone-title {
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.drone-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.drone-btn {
+  background: #09090b;
+  border: 1px solid #3f3f46;
+  color: #d4d4d8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.drone-btn:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.drone-badge-strip {
+  padding: 6px 12px;
+  background: #121214;
+  border-bottom: 1px solid #27272a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+}
+
+.dossier-badge-crit {
+  background: #dc2626;
+  color: #fff;
+  font-weight: 900;
+  padding: 2px 6px;
+}
+
+.dossier-badge-sub {
+  color: #facc15;
+  font-weight: 800;
+}
+
+.drone-grid {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.72rem;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #09090b;
+}
+
+.d-cell {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px dashed #1f1f23;
+  padding-bottom: 3px;
+  gap: 8px;
+}
+
+.d-key {
+  color: #71717a;
+  font-size: 0.68rem;
+  flex-shrink: 0;
+}
+
+.d-val {
+  color: #f4f4f5;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+.drone-footer-ticker {
+  background: #000;
+  border-top: 1px solid #27272a;
+  padding: 4px 10px;
+  font-size: 0.64rem;
+  color: #ef4444;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.drone-dock-pill {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 10000;
+  background: #18181b;
+  border: 2px solid #facc15;
+  color: #facc15;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 4px 4px 0px #000;
+  pointer-events: auto;
+  transition: all 0.15s ease;
+}
+
+.drone-dock-pill:hover {
+  background: #facc15;
+  color: #000;
+}
+
+.dock-dot {
+  color: #ef4444;
+  animation: pulse-terminal-led 0.6s infinite;
+}
+
+
