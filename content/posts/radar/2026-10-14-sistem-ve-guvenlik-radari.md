@@ -1,6 +1,6 @@
 ---
 title: "Sistem ve Güvenlik Radarı: 14 Ekim 2026"
-date: 2026-10-14T15:10:44+03:00
+date: 2026-10-14T15:25:41+03:00
 draft: false
 tags: ["Radar", "Sistem", "Güvenlik", "Linux", "CVE"]
 categories: ["Radar"]
@@ -12,13 +12,15 @@ TocOpen: false
 > **OPERASYONEL RAPOR // 2026-10-14**  
 > Bu bülten, [Canlı Sistem Radarı](/radar/) üzerinde toplanan 25+ otoriter kaynaktan derlenmiş; kural tabanlı puanlama ile filtrelenmiş günün en kritik gelişmelerini içerir.
 
+> 🐧 **Kernel.org Canlı Takipçisi:** `Mainline: 7.3-rc7` | `Stable: 7.2.10` | `LTS: 6.18.56`
+
 ## 🚨 Kritik Güvenlik ve CVE Uyarıları
 
-### **[CVE-2026-39919]** [Ghostscript flaw lets hackers hijack servers via PDF uploads](https://www.bleepingcomputer.com/news/security/ghostscript-flaw-lets-hackers-hijack-servers-via-pdf-uploads/)
+### **[[CVE-2026-39919](https://nvd.nist.gov/vuln/detail/CVE-2026-39919)]** [Ghostscript flaw lets hackers hijack servers via PDF uploads](https://www.bleepingcomputer.com/news/security/ghostscript-flaw-lets-hackers-hijack-servers-via-pdf-uploads/)
 - **Kaynak:** `BleepingComputer` | **Skor:** `10/10`
 - **Özet:** A critical heap buffer overflow vulnerability (CVE-2026-39919) in the Ghostscript interpreter and rendering engine could allow remote code execution through specially crafted PDF files.
 
-### **[CVE-2026-73570]** [ZCS Command Injection via SNMP Handlers Enables Unauthenticated Remote Code Execution](https://www.infoq.com/news/2026/10/zimbra-command-injection/?utm_campaign=infoq_content&utm_source=infoq&utm_medium=feed&utm_term=global)
+### **[[CVE-2026-73570](https://nvd.nist.gov/vuln/detail/CVE-2026-73570)]** [ZCS Command Injection via SNMP Handlers Enables Unauthenticated Remote Code Execution](https://www.infoq.com/news/2026/10/zimbra-command-injection/?utm_campaign=infoq_content&utm_source=infoq&utm_medium=feed&utm_term=global)
 - **Kaynak:** `InfoQ` | **Skor:** `10/10`
 - **Özet:** A critical remote command execution vulnerability in the Zimbra Collaboration Suite, identified as CVE-2026-73570, poses risks by allowing unauthorized access to mailbox data and credentials.
 
@@ -48,6 +50,15 @@ TocOpen: false
 - **[Hirudo Android Trojan Uses Patched Banking Apps to Bypass Their Built-In Security Checks](https://thehackernews.com/2026/10/hirudo-android-trojan-uses-patched.html)** (`The Hacker News`)  
   Cybersecurity researchers have disclosed details of a new Android banking trojan called Hirudo that works by replacing legitimate banking apps with purpose-built patched versions designed to bypass security checks from inside the app itself, marking a new...
 
+## 🐙 Açık Kaynak Sistemler ve eBPF Repoları
+
+- **[FootprintAI/Containarium: Open-source agent runtime — SSH-native isolation, eBPF egress policy,...](https://github.com/FootprintAI/Containarium)** (`GitHub Trending`)  
+  [Go ★305] Open-source agent runtime — SSH-native isolation, eBPF egress policy, Kubernetes + LXC backends, GPU passthrough, MCP-native CLI
+- **[open-telemetry/opentelemetry-ebpf-instrumentation: Zero-code OpenTelemetry instrumentation powered by eBPF](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation)** (`GitHub Trending`)  
+  [C ★590] Zero-code OpenTelemetry instrumentation powered by eBPF
+- **[cilium/tetragon: eBPF-based Security Observability and Runtime Enforcement](https://github.com/cilium/tetragon)** (`GitHub Trending`)  
+  [C ★5072] eBPF-based Security Observability and Runtime Enforcement
+
 ## ⚙️ Depolama, Ağ ve Kurumsal Mimariler
 
 - **[Intel’s Crescent Island AI Server GPU Gets a Name and Specs: Meet the Intel GPU D-Series](https://www.servethehome.com/intels-crescent-island-ai-server-gpu-gets-a-name-and-specs-meet-the-intel-gpu-d-series/)** (`ServeTheHome`)  
@@ -59,20 +70,20 @@ TocOpen: false
 
 ## ⚡ Yapay Zeka Altyapısı ve GPU Hesaplama
 
-- **[Anthropic Executive Says Open-Source AI Models Are Higher Risk](https://www.reddit.com/r/LocalLLaMA/comments/1x5nyd3/anthropic_executive_says_opensource_ai_models_are/)** (`r/LocalLLaMA`)  
+- **[Anthropic Executive Says Open-Source AI Models Are Higher Risk](https://www.reddit.com/r/LocalLLaMA/comments/1x5nyd3/anthropic_executive_says_opensource_ai_models_are/)** (`r/LocalLLaMA` · [Tartışma](https://www.reddit.com/r/LocalLLaMA/comments/1x5nyd3/anthropic_executive_says_opensource_ai_models_are/))  
   https://www.bloomberg.com/news/articles/2026-10-14/anthropic-executive-says-open-source-ai-models-are-higher-risk...
-- **[Someone is running Qwen 27B at ~20 tok/s on a jailbroken PS5's GPU](https://www.reddit.com/r/LocalLLaMA/comments/1x5ak2n/someone_is_running_qwen_27b_at_20_toks_on_a/)** (`r/LocalLLaMA`)  
+- **[Someone is running Qwen 27B at ~20 tok/s on a jailbroken PS5's GPU](https://www.reddit.com/r/LocalLLaMA/comments/1x5ak2n/someone_is_running_qwen_27b_at_20_toks_on_a/)** (`r/LocalLLaMA` · [Tartışma](https://www.reddit.com/r/LocalLLaMA/comments/1x5ak2n/someone_is_running_qwen_27b_at_20_toks_on_a/))  
   submitted by /u/LatentSpacer [link] [comments]
 - **[The Roadmap to Mastering Agentic AI Systems in 2026](https://www.kdnuggets.com/the-roadmap-to-mastering-agentic-ai-systems-in-2026)** (`KDnuggets`)  
   A four-level technical roadmap for building agentic AI systems, from single cognitive loops and stateful memory through multi-agent swarms and production observability.
 
 ## 🌐 Mühendislik Topluluğu ve Tartışmalar
 
-- **[AOSP Source Releases Are So Late Developers Disassemble Libraries to Report Bugs](https://github.com/android/ndk/issues/2260)** (`Hacker News: Best`)  
+- **[AOSP Source Releases Are So Late Developers Disassemble Libraries to Report Bugs](https://github.com/android/ndk/issues/2260)** (`Hacker News: Best` · [Topluluk Tartışması](https://news.ycombinator.com/item?id=50083130))  
   Article URL: https://github.com/android/ndk/issues/2260 Comments URL: https://news.ycombinator.com/item?id=50083130 Points: 302 # Comments: 142
-- **[Redesigning source control at Anthropic](https://www.anthropic.com/engineering/redesigning-source-control)** (`Hacker News: Best`)  
+- **[Redesigning source control at Anthropic](https://www.anthropic.com/engineering/redesigning-source-control)** (`Hacker News: Best` · [Topluluk Tartışması](https://news.ycombinator.com/item?id=50073633))  
   Article URL: https://www.anthropic.com/engineering/redesigning-source-control Comments URL: https://news.ycombinator.com/item?id=50073633 Points: 794 # Comments: 833
-- **[Introducing Firefox Enterprise](https://blog.mozilla.org/en/firefox/introducing-firefox-enterprise/)** (`Lobsters`)  
+- **[Introducing Firefox Enterprise](https://blog.mozilla.org/en/firefox/introducing-firefox-enterprise/)** (`Lobsters` · [Topluluk Tartışması](https://lobste.rs/s/7xg9rm/introducing_firefox_enterprise))  
   Introducing Firefox Enterprise
 
 ---

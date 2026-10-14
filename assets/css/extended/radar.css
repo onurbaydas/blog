@@ -1,5 +1,5 @@
 /* ==========================================================================
-   OB SYSTEM & SECURITY RADAR // BRUTALIST INDUSTRIAL SPEC
+   OB SYSTEM & SECURITY RADAR // BRUTALIST INDUSTRIAL SPEC (ADVANCED)
    ========================================================================== */
 
 .radar-container {
@@ -56,6 +56,75 @@
 .brutal-btn.opml-btn:hover {
   transform: translate(-2px, -2px);
   box-shadow: var(--shadow-hard-lg);
+  background: var(--text-main);
+  color: var(--bg-canvas);
+}
+
+/* Kernel.org Live Watchdog Banner */
+.kernel-watchdog-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  padding: 0.65rem 0.9rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+
+.kw-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.kw-dot {
+  font-size: 0.95rem;
+}
+
+.kw-versions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.kw-item .kw-label {
+  color: var(--text-ghost);
+  font-size: 0.76rem;
+}
+
+.kw-item strong {
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.kw-item.kw-stable strong {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-raw);
+  padding: 0.1rem 0.35rem;
+}
+
+.kw-sep {
+  color: var(--border-raw);
+}
+
+.kw-link {
+  color: var(--text-main);
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 2px solid var(--text-main);
+  transition: all 0.15s ease;
+}
+
+.kw-link:hover {
   background: var(--text-main);
   color: var(--bg-canvas);
 }
@@ -192,6 +261,17 @@
   box-shadow: 3px 3px 0px var(--border-raw);
 }
 
+.cat-pill.cat-triage-btn {
+  background: var(--bg-inset);
+  border-color: var(--border-raw);
+}
+
+.cat-pill.cat-triage-btn.active {
+  background: var(--c-blood);
+  color: #fff;
+  border-color: var(--c-blood);
+}
+
 .cat-dot {
   margin-right: 0.3rem;
 }
@@ -237,6 +317,14 @@
   letter-spacing: 0.05em;
   display: inline-block;
   border: 1px solid var(--border-raw);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+a.cve-warning-tag:hover {
+  background: #000;
+  color: #fff;
+  border-color: #fff;
 }
 
 .radar-meta-badges {
@@ -297,6 +385,38 @@
   margin: 0;
 }
 
+/* Internal Article Cross-Reference Callout */
+.radar-related-docket {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: var(--bg-inset);
+  border: 2px dashed var(--border-raw);
+  padding: 0.45rem 0.75rem;
+  margin-bottom: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.related-badge {
+  color: var(--text-ghost);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.related-link {
+  color: var(--text-main);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.related-link:hover {
+  color: var(--text-dim);
+}
+
 .radar-item-footer {
   display: flex;
   justify-content: space-between;
@@ -322,6 +442,25 @@
 
 .wire-time {
   color: var(--text-dim);
+}
+
+.radar-action-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.radar-comments-link {
+  color: var(--text-dim);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.radar-comments-link:hover {
+  color: var(--text-main);
+  text-decoration: underline;
 }
 
 .radar-wire-link {
@@ -470,6 +609,10 @@
   .radar-telemetry-bar {
     flex-direction: column;
     gap: 0.4rem;
+  }
+  .kernel-watchdog-banner {
+    flex-direction: column;
+    align-items: flex-start;
   }
   .radar-home-ticker {
     flex-direction: column;

@@ -12,7 +12,6 @@
             <outline type="rss" text="Krebs on Security" title="Krebs on Security" xmlUrl="https://krebsonsecurity.com/feed/" htmlUrl="https://krebsonsecurity.com"/>
             <outline type="rss" text="The Hacker News" title="The Hacker News" xmlUrl="https://thehackernews.com/feeds/posts/default" htmlUrl="https://thehackernews.com"/>
             <outline type="rss" text="Darknet Security" title="Darknet Security" xmlUrl="https://www.darknet.org.uk/feed/" htmlUrl="https://www.darknet.org.uk"/>
-            <outline type="rss" text="All InfoSec News" title="All InfoSec News" xmlUrl="https://allinfosecnews.com/feed/" htmlUrl="https://allinfosecnews.com/"/>
         </outline>
         <outline text="Linux, Çekirdek ve Altyapı" title="Linux, Çekirdek ve Altyapı">
             <outline type="rss" text="Phoronix" title="Phoronix" xmlUrl="https://www.phoronix.com/rss.php" htmlUrl="https://www.phoronix.com/"/>

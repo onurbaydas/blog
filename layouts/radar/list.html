@@ -31,6 +31,28 @@
     </p>
 
     {{- with $radar }}
+    {{- /* Live Kernel.org Watchdog Chassis */ -}}
+    {{- with .kernel_watchdog }}
+    {{- if eq .status "ONLINE" }}
+    <div class="kernel-watchdog-banner">
+      <div class="kw-tag">
+        <span class="kw-dot">🐧</span>
+        <span>KERNEL.ORG // LIVE_TRACKER</span>
+      </div>
+      <div class="kw-versions">
+        <span class="kw-item"><span class="kw-label">MAINLINE:</span> <strong>{{ .mainline }}</strong></span>
+        <span class="kw-sep">//</span>
+        <span class="kw-item kw-stable"><span class="kw-label">STABLE:</span> <strong>{{ .stable }}</strong></span>
+        <span class="kw-sep">//</span>
+        <span class="kw-item"><span class="kw-label">LTS:</span> <strong>{{ .longterm }}</strong></span>
+      </div>
+      <a href="https://kernel.org" target="_blank" rel="noopener noreferrer" class="kw-link" title="Open kernel.org releases">
+        KERNEL.ORG &rarr;
+      </a>
+    </div>
+    {{- end }}
+    {{- end }}
+
     {{- /* Live Telemetry Bar */ -}}
     <div class="radar-telemetry-bar">
       <div class="telemetry-node">
@@ -66,11 +88,17 @@
       <button class="cat-pill active" data-cat="all">
         <span class="cat-dot">■</span> {{ if $is_en }}ALL FEEDS{{ else }}TÜM AKIŞ{{ end }} ({{ .total_items }})
       </button>
+      <button class="cat-pill cat-triage-btn" id="triage-toggle-btn" title="Filter items scored 8 or higher">
+        <span class="cat-dot">⚡</span> {{ if $is_en }}STANDUP TRIAGE (8+ SCORE){{ else }}STANDUP TRIAGE (8+ PUAN){{ end }}
+      </button>
       <button class="cat-pill cat-security" data-cat="security">
         <span class="cat-dot">🛡️</span> {{ if $is_en }}SECURITY &amp; CVE{{ else }}GÜVENLİK &amp; CVE{{ end }}
       </button>
       <button class="cat-pill cat-kernel" data-cat="kernel">
         <span class="cat-dot">🐧</span> {{ if $is_en }}LINUX &amp; KERNEL{{ else }}LINUX &amp; ÇEKİRDEK{{ end }}
+      </button>
+      <button class="cat-pill cat-github" data-cat="github">
+        <span class="cat-dot">🐙</span> {{ if $is_en }}GITHUB SYSTEMS{{ else }}GITHUB SİSTEMLERİ{{ end }}
       </button>
       <button class="cat-pill cat-infra" data-cat="infra">
         <span class="cat-dot">⚙️</span> {{ if $is_en }}INFRA &amp; STORAGE{{ else }}ALTYAPI &amp; DEPOLAMA{{ end }}
@@ -96,7 +124,9 @@
       <div class="docket-header-strip">
         <div class="docket-id-box">
           {{- if $item.is_cve -}}
-            <span class="cve-warning-tag">⚠ {{ $item.cve_id }}</span>
+            <a href="{{ $item.cve_url }}" target="_blank" rel="noopener noreferrer" class="cve-warning-tag" title="Open Official NIST NVD CVE Advisory">
+              ⚠ {{ $item.cve_id }} ↗
+            </a>
           {{- else if $item.is_critical -}}
             <span class="cve-warning-tag">⚠ THREAT_ALERT</span>
           {{- else -}}
@@ -123,15 +153,32 @@
         <p>{{ $item.summary }}</p>
       </div>
 
+      {{- /* Internal Article Cross-Reference Callout */ -}}
+      {{- with $item.related_post }}
+      <div class="radar-related-docket">
+        <span class="related-badge">🔗 {{ .badge }}</span>
+        <a href="{{ if $is_en }}{{ .url_en }}{{ else }}{{ .url_tr }}{{ end }}" class="related-link">
+          {{ if $is_en }}{{ .title_en }}{{ else }}{{ .title_tr }}{{ end }} &rarr;
+        </a>
+      </div>
+      {{- end }}
+
       <footer class="radar-item-footer">
         <div class="footer-wire-info">
           <span class="wire-category">CAT: {{ $item.category | upper }}</span>
           <span class="wire-separator">//</span>
           <time class="wire-time" datetime="{{ $item.published_iso }}">{{ substr $item.published_iso 0 10 }}</time>
         </div>
-        <a href="{{ $item.link }}" target="_blank" rel="noopener noreferrer" class="radar-wire-link" title="Open Source">
-          ORIGINAL_WIRE &rarr;
-        </a>
+        <div class="radar-action-links">
+          {{- if $item.comments_url }}
+          <a href="{{ $item.comments_url }}" target="_blank" rel="noopener noreferrer" class="radar-comments-link" title="Open Community Discussion">
+            💬 {{ if $is_en }}DISCUSS{{ else }}TARTIŞMA{{ end }} ↗
+          </a>
+          {{- end }}
+          <a href="{{ $item.link }}" target="_blank" rel="noopener noreferrer" class="radar-wire-link" title="Open Source Wire">
+            ORIGINAL_WIRE &rarr;
+          </a>
+        </div>
       </footer>
     </article>
     {{- end }}
@@ -160,11 +207,13 @@
 (function() {
   const searchInput = document.getElementById('radar-search-input');
   const clearBtn = document.getElementById('radar-clear-btn');
-  const catButtons = document.querySelectorAll('#radar-category-filters .cat-pill');
+  const catButtons = document.querySelectorAll('#radar-category-filters .cat-pill:not(#triage-toggle-btn)');
+  const triageBtn = document.getElementById('triage-toggle-btn');
   const cards = document.querySelectorAll('#radar-feed-stream .radar-card');
   const emptyState = document.getElementById('radar-empty-message');
 
   let activeCategory = 'all';
+  let triageActive = false;
 
   function applyFilters() {
     const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
@@ -172,12 +221,14 @@
 
     cards.forEach(card => {
       const cardCat = card.getAttribute('data-category');
+      const score = parseInt(card.getAttribute('data-score') || '0', 10);
       const content = (card.getAttribute('data-content') || '').toLowerCase();
 
       const catMatches = (activeCategory === 'all') || (cardCat === activeCategory);
+      const triageMatches = !triageActive || (score >= 8);
       const queryMatches = !query || content.includes(query);
 
-      if (catMatches && queryMatches) {
+      if (catMatches && triageMatches && queryMatches) {
         card.style.display = '';
         visibleCount++;
       } else {
@@ -214,6 +265,14 @@
   if (clearBtn) {
     clearBtn.addEventListener('click', function() {
       if (searchInput) searchInput.value = '';
+      applyFilters();
+    });
+  }
+
+  if (triageBtn) {
+    triageBtn.addEventListener('click', function() {
+      triageActive = !triageActive;
+      this.classList.toggle('active', triageActive);
       applyFilters();
     });
   }
