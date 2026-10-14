@@ -280,7 +280,29 @@ Visit ${isEn ? '/en/radar/' : '/radar/'} for live grep filtering.
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  // IBM Model-M Mechanical Key Click Synthesizer
+  function playModelMClick(isEnter = false) {
+    if (typeof isAudioActive !== 'undefined' && !isAudioActive) return;
+    try {
+      if (typeof initAudio === 'function') initAudio();
+      if (!audioCtx) return;
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = isEnter ? 'square' : 'triangle';
+      osc.frequency.setValueAtTime(isEnter ? 500 : 1800 + Math.random() * 400, t);
+      osc.frequency.exponentialRampToValueAtTime(70, t + (isEnter ? 0.07 : 0.025));
+      gain.gain.setValueAtTime(isEnter ? 0.1 : 0.05, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + (isEnter ? 0.07 : 0.025));
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + (isEnter ? 0.07 : 0.025));
+    } catch(e) {}
+  }
+
   cliInput.addEventListener('keydown', function(e) {
+    playModelMClick(e.key === 'Enter');
     if (e.key === 'Enter') {
       const cmd = cliInput.value;
       cliInput.value = '';

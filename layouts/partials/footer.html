@@ -69,6 +69,7 @@
 
 {{- partial "extend_footer.html" . }}
 {{- partial "terminal.html" . }}
+{{- partial "command_palette.html" . }}
 
 {{- /* Core scripts & Brutalist Enhancements */ -}}
 {{- /* VOID WATCHER: The Two Terrifying Eyes That Suddenly Spawn At Random Page Edges */ -}}
@@ -740,4 +741,58 @@
             codeblock.parentNode.appendChild(copybutton);
         }
     });
+
+    // ==========================================
+    // VIM NAVIGATION KEYBINDINGS (Engineered for Sysadmins)
+    // ==========================================
+    (function() {
+        let lastGTime = 0;
+        const isEn = document.documentElement.lang === 'en';
+
+        document.addEventListener('keydown', function(e) {
+            // Ignore when typing in input, textarea, or contenteditable
+            const tag = (e.target.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+            // Ignore when modifier keys are pressed
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+            // Check if terminal or command palette is open
+            const termModal = document.getElementById('brutal-terminal-modal');
+            const cmdPalette = document.getElementById('brutal-cmd-palette');
+            if ((termModal && termModal.style.display !== 'none') || (cmdPalette && cmdPalette.style.display !== 'none')) {
+                return;
+            }
+
+            const now = Date.now();
+
+            if (e.key === 'j') {
+                window.scrollBy({ top: 140, behavior: 'smooth' });
+            } else if (e.key === 'k') {
+                window.scrollBy({ top: -140, behavior: 'smooth' });
+            } else if (e.key === 'g') {
+                if (now - lastGTime < 450) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    lastGTime = 0;
+                } else {
+                    lastGTime = now;
+                }
+            } else if (e.key === 'G') {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            } else if (e.key === 'h') {
+                window.location.href = isEn ? '/en/' : '/';
+            } else if (e.key === 'r') {
+                window.location.href = isEn ? '/en/radar/' : '/radar/';
+            } else if (e.key === 't') {
+                window.location.href = isEn ? '/en/tools/' : '/tools/';
+            } else if (e.key === 'l') {
+                window.location.href = isEn ? '/en/lab/' : '/lab/';
+            } else if (e.key === 'b') {
+                window.location.href = isEn ? '/en/runbooks/' : '/runbooks/';
+            } else if (e.key === 'i') {
+                window.location.href = isEn ? '/en/incidents/' : '/incidents/';
+            } else if (e.key === 's') {
+                window.location.href = isEn ? '/en/stack/' : '/stack/';
+            }
+        });
+    })();
 </script>

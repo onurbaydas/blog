@@ -1,0 +1,21 @@
+{
+  "name": "Onur Baydaş // Systems & Infrastructure",
+  "short_name": "OB Systems",
+  "description": "Systems engineering portal, Linux kernel internals, TrueNAS ZFS, offline runbooks, and GPU cluster architecture.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

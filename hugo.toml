@@ -47,9 +47,17 @@ enableRobotsTXT = true
       pageRef = '/runbooks'
       weight = 18
     [[languages.tr.menus.main]]
+      name = 'Olaylar'
+      pageRef = '/incidents'
+      weight = 19
+    [[languages.tr.menus.main]]
+      name = 'Teknoloji'
+      pageRef = '/stack'
+      weight = 20
+    [[languages.tr.menus.main]]
       name = 'Etiketler'
       pageRef = '/tags'
-      weight = 20
+      weight = 25
     [[languages.tr.menus.main]]
       name = 'Ara'
       pageRef = '/search'
@@ -91,9 +99,17 @@ enableRobotsTXT = true
       pageRef = '/runbooks'
       weight = 18
     [[languages.en.menus.main]]
+      name = 'Incidents'
+      pageRef = '/incidents'
+      weight = 19
+    [[languages.en.menus.main]]
+      name = 'Stack'
+      pageRef = '/stack'
+      weight = 20
+    [[languages.en.menus.main]]
       name = 'Tags'
       pageRef = '/tags'
-      weight = 20
+      weight = 25
     [[languages.en.menus.main]]
       name = 'Search'
       pageRef = '/search'

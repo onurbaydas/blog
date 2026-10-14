@@ -1,0 +1,235 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<div class="stack-container fracture-container">
+  {{- /* Top Telemetry Header */ -}}
+  <div class="radar-telemetry-chassis">
+    <div class="chassis-header-row">
+      <div class="chassis-title-wrap">
+        <span class="chassis-tag">[ TECHNOLOGY_RADAR // #07 ]</span>
+        <h1 class="chassis-headline">{{ if $is_en }}ENTERPRISE SYSTEMS TECHNOLOGY RADAR{{ else }}KURUMSAL SİSTEMLER TEKNOLOJİ RADARI{{ end }}</h1>
+      </div>
+      <div class="chassis-status-pill">
+        <span class="status-indicator"></span>
+        <span class="status-name">{{ if $is_en }}CYCLE: 2026-Q4 // 24 TRACKED TECHNOLOGIES{{ else }}DÖNEM: 2026-Q4 // 24 TAKİP EDİLEN TEKNOLOJİ{{ end }}</span>
+      </div>
+    </div>
+    <div class="chassis-desc">
+      {{ if $is_en }}
+      Opinionated technology radar tracking our production architecture decisions across Linux kernels, storage fabrics, security frameworks, and GPU clusters. Filter by adoption maturity rings (Adopt, Trial, Assess, Hold) or click any badge to inspect our production rationale.
+      {{ else }}
+      Linux çekirdeği, kurumsal depolama, kimlik güvenliği ve GPU kümelerindeki mimari kararlarımızı yansıtan teknoloji radarı. Olgunluk seviyelerine (Adopt, Trial, Assess, Hold) göre filtreleyin veya üretim tecrübelerimizi görmek için herhangi bir teknolojiye tıklayın.
+      {{ end }}
+    </div>
+  </div>
+
+  {{- /* Radar Controls */ -}}
+  <div class="stack-filter-bar">
+    <div class="ring-pills" id="stack-ring-pills">
+      <button class="cat-pill active" data-ring="all">[ ALL_MATURITY_RINGS ]</button>
+      <button class="cat-pill pill-adopt" data-ring="adopt">■ ADOPT (Standart)</button>
+      <button class="cat-pill pill-trial" data-ring="trial">▲ TRIAL (Pilot)</button>
+      <button class="cat-pill pill-assess" data-ring="assess">◆ ASSESS (İnceleme)</button>
+      <button class="cat-pill pill-hold" data-ring="hold">✕ HOLD (Yasak/Kaçın)</button>
+    </div>
+  </div>
+
+  {{- /* 4 Quadrants Grid */ -}}
+  <div class="stack-quadrants-grid">
+
+    {{- /* QUADRANT 1: INFRA & COMPUTE */ -}}
+    <div class="quadrant-card brutal-card-docket">
+      <div class="quadrant-header">
+        <span class="q-num">Q1</span>
+        <h2 class="q-title">{{ if $is_en }}INFRASTRUCTURE & COMPUTE{{ else }}ALTYAPI & HESAPLAMA{{ end }}</h2>
+      </div>
+      <div class="tech-pills-flow">
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="linux">Linux Kernel 6.x</button>
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="slurm">Slurm Workload Manager</button>
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="podman">Podman / Rootless Containers</button>
+        <button type="button" class="tech-pill ring-trial" data-ring="trial" data-tech="qemu">QEMU / KVM MicroVMs</button>
+        <button type="button" class="tech-pill ring-assess" data-ring="assess" data-tech="schedext">Linux sched-ext (BPF Schedulers)</button>
+        <button type="button" class="tech-pill ring-hold" data-ring="hold" data-tech="dockerroot">Unrestricted Docker Root Daemon</button>
+      </div>
+    </div>
+
+    {{- /* QUADRANT 2: STORAGE & FILESYSTEMS */ -}}
+    <div class="quadrant-card brutal-card-docket">
+      <div class="quadrant-header">
+        <span class="q-num">Q2</span>
+        <h2 class="q-title">{{ if $is_en }}STORAGE & FILESYSTEMS{{ else }}DEPOLAMA & DOSYA SİSTEMLERİ{{ end }}</h2>
+      </div>
+      <div class="tech-pills-flow">
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="zfs">OpenZFS 2.2+ (TrueNAS SCALE)</button>
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="nfskrb">NFSv4.2 + sec=krb5p</button>
+        <button type="button" class="tech-pill ring-trial" data-ring="trial" data-tech="nvmeof">NVMe-oF (RDMA Fabrics)</button>
+        <button type="button" class="tech-pill ring-assess" data-ring="assess" data-tech="bcachefs">Bcachefs</button>
+        <button type="button" class="tech-pill ring-hold" data-ring="hold" data-tech="nfsv3">NFSv3 Plaintext (root_squashed)</button>
+        <button type="button" class="tech-pill ring-hold" data-ring="hold" data-tech="smb1">SMBv1 / Plaintext CIFS</button>
+      </div>
+    </div>
+
+    {{- /* QUADRANT 3: SECURITY & IDENTITY */ -}}
+    <div class="quadrant-card brutal-card-docket">
+      <div class="quadrant-header">
+        <span class="q-num">Q3</span>
+        <h2 class="q-title">{{ if $is_en }}SECURITY & IDENTITY BROKER{{ else }}GÜVENLİK & KİMLİK YÖNETİMİ{{ end }}</h2>
+      </div>
+      <div class="tech-pills-flow">
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="opa">Open Policy Agent (OPA)</button>
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="sssd">SSSD + Active Directory PAM</button>
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="ebpfsec">eBPF XDP / bpftrace Probes</button>
+        <button type="button" class="tech-pill ring-trial" data-ring="trial" data-tech="vault">HashiCorp Vault Agent</button>
+        <button type="button" class="tech-pill ring-assess" data-ring="assess" data-tech="spiffe">SPIFFE / SPIRE Workload ID</button>
+        <button type="button" class="tech-pill ring-hold" data-ring="hold" data-tech="staticpass">Static Service Account Passwords</button>
+      </div>
+    </div>
+
+    {{- /* QUADRANT 4: DATA & ACCELERATOR FABRIC */ -}}
+    <div class="quadrant-card brutal-card-docket">
+      <div class="quadrant-header">
+        <span class="q-num">Q4</span>
+        <h2 class="q-title">{{ if $is_en }}DATA & ACCELERATOR FABRIC{{ else }}HIZLANDIRICI & VERİ FABRİĞİ{{ end }}</h2>
+      </div>
+      <div class="tech-pills-flow">
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="roce">100GbE RoCE v2 (RDMA)</button>
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="nvlink">NVIDIA NVLink 3.0 SXM4</button>
+        <button type="button" class="tech-pill ring-adopt" data-ring="adopt" data-tech="pytorch">PyTorch Distributed Data Parallel</button>
+        <button type="button" class="tech-pill ring-trial" data-ring="trial" data-tech="vllm">vLLM Continuous Batching</button>
+        <button type="button" class="tech-pill ring-assess" data-ring="assess" data-tech="sglang">SGLang Speculative Runtime</button>
+        <button type="button" class="tech-pill ring-hold" data-ring="hold" data-tech="tcpddp">PyTorch DDP over Standard TCP/IP</button>
+      </div>
+    </div>
+
+  </div>
+
+  {{- /* Interactive Drawer for Selected Tech */ -}}
+  <div class="stack-inspector-card" id="stack-inspector" style="display: none;">
+    <div class="inspector-top-tag">
+      <span id="stack-inspect-ring">[ STATUS: ADOPT ]</span>
+      <span id="stack-inspect-quadrant">QUADRANT: INFRASTRUCTURE</span>
+    </div>
+    <h3 class="inspect-title" id="stack-inspect-title">Technology Name</h3>
+    <p class="inspect-desc" id="stack-inspect-desc">Detailed rationale...</p>
+    <div class="inspect-recs" id="stack-inspect-recs">
+      <strong>RECOMMENDATION:</strong> <span id="stack-inspect-rec-text"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ringPills = document.querySelectorAll('#stack-ring-pills .cat-pill');
+  const techPills = document.querySelectorAll('.tech-pill');
+  const inspector = document.getElementById('stack-inspector');
+  const inspectRing = document.getElementById('stack-inspect-ring');
+  const inspectQuad = document.getElementById('stack-inspect-quadrant');
+  const inspectTitle = document.getElementById('stack-inspect-title');
+  const inspectDesc = document.getElementById('stack-inspect-desc');
+  const inspectRecText = document.getElementById('stack-inspect-rec-text');
+
+  const techData = {
+    zfs: {
+      title: 'OpenZFS 2.2+ (TrueNAS SCALE Enterprise)',
+      ring: 'ADOPT',
+      quad: 'STORAGE & FILESYSTEMS',
+      desc: 'Our mission-critical storage standard. Copy-on-Write transaction integrity, silent data corruption bitrot detection, inline ZSTD compression, and native NVMe SLOG/ZIL resilience.',
+      rec: 'Enforce ashift=12 for 4K drives, recordsize=16k for databases, recordsize=1M for AI checkpoints.'
+    },
+    linux: {
+      title: 'Linux Kernel 6.x (Mainline / Stable)',
+      ring: 'ADOPT',
+      quad: 'INFRASTRUCTURE & COMPUTE',
+      desc: 'Underlying foundation for all compute and edge proxies. Provides modern eBPF tracing, cgroups v2 resource isolation, user namespaces, and io_uring high-performance async I/O.',
+      rec: 'Track latest LTS/stable kernel for production clusters; test mainline on staging.'
+    },
+    opa: {
+      title: 'Open Policy Agent (OPA) & Rego Language',
+      ring: 'ADOPT',
+      quad: 'SECURITY & IDENTITY BROKER',
+      desc: 'Declarative policy engine enforcing zero-trust admission control on container execution, host volume binds, and Kubernetes admission gates. Enforces strict fail-close daemon configuration.',
+      rec: 'Audit all authz plugin reverse proxies to prevent Content-Length 0 bypasses (CVE-2024-41110).'
+    },
+    roce: {
+      title: '100GbE RoCE v2 (RDMA over Converged Ethernet)',
+      ring: 'ADOPT',
+      quad: 'DATA & ACCELERATOR FABRIC',
+      desc: 'Lossless, low-latency inter-GPU communication fabric. Bypasses host OS kernel network stacks for direct GPU-to-GPU and GPU-to-Storage transfers with cut-through latencies under 450ns.',
+      rec: 'Configure Priority Flow Control (PFC) on switch ports and set MTU 9000 jumbo frames.'
+    },
+    slurm: {
+      title: 'Slurm Workload Manager',
+      ring: 'ADOPT',
+      quad: 'INFRASTRUCTURE & COMPUTE',
+      desc: 'Gold standard multi-user workload scheduler for high-performance deep learning. Provides deterministic GPU resource allocation, preemption queues, and fair-share accounting.',
+      rec: 'Integrate with cgroup v2 GPU memory limits to prevent out-of-memory node panics.'
+    },
+    bcachefs: {
+      title: 'Bcachefs Next-Gen Linux Filesystem',
+      ring: 'ASSESS',
+      quad: 'STORAGE & FILESYSTEMS',
+      desc: 'Promising modern Copy-on-Write Linux kernel filesystem. Offers multi-device tiering, erasure coding, and checksumming. Currently undergoing stability auditing on secondary test benches.',
+      rec: 'Do not use for production clusters yet; track kernel 6.12+ upstream stabilization.'
+    },
+    dockerroot: {
+      title: 'Unrestricted Docker Root Daemon',
+      ring: 'HOLD',
+      quad: 'INFRASTRUCTURE & COMPUTE',
+      desc: 'Default unprivileged access to /var/run/docker.sock is equivalent to root on the host. Bypasses namespace isolation and permits host filesystem takeover.',
+      rec: 'Enforce rootless Podman or strict OPA fail-close authorization filters.'
+    },
+    nfsv3: {
+      title: 'NFSv3 Plaintext with root_squash',
+      ring: 'HOLD',
+      quad: 'STORAGE & FILESYSTEMS',
+      desc: 'Lacks cryptographic packet signing and RPC authentication. Vulnerable to client-side UID spoofing where unprivileged users masquerade as root or UID 1000.',
+      rec: 'Mandate NFSv4.2 with sec=krb5p and rpc.idmapd domain mapping.'
+    }
+  };
+
+  // Ring filter
+  ringPills.forEach(btn => {
+    btn.addEventListener('click', () => {
+      ringPills.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const targetRing = btn.getAttribute('data-ring');
+
+      techPills.forEach(p => {
+        if (targetRing === 'all' || p.getAttribute('data-ring') === targetRing) {
+          p.style.display = '';
+        } else {
+          p.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Tech pill click
+  techPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      techPills.forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
+
+      const id = pill.getAttribute('data-tech');
+      const data = techData[id] || {
+        title: pill.innerText,
+        ring: pill.getAttribute('data-ring').toUpperCase(),
+        quad: 'ENTERPRISE APPARATUS',
+        desc: 'Field tested and monitored under production workloads.',
+        rec: 'Standard operating architecture guideline applies.'
+      };
+
+      inspectRing.textContent = `[ STATUS: ${data.ring} ]`;
+      inspectQuad.textContent = `QUADRANT: ${data.quad}`;
+      inspectTitle.textContent = data.title;
+      inspectDesc.textContent = data.desc;
+      inspectRecText.textContent = data.rec;
+
+      inspector.style.display = 'block';
+      inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
+});
+</script>
+
+{{- end }}{{/* end main */}}

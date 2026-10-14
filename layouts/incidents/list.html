@@ -1,0 +1,227 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<div class="incidents-container fracture-container">
+  {{- /* Top Telemetry Header */ -}}
+  <div class="radar-telemetry-chassis">
+    <div class="chassis-header-row">
+      <div class="chassis-title-wrap">
+        <span class="chassis-tag">[ AUDIT_ARCHIVE // #06 ]</span>
+        <h1 class="chassis-headline">{{ if $is_en }}INCIDENT POST-MORTEM & ROOT CAUSE ANALYSIS LOG{{ else }}OLAY İNCELEMELERİ VE KÖK NEDEN ANALİZİ (RCA) GÜNLÜĞÜ{{ end }}</h1>
+      </div>
+      <div class="chassis-status-pill">
+        <span class="status-indicator"></span>
+        <span class="status-name">{{ if $is_en }}ALL_INCIDENTS: RESOLVED // ZERO_DATA_LOSS{{ else }}TÜM_OLAYLAR: ÇÖZÜLDÜ // SIFIR_VERİ_KAYBI{{ end }}</span>
+      </div>
+    </div>
+    <div class="chassis-desc">
+      {{ if $is_en }}
+      Transparent, blameless post-mortem dossiers for major production disruptions, kernel panics, and security anomalies across our GPU computing fabric and storage clusters. Complete with minute-by-minute timelines, root cause mechanics, and preventative sysctl/architecture remediations.
+      {{ else }}
+      GPU hesaplama kümesi ve depolama havuzlarımızda yaşanan büyük kesintiler, çekirdek kilitlenmeleri ve güvenlik anomalilerine dair şeffaf kök neden analizi (RCA) raporları. Dakika dakika olay zaman çizelgesi, çekirdek seviyesi hata mekaniği ve uygulanan önleyici tedbirlerle belgelenmiştir.
+      {{ end }}
+    </div>
+  </div>
+
+  {{- /* Incident Filter Bar */ -}}
+  <div class="incident-filter-bar">
+    <div class="terminal-search-strip">
+      <span class="prompt-sym">&gt; grep -i</span>
+      <input type="text" id="incident-search" class="terminal-input" placeholder="{{ if $is_en }}Filter post-mortems by keyword, CVE, or system tier...{{ else }}Anahtar kelime, CVE veya etkilenen sisteme göre filtrele...{{ end }}" autocomplete="off" spellcheck="false" />
+      <button id="incident-clear-btn" class="terminal-clear-btn">[ESC / CLR]</button>
+    </div>
+  </div>
+
+  {{- /* Incidents Docket List */ -}}
+  <div class="incidents-stream" id="incidents-stream">
+
+    {{- /* INCIDENT 1 */ -}}
+    <article class="incident-card brutal-card-docket" data-search="nfs rpc socket starvation pytorch a100 checkpoint truenas zfs roce kerberos krb5p inc-2026-08">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P0-CRITICAL</span>
+          <span class="docket-num">INC-2026-08</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[STORAGE_OUTAGE]</span>
+      </div>
+
+      <div class="incident-card-body">
+        <h2 class="incident-title">
+          {{ if $is_en }}NFSv4.2 RPC Socket Starvation During Distributed PyTorch 8x A100 Checkpoint Flush{{ else }}Dağıtık PyTorch 8x A100 Model Kaydı Sırasında NFSv4.2 RPC Soket Kilitlenmesi{{ end }}
+        </h2>
+
+        <div class="incident-meta-grid">
+          <div class="inc-meta-cell"><span class="m-key">MTTD (Tespiti Süresi):</span> <strong class="m-val text-neon">12 MIN</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">MTTR (Kurtarma Süresi):</span> <strong class="m-val text-alert">38 MIN</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">IMPACT:</span> <strong class="m-val">640GB VRAM PyTorch DDP Hang</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">STATUS:</span> <strong class="m-val text-neon">RESOLVED // CAPA APPLIED</strong></div>
+        </div>
+
+        <div class="incident-section">
+          <span class="inc-sec-title">[ 01 // {{ if $is_en }}INCIDENT SUMMARY{{ else }}OLAY ÖZETİ{{ end }} ]</span>
+          <p>
+            {{ if $is_en }}
+            During a 70B parameter distributed LLM checkpointing run across 8x NVIDIA A100 GPUs, compute nodes attempted to simultaneously burst write ~480 GB of unbuffered tensor weights to TrueNAS SCALE over NFSv4.2 with <code>sec=krb5p</code>. Client-side kernel TCP RPC slots were instantly saturated, triggering cascading ESTALE and RPC timeout cascades.
+            {{ else }}
+            8x NVIDIA A100 GPU üzerinde koşan 70B parametreli modelin ara kayıt (checkpointing) aşamasında, düğümler eşzamanlı olarak ~480 GB tensör ağırlığını TrueNAS SCALE NFSv4.2 (<code>sec=krb5p</code>) havuzuna yazmaya çalıştı. İstemci çekirdeğindeki TCP RPC yuvaları anında tükendi, NFS istemcileri kilitlenerek PyTorch eğitim işini askıya aldı.
+            {{ end }}
+          </p>
+        </div>
+
+        <div class="incident-section">
+          <span class="inc-sec-title">[ 02 // {{ if $is_en }}MINUTE-BY-MINUTE TIMELINE (UTC){{ else }}DAKİKA DAKİKA ZAMAN ÇİZELGESİ (UTC){{ end }} ]</span>
+          <ul class="inc-timeline-list">
+            <li><span class="time-stamp">14:02:11</span> Slurm job #8924 initiates epoch 14 checkpoint flush (480 GB total payload).</li>
+            <li><span class="time-stamp">14:03:40</span> TrueNAS disk write queue depth exceeds 256; NFS RPC latency spikes from 0.8ms to 14,200ms.</li>
+            <li><span class="time-stamp">14:05:12</span> Kernel emits <code>sunrpc: task 40182 on broken transport</code> on compute nodes.</li>
+            <li><span class="time-stamp">14:14:00</span> NOC on-call engineer paged via automated Slurm GPU non-responsive watchdog.</li>
+            <li><span class="time-stamp">14:26:30</span> Emergency sysctl socket queue expansion applied live across compute cluster.</li>
+            <li><span class="time-stamp">14:40:00</span> NFS client RPC slots recovered; checkpoint committed safely without data corruption.</li>
+          </ul>
+        </div>
+
+        <div class="incident-section">
+          <span class="inc-sec-title">[ 03 // {{ if $is_en }}ROOT CAUSE & REMEDIATION (CAPA){{ else }}KÖK NEDEN VE ÖNLEYİCİ MİMARİ DEĞİŞİKLİKLERİ{{ end }} ]</span>
+          <div class="inc-remediation-box">
+            <p>
+              {{ if $is_en }}
+              <strong>Root Cause:</strong> Default Linux kernel <code>sunrpc.tcp_slot_table_entries</code> was pegged at 16, creating severe head-of-line blocking under parallel multi-threaded synchronous I/O.
+              {{ else }}
+              <strong>Kök Neden:</strong> Varsayılan Linux çekirdek parametresi <code>sunrpc.tcp_slot_table_entries</code> 16 yuva ile sınırlıydı; yüksek paralellikteki eşzamanlı yazma işleminde hat başı tıkanması (head-of-line blocking) meydana geldi.
+              {{ end }}
+            </p>
+            <pre><code># Corrective Kernel Parameter applied across all cluster compute nodes:
+sysctl -w sunrpc.tcp_slot_table_entries=128
+sysctl -w sunrpc.tcp_max_slot_table_entries=128
+
+# TrueNAS ZFS dirty data throttle tuned to avoid RPC burst stalls:
+echo 17179869184 &gt; /sys/module/zfs/parameters/zfs_dirty_data_max_max</code></pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    {{- /* INCIDENT 2 */ -}}
+    <article class="incident-card brutal-card-docket" data-search="active directory kerberos ntp clock skew krb_ap_err_skew sssd ldap inc-2026-05">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P1-HIGH</span>
+          <span class="docket-num">INC-2026-05</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[IDENTITY_FABRIC]</span>
+      </div>
+
+      <div class="incident-card-body">
+        <h2 class="incident-title">
+          {{ if $is_en }}Active Directory Kerberos Clock Skew (KRB_AP_ERR_SKEW) Cluster Login Lockout{{ else }}Active Directory Kerberos Saat Kayması (KRB_AP_ERR_SKEW) Küme Erişim Kesintisi{{ end }}
+        </h2>
+
+        <div class="incident-meta-grid">
+          <div class="inc-meta-cell"><span class="m-key">MTTD:</span> <strong class="m-val text-neon">5 MIN</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">MTTR:</span> <strong class="m-val text-alert">18 MIN</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">IMPACT:</span> <strong class="m-val">SSH & Slurm Submission Lockout</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">STATUS:</span> <strong class="m-val text-neon">RESOLVED // CHRONY PTP ENFORCED</strong></div>
+        </div>
+
+        <div class="incident-section">
+          <span class="inc-sec-title">[ 01 // {{ if $is_en }}INCIDENT SUMMARY{{ else }}OLAY ÖZETİ{{ end }} ]</span>
+          <p>
+            {{ if $is_en }}
+            Following a hypervisor hardware clock desync, secondary compute node hyperthreads drifted 318 seconds ahead of the primary Active Directory Domain Controller. MIT Kerberos strictly rejected all ticket requests with <code>KRB_AP_ERR_SKEW (Clock skew too great)</code>.
+            {{ else }}
+            Sanallaştırma katmanındaki donanım saati uyumsuzluğu sonucu, ikincil hesaplama düğümleri Active Directory etki alanı denetleyicisinden 318 saniye ileri kaydı. MIT Kerberos, 300 saniyelik toleransı aştığı için tüm SSH ve Slurm kimlik doğrulamalarını reddetti.
+            {{ end }}
+          </p>
+        </div>
+
+        <div class="incident-section">
+          <span class="inc-sec-title">[ 02 // {{ if $is_en }}ROOT CAUSE & REMEDIATION (CAPA){{ else }}KÖK NEDEN VE ÖNLEYİCİ MİMARİ DEĞİŞİKLİKLERİ{{ end }} ]</span>
+          <div class="inc-remediation-box">
+            <pre><code># Replaced standard systemd-timesyncd with Chrony PTP hardware synchronization:
+chronyc makestep 1.0 3
+chronyc sources -v
+
+# Configured /etc/chrony/chrony.conf with local GPS/PTP stratum-1 boundary clock:
+server time.lab.internal iburst minpoll 2 maxpoll 4 maxdelay 0.05</code></pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    {{- /* INCIDENT 3 */ -}}
+    <article class="incident-card brutal-card-docket" data-search="docker opa cve-2024-41110 fail-open content-length unprivileged bypass inc-2026-02">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P0-CRITICAL</span>
+          <span class="docket-num">INC-2026-02</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[CONTAINER_SECURITY]</span>
+      </div>
+
+      <div class="incident-card-body">
+        <h2 class="incident-title">
+          {{ if $is_en }}Docker Authz Plugin Silent Fail-Open Incident (CVE-2024-41110 Triage){{ else }}Docker Yetkilendirme Eklentisi Sessiz Fail-Open İhlali (CVE-2024-41110 Müdahalesi){{ end }}
+        </h2>
+
+        <div class="incident-meta-grid">
+          <div class="inc-meta-cell"><span class="m-key">MTTD:</span> <strong class="m-val text-neon">4 MIN</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">MTTR:</span> <strong class="m-val text-alert">22 MIN</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">IMPACT:</span> <strong class="m-val">Attempted Rootless Privilege Escalation</strong></div>
+          <div class="inc-meta-cell"><span class="m-key">STATUS:</span> <strong class="m-val text-neon">CONTAINED // PROXY INJECTED</strong></div>
+        </div>
+
+        <div class="incident-section">
+          <span class="inc-sec-title">[ 01 // {{ if $is_en }}INCIDENT SUMMARY{{ else }}OLAY ÖZETİ{{ end }} ]</span>
+          <p>
+            {{ if $is_en }}
+            Automated eBPF audit probe intercepted an anomalous container spawn payload with <code>Content-Length: 0</code> aimed at bypassing our Open Policy Agent gatekeeper. Docker daemon forwarded an empty body to OPA, allowing privileged access.
+            {{ else }}
+            Canlı eBPF denetim probu, Open Policy Agent güvenlik filtremizi atlatmak amacıyla <code>Content-Length: 0</code> başlığıyla gönderilen bir konteyner oluşturma isteğini tespit etti. Docker Engine boş gövdeyi OPA'ya ilettiği için kural sessizce fail-open oldu.
+            {{ end }}
+          </p>
+        </div>
+
+        <div class="incident-section">
+          <span class="inc-sec-title">[ 02 // {{ if $is_en }}ROOT CAUSE & REMEDIATION (CAPA){{ else }}KÖK NEDEN VE ÖNLEYİCİ MİMARİ DEĞİŞİKLİKLERİ{{ end }} ]</span>
+          <div class="inc-remediation-box">
+            <pre><code># Upgraded Docker Engine to 27.1.1+ with fail-close enforcement:
+apt-get install -y docker-ce=5:27.1.1-1~ubuntu.22.04~jammy
+
+# Verified OPA proxy interceptor blocks Content-Length 0 requests unconditionally:
+iptables -A INPUT -p tcp --dport 2375 -m string --string "Content-Length: 0" --algo bm -j REJECT</code></pre>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('incident-search');
+  const clearBtn = document.getElementById('incident-clear-btn');
+  const cards = document.querySelectorAll('#incidents-stream .incident-card');
+
+  function filterIncidents() {
+    const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    cards.forEach(card => {
+      const searchData = (card.getAttribute('data-search') + ' ' + card.innerText).toLowerCase();
+      card.style.display = (!q || searchData.includes(q)) ? '' : 'none';
+    });
+  }
+
+  if (searchInput) searchInput.addEventListener('input', filterIncidents);
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      filterIncidents();
+    });
+  }
+});
+</script>
+
+{{- end }}{{/* end main */}}

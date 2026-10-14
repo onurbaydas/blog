@@ -37,6 +37,10 @@
       <span class="tab-idx">[03]</span>
       <span class="tab-title">{{ if $is_en }}ZFS ASHIFT & RECORDSIZE{{ else }}ZFS ASHIFT & RECORDSIZE{{ end }}</span>
     </button>
+    <button class="tool-tab-btn" data-tool="opa" role="tab" aria-selected="false">
+      <span class="tab-idx">[04]</span>
+      <span class="tab-title">{{ if $is_en }}OPA / REGO POLICY SIMULATOR{{ else }}OPA / REGO KURAL SİMÜLATÖRÜ{{ end }}</span>
+    </button>
   </div>
 
   {{- /* ================= TOOL 1: SUBUID / SUBGID MAPPER ================= */ -}}
@@ -298,7 +302,7 @@
           <select id="zfs-raid-type" class="brutal-select">
             <option value="mirror">{{ if $is_en }}Mirror (RAID-10 Equivalent - 2-Way){{ else }}Mirror (RAID-10 Eşdeğeri - 2-Yönlü){{ end }}</option>
             <option value="raidz1">{{ if $is_en }}RAIDZ1 (1 Disk Parity - RAID-5){{ else }}RAIDZ1 (1 Disk Parite - RAID-5){{ end }}</option>
-            <option value="raidz2" selected>{{ if $is_en }}RAIDZ2 (2 Disk Parite - RAID-6){{ else }}RAIDZ2 (2 Disk Parite - RAID-6){{ end }}</option>
+            <option value="raidz2" selected>{{ if $is_en }}RAIDZ2 (2 Disk Parity - RAID-6){{ else }}RAIDZ2 (2 Disk Parite - RAID-6){{ end }}</option>
             <option value="raidz3">{{ if $is_en }}RAIDZ3 (3 Disk Parity - High Resiliency){{ else }}RAIDZ3 (3 Disk Parite - Yüksek Direnç){{ end }}</option>
           </select>
         </div>
@@ -352,10 +356,116 @@ zfs set recordsize=128k tank/dataset</code></pre>
       </div>
     </div>
   </div>
+
+  {{- /* ================= TOOL 4: OPA / REGO POLICY SIMULATOR ================= */ -}}
+  <div id="tool-panel-opa" class="tool-panel">
+    <div class="tool-chassis-card">
+      <div class="card-top-tag">
+        <span>TOOL_04 // OPEN_POLICY_AGENT_CONTAINER_AUTHZ_ENGINE</span>
+        <span class="text-dim">Rego Rule Evaluation & CVE-2024-41110 Triage</span>
+      </div>
+
+      <div class="tool-desc-box">
+        {{ if $is_en }}
+        Simulate Open Policy Agent (OPA) Docker authorization rules client-side. Test whether Docker Engine requests are permitted or blocked, and inspect whether Content-Length manipulation triggers silent fail-open bypass anomalies (CVE-2024-41110).
+        {{ else }}
+        Open Policy Agent (OPA) Docker yetkilendirme kurallarını istemci tarafında simüle edin. Docker API isteklerinin engellenip engellenmediğini test edin ve Content-Length manipülasyonunun sessiz bypass açığını (CVE-2024-41110) tetikleyip tetiklemediğini anında görün.
+        {{ end }}
+      </div>
+
+      <div class="opa-sim-grid">
+        <div class="opa-column">
+          <label class="tool-label">
+            <span class="label-code">REGO POLICY DEFINITION</span>
+            <span class="label-hint">{{ if $is_en }}Active authorization policy rules{{ else }}Aktif yetkilendirme kural tanımı{{ end }}</span>
+          </label>
+          <textarea id="opa-policy-code" class="opa-textarea" rows="12">package docker.authz
+
+default allow = false
+
+# Rule 1: Allow inspect & list actions for everyone
+allow {
+    input.Method == "GET"
+}
+
+# Rule 2: Forbid privileged container creation unless admin
+allow {
+    input.Method == "POST"
+    input.Path == "/v1.40/containers/create"
+    input.User == "admin"
+}
+
+# Rule 3: Deny root filesystem host mounts for unprivileged
+allow {
+    input.Method == "POST"
+    input.Path == "/v1.40/containers/create"
+    input.User != "admin"
+    not input.Body.HostConfig.Privileged
+    not contains_root_mount(input.Body.HostConfig.Binds)
+}
+
+contains_root_mount(binds) {
+    binds[_] == "/:/host:rw"
+}</textarea>
+        </div>
+
+        <div class="opa-column">
+          <label class="tool-label">
+            <span class="label-code">MOCK DOCKER API REQUEST (JSON)</span>
+            <span class="label-hint">{{ if $is_en }}Simulated Docker daemon payload{{ else }}Simüle edilen Docker API yükü{{ end }}</span>
+          </label>
+          <textarea id="opa-request-json" class="opa-textarea" rows="12">{
+  "Method": "POST",
+  "Path": "/v1.40/containers/create",
+  "User": "developer_guest",
+  "Headers": {
+    "Content-Length": "0"
+  },
+  "Body": {
+    "Image": "alpine:latest",
+    "HostConfig": {
+      "Privileged": true,
+      "Binds": ["/:/host:rw"]
+    }
+  }
+}</textarea>
+        </div>
+      </div>
+
+      <div class="opa-actions-strip">
+        <button type="button" class="tool-tab-btn active" id="btn-eval-opa">
+          [ {{ if $is_en }}EVALUATE OPA POLICY // RUN{{ else }}POLİTİKAYI DEĞERLENDİR // ÇALIŞTIR{{ end }} ]
+        </button>
+        <button type="button" class="tool-tab-btn" id="btn-preset-normal">
+          [ {{ if $is_en }}LOAD SAFE REQ{{ else }}GÜVENLİ İSTEK YÜKLE{{ end }} ]
+        </button>
+        <button type="button" class="tool-tab-btn" id="btn-preset-exploit">
+          [ {{ if $is_en }}LOAD CVE-2024-41110 EXPLOIT{{ else }}CVE-2024-41110 EXPLOIT YÜKLE{{ end }} ]
+        </button>
+      </div>
+
+      {{- /* Simulation Decision Output */ -}}
+      <div class="tool-output-chassis" id="opa-output-box">
+        <div class="output-header">[ {{ if $is_en }}OPA DECISION & AUDIT LOG{{ else }}OPA KARARI VE DENETİM GÜNLÜĞÜ{{ end }} ]</div>
+        <div id="opa-decision-banner" class="opa-decision-plate deny">
+          <span class="opa-icon">🛑</span>
+          <div class="opa-decision-text">
+            <strong class="decision-status" id="opa-decision-status">DECISION: DENY (403 FORBIDDEN)</strong>
+            <span class="decision-reason" id="opa-decision-reason">Container creation blocked: Privileged mode requested by non-admin user 'developer_guest'.</span>
+          </div>
+        </div>
+        <div id="opa-cve-warning" class="opa-cve-alert" style="display: none;">
+          <strong>⚠ CRITICAL ANOMALY // CVE-2024-41110 DETECTED:</strong>
+          <span>Header <code>Content-Length: 0</code> was passed with an unparsed payload body. In vulnerable Docker engines (&lt; 27.1.1), Docker forwards an empty body to the authz plugin, triggering silent fail-open!</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Tabs switching
   const tabBtns = document.querySelectorAll('.tool-tab-btn');
   const panels = document.querySelectorAll('.tool-panel');
 
@@ -371,6 +481,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // TOOL 1: Subuid Calculator
   const subuidStartEl = document.getElementById('subuid-start');
   const subuidCountEl = document.getElementById('subuid-count');
   const containerUidEl = document.getElementById('container-uid');
@@ -416,6 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   updateSubuid();
 
+  // Copy Subuid
   const copySubuidBtn = document.getElementById('btn-copy-subuid');
   if (copySubuidBtn) {
     copySubuidBtn.addEventListener('click', () => {
@@ -425,6 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // TOOL 2: CVSS v3.1 Engine
   const cvssValues = {
     AV: { N: 0.85, A: 0.62, L: 0.55, P: 0.2 },
     AC: { L: 0.77, H: 0.44 },
@@ -484,6 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
+    // Format
     const scoreStr = baseScore.toFixed(1);
     const scoreEl = document.getElementById('cvss-score-num');
     const badgeEl = document.getElementById('cvss-severity-badge');
@@ -518,6 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // TOOL 3: ZFS Storage Calculator
   const zfsDriveCountEl = document.getElementById('zfs-drive-count');
   const zfsDriveSizeEl = document.getElementById('zfs-drive-size');
   const zfsRaidTypeEl = document.getElementById('zfs-raid-type');
@@ -548,7 +663,9 @@ document.addEventListener('DOMContentLoaded', function() {
       dataDrives = Math.max(1, drives - 3);
     }
 
+    // TiB conversion (1TB = 0.909495 TiB)
     const rawTibPerDrive = driveSizeTb * 0.909495;
+    // OpenZFS slop space reservation is 1/32nd (approx 3.125%)
     const netUsableTib = (dataDrives * rawTibPerDrive) * 0.96875;
     const parityRatio = ((parityDrives / drives) * 100).toFixed(1);
 
@@ -573,6 +690,130 @@ document.addEventListener('DOMContentLoaded', function() {
       navigator.clipboard.writeText(document.getElementById('zfs-cli-cmd').innerText);
       copyZfsBtn.innerText = '[ COPIED // BUFFER READY ]';
       setTimeout(() => copyZfsBtn.innerText = '[ COPY ZFS COMMANDS ]', 2000);
+    });
+  }
+
+  // TOOL 4: OPA Simulator Logic
+  const btnEvalOpa = document.getElementById('btn-eval-opa');
+  const btnPresetNormal = document.getElementById('btn-preset-normal');
+  const btnPresetExploit = document.getElementById('btn-preset-exploit');
+  const reqJsonEl = document.getElementById('opa-request-json');
+  const decisionBanner = document.getElementById('opa-decision-banner');
+  const decisionStatus = document.getElementById('opa-decision-status');
+  const decisionReason = document.getElementById('opa-decision-reason');
+  const cveWarning = document.getElementById('opa-cve-warning');
+
+  function evaluateOpa() {
+    if (!reqJsonEl || !decisionBanner) return;
+    let req = {};
+    try {
+      req = JSON.parse(reqJsonEl.value);
+    } catch(e) {
+      decisionBanner.className = 'opa-decision-plate deny';
+      decisionStatus.textContent = 'ERROR // MALFORMED JSON REQUEST';
+      decisionReason.textContent = e.message;
+      cveWarning.style.display = 'none';
+      return;
+    }
+
+    const method = req.Method || 'GET';
+    const path = req.Path || '/';
+    const user = req.User || 'anonymous';
+    const headers = req.Headers || {};
+    const body = req.Body || {};
+    const hostConfig = body.HostConfig || {};
+    const isPrivileged = !!hostConfig.Privileged;
+    const binds = hostConfig.Binds || [];
+    const hasRootMount = binds.some(b => b.includes('/:/host'));
+
+    // Check CVE-2024-41110 condition
+    const isZeroContentLength = headers['Content-Length'] === '0' || headers['Content-Length'] === 0;
+
+    let allow = false;
+    let reason = '';
+
+    if (method === 'GET') {
+      allow = true;
+      reason = 'Rule 1: Read-only GET request permitted for all identities.';
+    } else if (method === 'POST' && path === '/v1.40/containers/create') {
+      if (user === 'admin') {
+        allow = true;
+        reason = 'Rule 2: Admin user authorized for privileged container allocation.';
+      } else {
+        if (isPrivileged) {
+          allow = false;
+          reason = `Rule 3: Access denied. Privileged mode is forbidden for non-admin user '${user}'.`;
+        } else if (hasRootMount) {
+          allow = false;
+          reason = `Rule 3: Access denied. Mounting root filesystem '/:/host' is forbidden for non-admin user '${user}'.`;
+        } else {
+          allow = true;
+          reason = `Rule 3: Unprivileged container creation permitted within restricted boundaries.`;
+        }
+      }
+    } else {
+      allow = false;
+      reason = `Default policy rejection: No matching rule for ${method} ${path}.`;
+    }
+
+    if (isZeroContentLength && path === '/v1.40/containers/create' && !allow) {
+      cveWarning.style.display = 'block';
+    } else {
+      cveWarning.style.display = 'none';
+    }
+
+    if (allow) {
+      decisionBanner.className = 'opa-decision-plate allow';
+      decisionStatus.textContent = 'DECISION: ALLOW (200 OK)';
+      decisionReason.textContent = reason;
+    } else {
+      decisionBanner.className = 'opa-decision-plate deny';
+      decisionStatus.textContent = 'DECISION: DENY (403 FORBIDDEN)';
+      decisionReason.textContent = reason;
+    }
+  }
+
+  if (btnEvalOpa) btnEvalOpa.addEventListener('click', evaluateOpa);
+
+  if (btnPresetNormal) {
+    btnPresetNormal.addEventListener('click', () => {
+      reqJsonEl.value = JSON.stringify({
+        Method: "POST",
+        Path: "/v1.40/containers/create",
+        User: "developer_guest",
+        Headers: {
+          "Content-Length": "128"
+        },
+        Body: {
+          Image: "alpine:latest",
+          HostConfig: {
+            Privileged: false,
+            Binds: ["/data/workdir:/workspace:rw"]
+          }
+        }
+      }, null, 2);
+      evaluateOpa();
+    });
+  }
+
+  if (btnPresetExploit) {
+    btnPresetExploit.addEventListener('click', () => {
+      reqJsonEl.value = JSON.stringify({
+        Method: "POST",
+        Path: "/v1.40/containers/create",
+        User: "developer_guest",
+        Headers: {
+          "Content-Length": "0"
+        },
+        Body: {
+          Image: "alpine:latest",
+          HostConfig: {
+            Privileged: true,
+            Binds: ["/:/host:rw"]
+          }
+        }
+      }, null, 2);
+      evaluateOpa();
     });
   }
 });
