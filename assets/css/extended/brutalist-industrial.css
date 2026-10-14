@@ -16,31 +16,33 @@
   --main-width: 900px;
   --radius: 0px !important;
 
-  /* LIGHT MODE (Bleached Blueprint, Clinical Decay, Concrete Void) */
-  --bg-canvas: #ebe8de;
-  --bg-surface: #ffffff;
-  --bg-inset: #ded9cd;
+  /* LIGHT MODE (Stained Asylum Ward, Jaundiced Bio-Parchment, Formaldehyde Clinic) */
+  --bg-canvas: #c7bfa1;       /* Damp nicotine-stained clinic plaster, discolored tile */
+  --bg-surface: #d8cfb0;      /* Autopsy intake sheet, stained medical parchment */
+  --bg-inset: #aba07f;        /* Damp basement concrete drain floor */
   
-  --border-thick: 3.5px solid #000000;
-  --border-raw: #000000;
+  --border-thick: 3.5px solid #202613; /* Gangrene rot black-green */
+  --border-raw: #202613;
   --border-width: 3.5px;
   
-  --text-main: #000000;
-  --text-dim: #2a2d34;
-  --text-ghost: #606676;
+  --text-main: #13190c;       /* Congealed black bile */
+  --text-dim: #434c31;        /* Oxidized pond scum */
+  --text-ghost: #6e7759;      /* Decayed mold grime */
   
-  --c-acid: #ccff00;
-  --c-blood: #ff003c;
-  --c-toxic: #ff4800;
-  --c-cyan: #00d9ff;
-  --c-concrete: #b5b1a4;
+  --c-acid: #8c8012;          /* Curdled rancid earwax, sour mustard */
+  --c-blood: #6e101b;         /* Dried surgical scab maroon */
+  --c-clot: #3c060e;          /* Blackened blood clot */
+  --c-toxic: #7a320c;         /* Scorched pipe rust */
+  --c-cyan: #144f43;          /* Corroded verdigris copper */
+  --c-concrete: #9e9574;      /* Dirty hospital linoleum */
+  --c-iodine: #3d1728;        /* Deep contusion hematoma */
   
-  --shadow-hard: 6px 6px 0px #000000;
-  --shadow-hard-lg: 10px 10px 0px #000000;
+  --shadow-hard: 6px 6px 0px #202613;
+  --shadow-hard-lg: 10px 10px 0px #202613;
   
-  --hazard-stripe: repeating-linear-gradient(-45deg, #ff4800, #ff4800 12px, #000000 12px, #000000 24px);
-  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #ccff00, #ccff00 12px, #000000 12px, #000000 24px);
-  --grid-pattern: radial-gradient(#000000 1.2px, transparent 1.2px);
+  --hazard-stripe: repeating-linear-gradient(-45deg, #7a320c, #7a320c 12px, #202613 12px, #202613 24px);
+  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #8c8012, #8c8012 12px, #202613 12px, #202613 24px);
+  --grid-pattern: radial-gradient(rgba(32, 38, 19, 0.18) 1.2px, transparent 1.2px);
 
   --theme: var(--bg-canvas);
   --entry: var(--bg-surface);
@@ -49,38 +51,40 @@
   --tertiary: var(--border-raw);
   --content: var(--text-main);
   --border: var(--border-raw);
-  --code-block-bg: #07080b;
-  --code-bg: #d7d3c5;
+  --code-block-bg: #0b1107;
+  --code-bg: #bfb591;
   
   color-scheme: light;
 }
 
 :root[data-theme="dark"], body.dark {
-  /* DARK MODE (Suffocating Obsidian Void, Radioactive Voltage, Blur Decay) */
-  --bg-canvas: #040507;
-  --bg-surface: #0a0d13;
-  --bg-inset: #06080c;
+  /* DARK MODE (Noxious Stagnant Sludge, Radioactive Bile Sulphur, Jaundiced Bone Marrow) */
+  --bg-canvas: #0c1109;       /* Murky oily bog-water sludge with rancid olive cast */
+  --bg-surface: #131a0e;      /* Decomposing organic matter, damp concrete bunker */
+  --bg-inset: #080d06;        /* Deep stagnant cesspool trench */
   
-  --border-thick: 3.5px solid #232b3b;
-  --border-raw: #232b3b;
+  --border-thick: 3.5px solid #38471c; /* Corroded gangrenous zinc-brass */
+  --border-raw: #38471c;
   --border-width: 3.5px;
   
-  --text-main: #f0f4fc;
-  --text-dim: #9aa7be;
-  --text-ghost: #505c72;
+  --text-main: #d4dcc0;       /* Jaundiced bone marrow, aged specimen enamel */
+  --text-dim: #74835a;        /* Stagnant pond film, dried moss */
+  --text-ghost: #465233;      /* Mold spores, decaying sediment */
   
-  --c-acid: #ddff00;
-  --c-blood: #ff003c;
-  --c-toxic: #ff4800;
-  --c-cyan: #00ffff;
-  --c-concrete: #1a202c;
+  --c-acid: #c5b216;          /* Diseased rancid bile, pus sulfur (sour, unpalatable, uncanny) */
+  --c-blood: #821220;         /* Viscous coagulated dried scab maroon (dark, arterial, heavy) */
+  --c-clot: #4d0a13;          /* Blackened necrotic clot */
+  --c-toxic: #9e3d0f;         /* Scorched battery rust, curdled iron oxide */
+  --c-cyan: #197360;          /* Stagnant morgue preservative chemical teal */
+  --c-concrete: #1f2814;      /* Mossy basement stone */
+  --c-iodine: #521c38;        /* Necrotic spleen hematoma plum (jarring clash with bile yellow) */
   
-  --shadow-hard: 6px 6px 0px var(--c-acid);
-  --shadow-hard-lg: 10px 10px 0px var(--c-acid);
+  --shadow-hard: 6px 6px 0px #040603;
+  --shadow-hard-lg: 10px 10px 0px #040603;
   
-  --hazard-stripe: repeating-linear-gradient(-45deg, #ddff00, #ddff00 12px, #040507 12px, #040507 24px);
-  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #ff003c, #ff003c 12px, #040507 12px, #040507 24px);
-  --grid-pattern: radial-gradient(rgba(221, 255, 0, 0.14) 1.2px, transparent 1.2px);
+  --hazard-stripe: repeating-linear-gradient(-45deg, #9e3d0f, #9e3d0f 12px, #080d06 12px, #080d06 24px);
+  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #c5b216, #c5b216 12px, #4d0a13 12px, #4d0a13 24px);
+  --grid-pattern: radial-gradient(rgba(197, 178, 22, 0.08) 1.2px, transparent 1.2px);
 
   --theme: var(--bg-canvas);
   --entry: var(--bg-surface);
@@ -89,8 +93,8 @@
   --tertiary: var(--border-raw);
   --content: var(--text-main);
   --border: var(--border-raw);
-  --code-block-bg: #030406;
-  --code-bg: #111520;
+  --code-block-bg: #060904;
+  --code-bg: #151d0f;
   
   color-scheme: dark;
 }
@@ -101,6 +105,28 @@
 * {
   border-radius: 0 !important;
   box-sizing: border-box;
+}
+
+::selection {
+  background: var(--c-acid);
+  color: #2b040a;
+}
+::-moz-selection {
+  background: var(--c-acid);
+  color: #2b040a;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+  background: var(--bg-inset);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-raw);
+  border: 1px solid var(--c-acid);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-blood);
 }
 
 body {
@@ -398,9 +424,9 @@ body::before {
 }
 
 :root[data-theme="dark"] .logo-box {
-  background: #0c0f16;
-  border-color: var(--c-acid);
-  box-shadow: 5px 5px 0px var(--c-acid);
+  background: var(--bg-inset);
+  border-color: var(--border-raw);
+  box-shadow: 5px 5px 0px #040603;
 }
 
 .logo-box:hover {
@@ -746,21 +772,21 @@ body::before {
 
 /* VT100 Terminal Fault Dump Display */
 .ascii-art-screen {
-  background: #040508;
-  border: 3px solid #000000;
-  box-shadow: inset 0 0 20px rgba(0, 255, 100, 0.12);
+  background: var(--bg-inset);
+  border: 3px solid var(--border-raw);
+  box-shadow: inset 0 0 16px rgba(197, 178, 22, 0.06);
   margin-bottom: 24px;
   overflow: hidden;
 }
 
 :root[data-theme="dark"] .ascii-art-screen {
-  border-color: #273144;
+  border-color: var(--border-raw);
 }
 
 .ascii-bar {
-  background: #0c0f16;
-  border-bottom: 2px solid #1a2233;
-  color: #72829c;
+  background: var(--bg-surface);
+  border-bottom: 2px solid var(--border-raw);
+  color: var(--text-dim);
   padding: 5px 12px;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -775,14 +801,14 @@ body::before {
 }
 
 .ascii-code {
-  color: #00ff66;
+  color: #aba22d;
   font-family: var(--font-mono);
   font-size: clamp(10px, 1.35vw, 12.5px);
   line-height: 1.25;
   padding: 12px 14px;
   margin: 0;
   overflow-x: auto;
-  text-shadow: 0 0 6px rgba(0, 255, 102, 0.5);
+  text-shadow: 0 0 5px rgba(171, 162, 45, 0.35);
   white-space: pre;
 }
 
@@ -806,15 +832,15 @@ body::before {
   font-weight: 900;
   line-height: 1;
   padding: 8px 16px;
-  border: 4px solid #000000;
-  box-shadow: 5px 5px 0px #000000;
+  border: 4px solid var(--border-raw);
+  box-shadow: 5px 5px 0px #040603;
   display: inline-block;
   text-transform: uppercase;
   transition: transform 0.1s ease;
 }
 
-.l-o { background: var(--c-acid); color: #000; transform: rotate(-3deg); }
-.l-b { background: var(--c-blood); color: #fff; transform: rotate(3deg); }
+.l-o { background: var(--c-acid); color: #13190c; transform: rotate(-3deg); }
+.l-b { background: var(--c-blood); color: #d4dcc0; transform: rotate(3deg); }
 
 .r-letter:hover {
   transform: scale(1.18) rotate(0deg) !important;
@@ -822,8 +848,8 @@ body::before {
 }
 
 .apparatus-box {
-  background: #000000;
-  color: #ffffff;
+  background: var(--c-iodine);
+  color: #d4dcc0;
   padding: 6px 12px;
   border: 3px solid var(--border-raw);
   font-family: var(--font-industrial);
@@ -831,7 +857,7 @@ body::before {
   font-weight: 900;
   display: flex;
   flex-direction: column;
-  box-shadow: 3px 3px 0px var(--c-blood);
+  box-shadow: 3px 3px 0px #040603;
   transform: rotate(-2deg);
 }
 
@@ -839,8 +865,8 @@ body::before {
 
 /* Redacted Bar (Hover to De-redact) */
 .redacted-block {
-  background: #000000;
-  color: #000000;
+  background: var(--bg-inset);
+  color: var(--bg-inset);
   padding: 8px 14px;
   border: 2px solid var(--c-blood);
   font-family: var(--font-mono);
@@ -855,7 +881,7 @@ body::before {
 
 .redacted-block:hover {
   background: var(--c-blood);
-  color: #ffffff;
+  color: #d4dcc0;
   transform: scale(1.05) rotate(0deg);
   box-shadow: 4px 4px 0px var(--c-acid);
 }
@@ -1209,19 +1235,19 @@ body::before {
 }
 
 :root[data-theme="dark"] .fracture-card {
-  border-color: #273144;
-  box-shadow: 6px 6px 0px #111722;
+  border-color: var(--border-raw);
+  box-shadow: 6px 6px 0px #040603;
 }
 
 :root[data-theme="dark"] .fracture-card:hover {
   border-color: var(--c-acid);
-  box-shadow: 9px 9px 0px var(--c-acid);
+  box-shadow: 8px 8px 0px #040603;
 }
 
 /* Card Header Strip */
 .docket-header-strip {
-  background: #000000;
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-main);
   border-bottom: 3px solid var(--border-raw);
   padding: 8px 16px;
   display: flex;
@@ -1391,17 +1417,17 @@ body::before {
 
 :root[data-theme="dark"] .docket-action-btn {
   background: var(--c-acid);
-  color: #000000;
+  color: #13190c;
   border-color: var(--c-acid);
-  box-shadow: 3px 3px 0px #000000;
+  box-shadow: 3px 3px 0px #040603;
 }
 
 .fracture-card:hover .docket-action-btn {
   background: var(--c-blood);
-  color: #ffffff;
+  color: #d4dcc0;
   border-color: var(--c-blood);
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0px var(--border-raw);
+  box-shadow: 4px 4px 0px #040603;
 }
 
 /* --------------------------------------------------------------------------
@@ -1417,13 +1443,13 @@ body::before {
 }
 
 :root[data-theme="dark"] .brutal-single-docket {
-  border-color: #2b3548;
-  box-shadow: 8px 8px 0px var(--c-acid);
+  border-color: var(--border-raw);
+  box-shadow: 8px 8px 0px #040603;
 }
 
 .single-spec-bar {
-  background: #000000;
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-main);
   border-bottom: 3px solid var(--border-raw);
   padding: 10px 22px;
   display: flex;
@@ -1745,9 +1771,9 @@ p code, li code {
 }
 
 .terminal-shell-bar {
-  background: #0c0f16;
+  background: var(--bg-inset);
   border-bottom: 3px solid var(--border-raw);
-  color: #fff;
+  color: var(--text-main);
   padding: 10px 16px;
   display: flex;
   align-items: center;
@@ -1758,14 +1784,14 @@ p code, li code {
 }
 
 .shell-dots { display: flex; gap: 6px; }
-.shell-dots .dot { width: 10px; height: 10px; border: 1.5px solid #000; }
-.d-red { background: #ff3333; }
-.d-yel { background: #ffcc00; }
-.d-grn { background: #00ee44; }
+.shell-dots .dot { width: 10px; height: 10px; border: 1.5px solid var(--border-raw); }
+.d-red { background: var(--c-blood); }
+.d-yel { background: var(--c-acid); }
+.d-grn { background: var(--c-cyan); }
 
 .shell-status {
   background: var(--c-acid);
-  color: #000;
+  color: #13190c;
   padding: 2px 8px;
   font-weight: 900;
 }
@@ -1776,7 +1802,7 @@ p code, li code {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #0d0f18;
+  background: var(--bg-inset);
   border: 3px solid var(--border-raw);
   padding: 8px 16px;
 }
@@ -2265,7 +2291,7 @@ body {
   width: 22px;
   height: 22px;
   border-radius: 50% !important;
-  background: radial-gradient(circle, #ddff00 0%, #a8c400 45%, #60101b 80%, #000000 100%);
+  background: radial-gradient(circle, var(--c-acid) 0%, #857814 45%, var(--c-blood) 80%, #000000 100%);
   border: 1.5px solid #000;
   box-shadow: inset 0 0 4px #000;
   position: relative;
@@ -2302,8 +2328,8 @@ body {
   left: 0;
   width: 100%;
   height: 50%;
-  background: #040507;
-  border-bottom: 2px solid #ff003c;
+  background: var(--bg-canvas);
+  border-bottom: 2px solid var(--c-blood);
   z-index: 10;
   transition: transform 0.28s cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -2316,7 +2342,7 @@ body {
 .eyelid-bottom {
   bottom: 0;
   border-bottom: none;
-  border-top: 2px solid #ff003c;
+  border-top: 2px solid var(--c-blood);
   transform: translateY(0%);
 }
 
@@ -2441,9 +2467,9 @@ body {
 
 .dossier-id-card-plate {
   margin: 28px 0 34px 0;
-  background: #05070c;
+  background: var(--bg-inset);
   border: 3.5px solid var(--border-raw);
-  box-shadow: 8px 8px 0px var(--border-raw);
+  box-shadow: 8px 8px 0px #040603;
   padding: 24px;
   display: flex;
   gap: 28px;
@@ -2454,16 +2480,16 @@ body {
 
 :root[data-theme="dark"] .dossier-id-card-plate {
   border-color: var(--c-blood);
-  box-shadow: 8px 8px 0px var(--c-blood);
+  box-shadow: 8px 8px 0px #040603;
 }
 
 .dossier-photo-box {
   width: 140px;
   height: 140px;
   flex-shrink: 0;
-  background: #000;
-  border: 3px solid var(--c-acid);
-  box-shadow: 4px 4px 0px #000;
+  background: var(--bg-canvas);
+  border: 3px solid var(--border-raw);
+  box-shadow: 4px 4px 0px #040603;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -2475,7 +2501,7 @@ body {
   top: 0; left: 0; right: 0;
   height: 3px;
   background: var(--c-blood);
-  box-shadow: 0 0 8px var(--c-blood);
+  box-shadow: 0 0 6px var(--c-blood);
   animation: scanlineSweep 2.2s infinite ease-in-out;
   z-index: 5;
 }
@@ -2491,14 +2517,14 @@ body {
 }
 
 .dossier-barcode {
-  background: #000;
+  background: var(--bg-inset);
   color: var(--c-acid);
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 900;
   text-align: center;
   padding: 3px 0;
-  border-top: 1.5px solid var(--c-acid);
+  border-top: 1.5px solid var(--border-raw);
   letter-spacing: 0.12em;
 }
 
@@ -2517,13 +2543,13 @@ body {
 }
 
 .d-label {
-  color: #718096;
+  color: var(--text-dim);
   font-weight: 900;
   min-width: 160px;
 }
 
 .d-val {
-  color: #ffffff;
+  color: var(--text-main);
   font-weight: 800;
 }
 
