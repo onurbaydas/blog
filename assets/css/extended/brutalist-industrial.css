@@ -2125,3 +2125,433 @@ body.decay-active .fracture-card:nth-child(odd) {
   .brutal-post-header { padding: 20px 16px; }
   .footer-chassis-grid { grid-template-columns: 1fr; }
 }
+
+/* --------------------------------------------------------------------------
+   15. TERRIFYING VOID WATCHER EYES & PSYCHOLOGICAL DYSTOPIA ENGINE
+   -------------------------------------------------------------------------- */
+
+/* NEGATIVE PANIC FLASH (Mikro Kernel Panik Sinyali) */
+body.panic-flash {
+  filter: invert(100%) hue-rotate(180deg) contrast(150%) !important;
+  transition: none !important;
+}
+
+/* SCROLL ENTROPY EFFECT */
+:root {
+  --scroll-entropy: 0;
+}
+
+body {
+  box-shadow: inset 0 0 calc(var(--scroll-entropy) * 140px) rgba(0, 0, 0, 0.95);
+}
+
+/* AUDIO TRIGGER BUTTON IN HUD */
+.audio-trigger-btn {
+  background: #11141c;
+  color: #8892a6;
+  border: 2px solid #2a3346;
+  padding: 3px 10px;
+  font-family: var(--font-industrial);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.12s ease;
+}
+
+.audio-trigger-btn .audio-icon {
+  color: var(--c-acid);
+  font-size: 13px;
+}
+
+.audio-trigger-btn:hover {
+  background: var(--c-acid);
+  color: #000;
+  border-color: #000;
+}
+
+.audio-trigger-btn.audio-active {
+  background: var(--c-blood);
+  color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px var(--c-blood);
+}
+
+.audio-trigger-btn.audio-active .audio-icon {
+  color: #ffffff;
+  animation: audioPulse 0.8s infinite alternate;
+}
+
+@keyframes audioPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.3); }
+}
+
+/* ==========================================================================
+   THE TWO TERRIFYING PEEPING EYES (#void-watcher)
+   Aniden sayfanın kenarlarında beliren, kırpılıp açılan ve fareyi izleyen gözler
+   ========================================================================== */
+.void-watcher-presence {
+  position: fixed;
+  z-index: 99999;
+  display: flex;
+  gap: 14px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  filter: drop-shadow(0 0 18px rgba(255, 0, 60, 0.9));
+}
+
+.void-watcher-presence.spawning {
+  opacity: 1;
+  visibility: visible;
+  animation: watcherMaterialize 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+@keyframes watcherMaterialize {
+  0% { transform: scale(0.6) skewX(-15deg); filter: blur(6px) contrast(200%); }
+  50% { transform: scale(1.1) skewX(10deg); filter: blur(2px); }
+  100% { transform: scale(1) skewX(0); filter: blur(0); }
+}
+
+.void-watcher-presence.panic-vanish {
+  animation: watcherPanicVanish 0.15s forwards ease-in;
+}
+
+@keyframes watcherPanicVanish {
+  0% { transform: scale(1.3); filter: invert(1); }
+  100% { transform: scale(0) rotate(25deg); opacity: 0; filter: blur(8px); }
+}
+
+.creepy-eye {
+  width: 58px;
+  height: 36px;
+  position: relative;
+  overflow: hidden;
+  background: #020305;
+  border: 2px solid #000;
+  border-radius: 50% !important;
+  box-shadow: inset 0 0 8px #000, 0 0 14px rgba(255, 0, 60, 0.6);
+}
+
+.sclera {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, #f4efe1 35%, #d1c8b2 75%, #3d1017 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Bloodshot Capillary Veins */
+.vein-mesh {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 0, 60, 0.6) 1px, transparent 1px),
+    radial-gradient(circle at 85% 70%, rgba(255, 0, 60, 0.5) 1.5px, transparent 1.5px),
+    linear-gradient(45deg, transparent 46%, rgba(200, 0, 40, 0.35) 48%, rgba(200, 0, 40, 0.35) 52%, transparent 54%),
+    linear-gradient(-35deg, transparent 47%, rgba(220, 0, 40, 0.3) 49%, rgba(220, 0, 40, 0.3) 51%, transparent 53%);
+  pointer-events: none;
+}
+
+/* Predator Amber / Acid Iris */
+.iris {
+  width: 22px;
+  height: 22px;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #ddff00 0%, #a8c400 45%, #60101b 80%, #000000 100%);
+  border: 1.5px solid #000;
+  box-shadow: inset 0 0 4px #000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Uncanny Vertical Slit or Dilating Pupil */
+.pupil {
+  width: 9px;
+  height: 9px;
+  border-radius: 50% !important;
+  background: #000000;
+  position: relative;
+  transition: transform 0.08s ease-out;
+  box-shadow: 0 0 2px #000;
+}
+
+.glint {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50% !important;
+  background: #ffffff;
+  opacity: 0.9;
+}
+
+/* Eyelids that open and blink */
+.eyelid {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #040507;
+  border-bottom: 2px solid #ff003c;
+  z-index: 10;
+  transition: transform 0.28s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.eyelid-top {
+  top: 0;
+  transform: translateY(0%);
+}
+
+.eyelid-bottom {
+  bottom: 0;
+  border-bottom: none;
+  border-top: 2px solid #ff003c;
+  transform: translateY(0%);
+}
+
+/* Eyes Open State */
+.void-watcher-presence.eyes-open .eyelid-top {
+  transform: translateY(-100%);
+}
+.void-watcher-presence.eyes-open .eyelid-bottom {
+  transform: translateY(100%);
+}
+
+/* Periodic Natural Blink */
+.void-watcher-presence.blinking .eyelid-top {
+  transform: translateY(0%) !important;
+  transition: transform 0.06s ease !important;
+}
+.void-watcher-presence.blinking .eyelid-bottom {
+  transform: translateY(0%) !important;
+  transition: transform 0.06s ease !important;
+}
+
+/* Panic Widened */
+.void-watcher-presence.eyes-widened .eyelid-top {
+  transform: translateY(-130%) !important;
+}
+.void-watcher-presence.eyes-widened .eyelid-bottom {
+  transform: translateY(130%) !important;
+}
+.void-watcher-presence.eyes-widened .pupil {
+  transform: scale(0.4) !important;
+}
+
+/* ==========================================================================
+   STALKER RETICLE (Military Crosshair Cursor & Live Coordinates)
+   ========================================================================== */
+.stalker-reticle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99990;
+  transform: translate(-100px, -100px);
+  will-change: transform;
+}
+
+.reticle-box {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  margin-top: -19px;
+  margin-left: -19px;
+  border: 1.5px solid var(--c-acid);
+  border-radius: 50% !important;
+  transition: border-color 0.12s, transform 0.12s;
+}
+
+.reticle-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+}
+
+.reticle-cross::before,
+.reticle-cross::after {
+  content: "";
+  position: absolute;
+  background: var(--c-acid);
+}
+
+.reticle-cross::before {
+  top: 3px; left: -4px; width: 16px; height: 2px;
+}
+.reticle-cross::after {
+  top: -4px; left: 3px; width: 2px; height: 16px;
+}
+
+.reticle-coords {
+  position: absolute;
+  left: 28px;
+  top: -10px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--c-acid);
+  color: var(--c-acid);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 5px;
+  white-space: nowrap;
+  letter-spacing: 0.08em;
+}
+
+/* Hover Lock on interactive elements */
+.stalker-reticle.reticle-lock .reticle-box {
+  border-color: var(--c-blood);
+  transform: scale(1.3) rotate(45deg);
+  box-shadow: 0 0 10px var(--c-blood);
+}
+
+.stalker-reticle.reticle-lock .reticle-cross::before,
+.stalker-reticle.reticle-lock .reticle-cross::after {
+  background: var(--c-blood);
+}
+
+.stalker-reticle.reticle-lock .reticle-coords {
+  border-color: var(--c-blood);
+  color: var(--c-blood);
+}
+
+@media (max-width: 900px) {
+  .stalker-reticle { display: none; }
+}
+
+/* ==========================================================================
+   ABOUT DOSSIER PLATE (Sızdırılmış Personel Tehdit Dosyası)
+   ========================================================================== */
+.about-dossier-mode {
+  border-color: var(--c-blood) !important;
+}
+
+.dossier-id-card-plate {
+  margin: 28px 0 34px 0;
+  background: #05070c;
+  border: 3.5px solid var(--border-raw);
+  box-shadow: 8px 8px 0px var(--border-raw);
+  padding: 24px;
+  display: flex;
+  gap: 28px;
+  position: relative;
+  align-items: center;
+  overflow: hidden;
+}
+
+:root[data-theme="dark"] .dossier-id-card-plate {
+  border-color: var(--c-blood);
+  box-shadow: 8px 8px 0px var(--c-blood);
+}
+
+.dossier-photo-box {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  background: #000;
+  border: 3px solid var(--c-acid);
+  box-shadow: 4px 4px 0px #000;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.biometric-scan-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--c-blood);
+  box-shadow: 0 0 8px var(--c-blood);
+  animation: scanlineSweep 2.2s infinite ease-in-out;
+  z-index: 5;
+}
+
+@keyframes scanlineSweep {
+  0% { top: 0%; opacity: 0.8; }
+  50% { top: 96%; opacity: 1; }
+  100% { top: 0%; opacity: 0.8; }
+}
+
+.dossier-avatar-svg {
+  flex: 1;
+}
+
+.dossier-barcode {
+  background: #000;
+  color: var(--c-acid);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 900;
+  text-align: center;
+  padding: 3px 0;
+  border-top: 1.5px solid var(--c-acid);
+  letter-spacing: 0.12em;
+}
+
+.dossier-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dossier-row {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+}
+
+.d-label {
+  color: #718096;
+  font-weight: 900;
+  min-width: 160px;
+}
+
+.d-val {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.text-neon {
+  color: var(--c-acid) !important;
+}
+
+.dossier-stamp-seal {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 8px;
+  background: transparent;
+  color: var(--c-blood);
+  border: 3px solid var(--c-blood);
+  padding: 5px 12px;
+  font-family: var(--font-industrial);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  transform: rotate(-2deg);
+  box-shadow: 3px 3px 0px var(--c-blood);
+}
+
+@media (max-width: 768px) {
+  .dossier-id-card-plate {
+    flex-direction: column;
+    text-align: left;
+    align-items: flex-start;
+  }
+}
+

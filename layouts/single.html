@@ -1,17 +1,18 @@
 {{- define "main" }}
 {{- $is_en := eq site.Language.Lang "en" }}
+{{- $is_about := strings.Contains .RelPermalink "about" }}
 
-<article class="post-single brutal-single-docket fracture-container">
+<article class="post-single brutal-single-docket fracture-container {{- if $is_about }} about-dossier-mode{{- end }}">
   {{- /* Top Industrial Classification Bar */ -}}
   <div class="single-spec-bar">
     <div class="spec-classification">
       <span class="sec-dot">■</span>
-      <span class="sec-label">{{ if $is_en }}DOCUMENT_SPEC:{{ else }}DOKÜMAN_TÜRÜ:{{ end }}</span>
-      <span class="sec-id">INCIDENT_ANALYSIS // {{ if not .Date.IsZero }}{{ .Date | time.Format "2006-01-02" }}{{ else }}CURRENT{{ end }}</span>
+      <span class="sec-label">{{ if $is_about }}{{ if $is_en }}DOSSIER_TYPE:{{ else }}DOSYA_TÜRÜ:{{ end }}{{ else }}{{ if $is_en }}DOCUMENT_SPEC:{{ else }}DOKÜMAN_TÜRÜ:{{ end }}{{ end }}</span>
+      <span class="sec-id">{{ if $is_about }}SUBJECT_DOSSIER // PERSONNEL_SECURITY_AUDIT{{ else }}INCIDENT_ANALYSIS // {{ if not .Date.IsZero }}{{ .Date | time.Format "2006-01-02" }}{{ else }}CURRENT{{ end }}{{ end }}</span>
     </div>
     <div class="spec-status-pill">
       <span class="status-indicator"></span>
-      <span class="status-name">{{ if $is_en }}AUDIT_UNRESOLVED // RING-0{{ else }}GÜVENLİK_ANOMALİSİ{{ end }}</span>
+      <span class="status-name">{{ if $is_about }}{{ if $is_en }}CLEARANCE: REVOKED // LEVEL-4{{ else }}GÜVENLİK_İZİNLERİ: İPTAL{{ end }}{{ else }}{{ if $is_en }}AUDIT_UNRESOLVED // RING-0{{ else }}GÜVENLİK_ANOMALİSİ{{ end }}{{ end }}</span>
     </div>
   </div>
 
@@ -26,6 +27,34 @@
       </span>
       {{- end }}
     </h1>
+
+    {{- if $is_about }}
+    {{- /* Sızdırılmış Biyometrik Kimlik Kartı & Tehdit Değerlendirme Panosu */ -}}
+    <div class="dossier-id-card-plate">
+      <div class="dossier-photo-box">
+        <div class="biometric-scan-line"></div>
+        <svg class="dossier-avatar-svg" viewBox="0 0 100 100" width="100%" height="100%">
+          <rect width="100" height="100" fill="#040507"/>
+          <circle cx="50" cy="36" r="18" fill="#151b28" stroke="#ddff00" stroke-width="2"/>
+          <path d="M22,86 C22,60 34,54 50,54 C66,54 78,60 78,86 Z" fill="#151b28" stroke="#ddff00" stroke-width="2"/>
+          <rect x="28" y="30" width="44" height="11" fill="#000" stroke="#ff003c" stroke-width="1.5"/>
+          <text x="50" y="38" fill="#ff003c" font-size="6" font-weight="900" text-anchor="middle" font-family="monospace">CLASSIFIED</text>
+          <circle cx="50" cy="35" r="28" fill="none" stroke="rgba(221,255,0,0.3)" stroke-dasharray="3 3"/>
+          <line x1="15" y1="35" x2="85" y2="35" stroke="rgba(221,255,0,0.25)"/>
+          <line x1="50" y1="5" x2="50" y2="65" stroke="rgba(221,255,0,0.25)"/>
+        </svg>
+        <div class="dossier-barcode">OB-99402-AUDIT</div>
+      </div>
+      <div class="dossier-details">
+        <div class="dossier-row"><span class="d-label">CODENAME:</span> <strong class="d-val text-neon">OPERATOR OB</strong></div>
+        <div class="dossier-row"><span class="d-label">CLEARANCE:</span> <strong class="d-val text-alert">REVOKED (CONTAINMENT BREACH)</strong></div>
+        <div class="dossier-row"><span class="d-label">ASSIGNMENT:</span> <strong class="d-val">MULTI-USER GPU CLUSTERS & STORAGE</strong></div>
+        <div class="dossier-row"><span class="d-label">CONTAINER POLICY:</span> <strong class="d-val">OPA FAIL-OPEN EXPERIMENTS (AUDITED)</strong></div>
+        <div class="dossier-row"><span class="d-label">SURVEILLANCE:</span> <strong class="d-val text-neon">ACTIVE // TTY1 INTERCEPTED</strong></div>
+        <div class="dossier-stamp-seal">INTERNAL AUDIT // SUBJECT UNDER SURVEILLANCE</div>
+      </div>
+    </div>
+    {{- end }}
 
     {{- if .Description }}
     <div class="post-description brutal-single-desc">

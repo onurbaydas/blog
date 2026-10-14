@@ -62,6 +62,40 @@
 {{- partial "extend_footer.html" . }}
 
 {{- /* Core scripts & Brutalist Enhancements */ -}}
+{{- /* VOID WATCHER: The Two Terrifying Eyes That Suddenly Spawn At Random Page Edges */ -}}
+<div id="void-watcher" class="void-watcher-presence" aria-hidden="true">
+    <div class="creepy-eye eye-left">
+        <div class="sclera">
+            <div class="vein-mesh"></div>
+            <div class="iris">
+                <div class="pupil"></div>
+                <div class="glint"></div>
+            </div>
+        </div>
+        <div class="eyelid eyelid-top"></div>
+        <div class="eyelid eyelid-bottom"></div>
+    </div>
+    <div class="creepy-eye eye-right">
+        <div class="sclera">
+            <div class="vein-mesh"></div>
+            <div class="iris">
+                <div class="pupil"></div>
+                <div class="glint"></div>
+            </div>
+        </div>
+        <div class="eyelid eyelid-top"></div>
+        <div class="eyelid eyelid-bottom"></div>
+    </div>
+</div>
+
+{{- /* STALKER RETICLE: Military Targeting Crosshair & Telemetry Coordinates */ -}}
+<div id="stalker-reticle" class="stalker-reticle" aria-hidden="true">
+    <div class="reticle-box">
+        <div class="reticle-cross"></div>
+        <div class="reticle-coords" id="reticle-coords">LOC: [000, 000]</div>
+    </div>
+</div>
+
 <script>
     // Live Telemetry UTC Clock
     function updateSysClock() {
@@ -76,41 +110,336 @@
     updateSysClock();
     setInterval(updateSysClock, 1000);
 
-    // Mechanical Relay Audio Solenoid Click (Synthesized via Web Audio API)
+    // ==========================================
+    // AUDIO ENGINE: 60Hz Sub-Station Hum & Geiger Radiation Counter
+    // ==========================================
     let audioCtx = null;
-    function playRelayClick() {
+    let humOsc = null;
+    let humGain = null;
+    let geigerInterval = null;
+    let isAudioActive = false;
+    let mouseSpeed = 0;
+    let lastMouseX = 0, lastMouseY = 0, lastMouseTime = Date.now();
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playRelayClick(pitch = 380, duration = 0.035, vol = 0.08) {
         try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            initAudio();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(380, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.035);
-            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+            osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + duration);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.035);
+            osc.stop(audioCtx.currentTime + duration);
         } catch(e) {}
     }
 
-    // Chaos Mode Toggle (Decay & Glitch & Mechanical Fracture trigger)
+    function playGeigerClick() {
+        if (!isAudioActive) return;
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            const f = 900 + Math.random() * 2500;
+            osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.02 + Math.random() * 0.03, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.008);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.008);
+        } catch(e) {}
+    }
+
+    function startHum() {
+        try {
+            initAudio();
+            if (humOsc) return;
+            humOsc = audioCtx.createOscillator();
+            humGain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(140, audioCtx.currentTime);
+
+            humOsc.type = 'sawtooth';
+            humOsc.frequency.setValueAtTime(58, audioCtx.currentTime); // 58Hz electrical sub-hum
+            humGain.gain.setValueAtTime(0.025, audioCtx.currentTime);
+
+            humOsc.connect(filter);
+            filter.connect(humGain);
+            humGain.connect(audioCtx.destination);
+            humOsc.start();
+        } catch(e) {}
+    }
+
+    function stopHum() {
+        if (humOsc) {
+            try {
+                humOsc.stop();
+                humOsc.disconnect();
+            } catch(e) {}
+            humOsc = null;
+            humGain = null;
+        }
+    }
+
+    function toggleAudioEngine() {
+        isAudioActive = !isAudioActive;
+        const btnText = document.getElementById('audio-btn-text');
+        const btn = document.getElementById('audio-btn');
+        if (isAudioActive) {
+            startHum();
+            if (btnText) btnText.textContent = 'AUDIO: 380V ON';
+            if (btn) btn.classList.add('audio-active');
+            localStorage.setItem('core-audio', 'true');
+        } else {
+            stopHum();
+            if (btnText) btnText.textContent = 'AUDIO: OFF';
+            if (btn) btn.classList.remove('audio-active');
+            localStorage.setItem('core-audio', 'false');
+        }
+        playRelayClick(450, 0.04, 0.12);
+    }
+
+    const audioBtn = document.getElementById('audio-btn');
+    if (audioBtn) {
+        audioBtn.addEventListener('click', toggleAudioEngine);
+        if (localStorage.getItem('core-audio') === 'true') {
+            // Auto start requires user interaction per browser policy
+            document.addEventListener('click', function autoStarter() {
+                if (!isAudioActive && localStorage.getItem('core-audio') === 'true') {
+                    toggleAudioEngine();
+                }
+                document.removeEventListener('click', autoStarter);
+            }, { once: true });
+        }
+    }
+
+    // Dynamic Geiger radiation clicks based on scroll depth & mouse speed
+    function triggerGeigerLoop() {
+        if (isAudioActive) {
+            const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) || 0;
+            const probability = 0.08 + (scrollPercent * 0.28) + (mouseSpeed * 0.003);
+            if (Math.random() < probability) {
+                playGeigerClick();
+            }
+        }
+        setTimeout(triggerGeigerLoop, 60);
+    }
+    triggerGeigerLoop();
+
+    // ==========================================
+    // NEGATIVE PANIC FLASH (Mikro Kernel Panik Sinyali)
+    // ==========================================
+    function triggerPanicFlash() {
+        document.body.classList.add('panic-flash');
+        playRelayClick(520, 0.045, 0.1);
+        setTimeout(() => {
+            document.body.classList.remove('panic-flash');
+        }, 75);
+    }
+
+    document.querySelectorAll('a, button, .fracture-card, .redacted-block').forEach(el => {
+        el.addEventListener('click', () => {
+            triggerPanicFlash();
+        });
+    });
+
+    // ==========================================
+    // SCROLL ENTROPY ENGINE (Sayfada indikçe artan radyasyon & bozulma)
+    // ==========================================
+    window.addEventListener('scroll', () => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const entropy = totalHeight > 0 ? (window.scrollY / totalHeight) : 0;
+        document.documentElement.style.setProperty('--scroll-entropy', entropy.toFixed(3));
+        
+        // Update live status if at extreme depth
+        const reactorLabel = document.querySelector('.hud-val');
+        if (reactorLabel && entropy > 0.8) {
+            reactorLabel.textContent = 'MELTDOWN_CRITICAL';
+            reactorLabel.classList.add('text-alert');
+        }
+    });
+
+    // ==========================================
+    // STALKER RETICLE (Hedefleme Crosshair'i)
+    // ==========================================
+    const reticle = document.getElementById('stalker-reticle');
+    const reticleCoords = document.getElementById('reticle-coords');
+    let targetX = -100, targetY = -100, currX = -100, currY = -100;
+
+    window.addEventListener('mousemove', (e) => {
+        targetX = e.clientX;
+        targetY = e.clientY;
+
+        const now = Date.now();
+        const dt = now - lastMouseTime;
+        if (dt > 16) {
+            const dist = Math.hypot(e.clientX - lastMouseX, e.clientY - lastMouseY);
+            mouseSpeed = dist / dt * 10;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            lastMouseTime = now;
+        }
+
+        if (reticleCoords) {
+            reticleCoords.textContent = `LOC: [${String(e.clientX).padStart(4, '0')}, ${String(e.clientY).padStart(4, '0')}]`;
+        }
+    });
+
+    function renderReticle() {
+        currX += (targetX - currX) * 0.35;
+        currY += (targetY - currY) * 0.35;
+        if (reticle) {
+            reticle.style.transform = `translate(${currX}px, ${currY}px)`;
+        }
+        requestAnimationFrame(renderReticle);
+    }
+    renderReticle();
+
+    document.querySelectorAll('a, button, .fracture-card, .redacted-block').forEach(interactive => {
+        interactive.addEventListener('mouseenter', () => {
+            if (reticle) reticle.classList.add('reticle-lock');
+        });
+        interactive.addEventListener('mouseleave', () => {
+            if (reticle) reticle.classList.remove('reticle-lock');
+        });
+    });
+
+    // ==========================================
+    // VOID WATCHER: The Two Terrifying Peeping Eyes ("kırpılıp açılan korkunç gözler")
+    // ==========================================
+    const voidWatcher = document.getElementById('void-watcher');
+    const leftPupil = voidWatcher ? voidWatcher.querySelector('.eye-left .pupil') : null;
+    const rightPupil = voidWatcher ? voidWatcher.querySelector('.eye-right .pupil') : null;
+    let eyeActive = false;
+    let eyeTimer = null;
+    let eyeCenter = { x: 0, y: 0 };
+
+    const edgePositions = [
+        { name: 'pos-bottom-right', bottom: '60px', right: '35px', top: 'auto', left: 'auto', rot: '-8deg' },
+        { name: 'pos-left-edge', top: '45%', left: '10px', right: 'auto', bottom: 'auto', rot: '12deg' },
+        { name: 'pos-top-right', top: '48px', right: '220px', left: 'auto', bottom: 'auto', rot: '4deg' },
+        { name: 'pos-bottom-left', bottom: '50px', left: '25px', top: 'auto', right: 'auto', rot: '15deg' },
+        { name: 'pos-mid-right', top: '65%', right: '15px', left: 'auto', bottom: 'auto', rot: '-14deg' }
+    ];
+
+    function spawnVoidEyes() {
+        if (!voidWatcher || eyeActive) return;
+        const pos = edgePositions[Math.floor(Math.random() * edgePositions.length)];
+        voidWatcher.style.top = pos.top;
+        voidWatcher.style.left = pos.left;
+        voidWatcher.style.right = pos.right;
+        voidWatcher.style.bottom = pos.bottom;
+        voidWatcher.style.transform = `rotate(${pos.rot})`;
+        
+        eyeActive = true;
+        voidWatcher.classList.add('spawning');
+        voidWatcher.classList.remove('hidden-void');
+        
+        // Eyelids slowly open
+        setTimeout(() => {
+            voidWatcher.classList.add('eyes-open');
+            playRelayClick(800, 0.02, 0.04);
+            const rect = voidWatcher.getBoundingClientRect();
+            eyeCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        }, 150);
+
+        // Natural periodic blinks while watching
+        const blinkInterval = setInterval(() => {
+            if (!eyeActive) { clearInterval(blinkInterval); return; }
+            voidWatcher.classList.add('blinking');
+            setTimeout(() => {
+                voidWatcher.classList.remove('blinking');
+            }, 120);
+        }, 2200);
+
+        // Dismiss after 5 to 7 seconds
+        eyeTimer = setTimeout(() => {
+            dismissVoidEyes();
+        }, 5500 + Math.random() * 2500);
+    }
+
+    function dismissVoidEyes(isPanic = false) {
+        if (!voidWatcher || !eyeActive) return;
+        eyeActive = false;
+        clearTimeout(eyeTimer);
+        
+        if (isPanic) {
+            voidWatcher.classList.add('panic-vanish');
+            triggerPanicFlash();
+            playRelayClick(120, 0.08, 0.15);
+        } else {
+            voidWatcher.classList.remove('eyes-open');
+        }
+
+        setTimeout(() => {
+            voidWatcher.className = 'void-watcher-presence hidden-void';
+            // Schedule next terrifying emergence
+            scheduleNextSpawn();
+        }, isPanic ? 150 : 600);
+    }
+
+    function scheduleNextSpawn() {
+        const delay = 8000 + Math.random() * 12000; // 8 - 20s
+        setTimeout(spawnVoidEyes, delay);
+    }
+
+    // Pupils track user's cursor
+    window.addEventListener('mousemove', (e) => {
+        if (!eyeActive || !leftPupil || !rightPupil) return;
+        const dx = e.clientX - eyeCenter.x;
+        const dy = e.clientY - eyeCenter.y;
+        const dist = Math.hypot(dx, dy);
+
+        // Panic escape if cursor gets too close!
+        if (dist < 110) {
+            dismissVoidEyes(true);
+            return;
+        }
+
+        const angle = Math.atan2(dy, dx);
+        const maxOffset = 7;
+        const px = Math.cos(angle) * maxOffset;
+        const py = Math.sin(angle) * maxOffset;
+
+        leftPupil.style.transform = `translate(${px}px, ${py}px)`;
+        rightPupil.style.transform = `translate(${px}px, ${py}px)`;
+    });
+
+    // Start void watcher after initial page load
+    setTimeout(spawnVoidEyes, 4000);
+
+    // ==========================================
+    // OTHER SYSTEM HANDLERS (Chaos, Theme, Redacted, Copy)
+    // ==========================================
     const chaosBtn = document.getElementById('chaos-btn');
     if (chaosBtn) {
         if (localStorage.getItem('decay-mode') === 'true') {
             document.body.classList.add('decay-active');
         }
         chaosBtn.addEventListener('click', () => {
-            playRelayClick();
+            playRelayClick(320, 0.05, 0.1);
             document.body.classList.toggle('decay-active');
             const isActive = document.body.classList.contains('decay-active');
             localStorage.setItem('decay-mode', isActive);
         });
     }
 
-    // Scroll to Top threshold
     const toplink = document.getElementById("top-link");
     if (toplink) {
         window.onscroll = function () {
@@ -121,14 +450,13 @@
                 toplink.classList.add("hidden");
             }
         };
-        toplink.addEventListener('click', playRelayClick);
+        toplink.addEventListener('click', () => playRelayClick(500, 0.03, 0.1));
     }
 
-    // Theme toggle handling
     const themeBtn = document.getElementById("theme-toggle");
     if (themeBtn) {
         themeBtn.addEventListener("click", () => {
-            playRelayClick();
+            playRelayClick(380, 0.04, 0.12);
             const html = document.querySelector("html");
             const newTheme = html.dataset.theme === "dark" ? "light" : "dark";
             html.dataset.theme = newTheme;
@@ -136,23 +464,19 @@
         });
     }
 
-    // Interactive Classified Redacted Blocks
     document.querySelectorAll('.redacted-block').forEach(blk => {
         blk.addEventListener('click', () => {
-            playRelayClick();
+            playRelayClick(650, 0.03, 0.09);
             blk.classList.toggle('revealed');
         });
     });
 
-    // Mechanical snap on card hover/click
     document.querySelectorAll('.fracture-card').forEach(c => {
         c.addEventListener('mouseenter', () => {
-            // Subtle random glitch jitter
-            if (Math.random() > 0.6) playRelayClick();
+            if (Math.random() > 0.5) playRelayClick(240, 0.02, 0.04);
         });
     });
 
-    // Code copy buttons
     document.querySelectorAll('pre > code').forEach((codeblock) => {
         const container = codeblock.parentNode.parentNode;
         const copybutton = document.createElement('button');
