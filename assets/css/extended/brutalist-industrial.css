@@ -16,33 +16,33 @@
   --main-width: 900px;
   --radius: 0px !important;
 
-  /* LIGHT MODE (Stained Asylum Ward, Jaundiced Bio-Parchment, Formaldehyde Clinic) */
-  --bg-canvas: #c7bfa1;       /* Damp nicotine-stained clinic plaster, discolored tile */
-  --bg-surface: #d8cfb0;      /* Autopsy intake sheet, stained medical parchment */
-  --bg-inset: #aba07f;        /* Damp basement concrete drain floor */
+  /* LIGHT MODE (Desaturated Weathered Cardboard, Concrete Dust, Muted Newsprint) */
+  --bg-canvas: #b8b39f;       /* Faded gray-tan cardboard / industrial cement */
+  --bg-surface: #c7c1ae;      /* Desaturated newsprint / aged sheet */
+  --bg-inset: #a6a08c;        /* Cold damp slab */
   
-  --border-thick: 3.5px solid #202613; /* Gangrene rot black-green */
-  --border-raw: #202613;
-  --border-width: 3.5px;
+  --border-thick: 3px solid #333a2d; /* Matte dark charcoal-green */
+  --border-raw: #333a2d;
+  --border-width: 3px;
   
-  --text-main: #13190c;       /* Congealed black bile */
-  --text-dim: #434c31;        /* Oxidized pond scum */
-  --text-ghost: #6e7759;      /* Decayed mold grime */
+  --text-main: #1c2118;       /* Deep matte charcoal */
+  --text-dim: #4d5644;        /* Dull graphite */
+  --text-ghost: #6f7864;      /* Faded dust */
   
-  --c-acid: #8c8012;          /* Curdled rancid earwax, sour mustard */
-  --c-blood: #6e101b;         /* Dried surgical scab maroon */
-  --c-clot: #3c060e;          /* Blackened blood clot */
-  --c-toxic: #7a320c;         /* Scorched pipe rust */
-  --c-cyan: #144f43;          /* Corroded verdigris copper */
-  --c-concrete: #9e9574;      /* Dirty hospital linoleum */
-  --c-iodine: #3d1728;        /* Deep contusion hematoma */
+  --c-acid: #505847;          /* Cold tarnished lead-green (ZERO yellow) */
+  --c-blood: #443e3e;         /* Desaturated slate-iron (ZERO bright red) */
+  --c-clot: #2b2c28;          /* Dark soot */
+  --c-toxic: #4a4740;         /* Weathered dirt */
+  --c-cyan: #3c4240;          /* Gunmetal */
+  --c-concrete: #8c8676;
+  --c-iodine: #36353a;
   
-  --shadow-hard: 6px 6px 0px #202613;
-  --shadow-hard-lg: 10px 10px 0px #202613;
+  --shadow-hard: 5px 5px 0px #333a2d;
+  --shadow-hard-lg: 8px 8px 0px #333a2d;
   
-  --hazard-stripe: repeating-linear-gradient(-45deg, #7a320c, #7a320c 12px, #202613 12px, #202613 24px);
-  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #8c8012, #8c8012 12px, #202613 12px, #202613 24px);
-  --grid-pattern: radial-gradient(rgba(32, 38, 19, 0.18) 1.2px, transparent 1.2px);
+  --hazard-stripe: repeating-linear-gradient(-45deg, #444a3e, #444a3e 10px, #2d3329 10px, #2d3329 20px);
+  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #444a3e, #444a3e 10px, #2d3329 10px, #2d3329 20px);
+  --grid-pattern: radial-gradient(rgba(51, 58, 45, 0.12) 1.2px, transparent 1.2px);
 
   --theme: var(--bg-canvas);
   --entry: var(--bg-surface);
@@ -51,40 +51,40 @@
   --tertiary: var(--border-raw);
   --content: var(--text-main);
   --border: var(--border-raw);
-  --code-block-bg: #0b1107;
-  --code-bg: #bfb591;
+  --code-block-bg: #141712;
+  --code-bg: #aba38f;
   
   color-scheme: light;
 }
 
 :root[data-theme="dark"], body.dark {
-  /* DARK MODE (Noxious Stagnant Sludge, Radioactive Bile Sulphur, Jaundiced Bone Marrow) */
-  --bg-canvas: #0c1109;       /* Murky oily bog-water sludge with rancid olive cast */
-  --bg-surface: #131a0e;      /* Decomposing organic matter, damp concrete bunker */
-  --bg-inset: #080d06;        /* Deep stagnant cesspool trench */
+  /* DARK MODE (Desaturated Heavy Industrial, Concrete Soot, Weathered Lead, Muted Grime) */
+  --bg-canvas: #121411;       /* Deep matte charcoal soot with cold damp concrete undertone */
+  --bg-surface: #191c17;      /* Matte dark iron / weathered bunker steel */
+  --bg-inset: #0e100d;        /* Deep matte shadow */
   
-  --border-thick: 3.5px solid #38471c; /* Corroded gangrenous zinc-brass */
-  --border-raw: #38471c;
-  --border-width: 3.5px;
+  --border-thick: 3px solid #2d3429; /* Tarnished cold zinc/lead */
+  --border-raw: #2d3429;
+  --border-width: 3px;
   
-  --text-main: #d4dcc0;       /* Jaundiced bone marrow, aged specimen enamel */
-  --text-dim: #74835a;        /* Stagnant pond film, dried moss */
-  --text-ghost: #465233;      /* Mold spores, decaying sediment */
+  --text-main: #b8c0b0;       /* Muted ash bone / soft chalk (gentle, matte, non-glaring) */
+  --text-dim: #707967;        /* Weathered lead pencil */
+  --text-ghost: #464e3f;      /* Charcoal soot */
   
-  --c-acid: #c5b216;          /* Diseased rancid bile, pus sulfur (sour, unpalatable, uncanny) */
-  --c-blood: #821220;         /* Viscous coagulated dried scab maroon (dark, arterial, heavy) */
-  --c-clot: #4d0a13;          /* Blackened necrotic clot */
-  --c-toxic: #9e3d0f;         /* Scorched battery rust, curdled iron oxide */
-  --c-cyan: #197360;          /* Stagnant morgue preservative chemical teal */
-  --c-concrete: #1f2814;      /* Mossy basement stone */
-  --c-iodine: #521c38;        /* Necrotic spleen hematoma plum (jarring clash with bile yellow) */
+  --c-acid: #4e5647;          /* Desaturated weathered lead-slate (NO yellow!) */
+  --c-blood: #3d3838;         /* Muted cold iron-slate (NO red!) */
+  --c-clot: #1a1e18;          /* Deep umber */
+  --c-toxic: #3d3a34;         /* Burnt silt */
+  --c-cyan: #2c3532;          /* Dull gunmetal slate */
+  --c-concrete: #1e221b;      /* Cold bunker granite */
+  --c-iodine: #262729;        /* Graphite slate */
   
-  --shadow-hard: 6px 6px 0px #040603;
-  --shadow-hard-lg: 10px 10px 0px #040603;
+  --shadow-hard: 5px 5px 0px #060805;
+  --shadow-hard-lg: 8px 8px 0px #060805;
   
-  --hazard-stripe: repeating-linear-gradient(-45deg, #9e3d0f, #9e3d0f 12px, #080d06 12px, #080d06 24px);
-  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #c5b216, #c5b216 12px, #4d0a13 12px, #4d0a13 24px);
-  --grid-pattern: radial-gradient(rgba(197, 178, 22, 0.08) 1.2px, transparent 1.2px);
+  --hazard-stripe: repeating-linear-gradient(-45deg, #232820, #232820 10px, #121511 10px, #121511 20px);
+  --hazard-yellow-stripe: repeating-linear-gradient(-45deg, #2b3226, #2b3226 10px, #151a12 10px, #151a12 20px);
+  --grid-pattern: radial-gradient(rgba(184, 192, 176, 0.05) 1.2px, transparent 1.2px);
 
   --theme: var(--bg-canvas);
   --entry: var(--bg-surface);
@@ -93,8 +93,8 @@
   --tertiary: var(--border-raw);
   --content: var(--text-main);
   --border: var(--border-raw);
-  --code-block-bg: #060904;
-  --code-bg: #151d0f;
+  --code-block-bg: #0a0c09;
+  --code-bg: #1e221b;
   
   color-scheme: dark;
 }
@@ -108,12 +108,12 @@
 }
 
 ::selection {
-  background: var(--c-acid);
-  color: #2b040a;
+  background: #333a2d;
+  color: #b8c0b0;
 }
 ::-moz-selection {
-  background: var(--c-acid);
-  color: #2b040a;
+  background: #333a2d;
+  color: #b8c0b0;
 }
 
 ::-webkit-scrollbar {
@@ -122,11 +122,11 @@
   background: var(--bg-inset);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-raw);
-  border: 1px solid var(--c-acid);
+  background: #2d3429;
+  border: 1px solid #464e3f;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--c-blood);
+  background: #3d4737;
 }
 
 body {
@@ -186,7 +186,7 @@ body::before {
 }
 
 :root[data-theme="dark"] body::before {
-  color: rgba(221, 255, 0, 0.032);
+  color: rgba(255, 255, 255, 0.02);
 }
 
 /* Surveillance Camera Corner HUD */
@@ -203,15 +203,15 @@ body::before {
 
 .hud-corner-tag {
   position: fixed;
-  background: rgba(0, 0, 0, 0.82);
-  border: 1.5px solid rgba(221, 255, 0, 0.35);
-  color: rgba(221, 255, 0, 0.7);
+  background: rgba(14, 16, 13, 0.9);
+  border: 1px solid var(--border-raw);
+  color: var(--text-dim);
   padding: 3px 8px;
   backdrop-filter: blur(2px);
   z-index: 9998;
 }
 
-.hud-corner-tag.hud-tl { top: 38px; left: 14px; color: var(--c-blood); border-color: rgba(255, 0, 60, 0.5); }
+.hud-corner-tag.hud-tl { top: 38px; left: 14px; color: var(--text-dim); border-color: var(--border-raw); }
 .hud-corner-tag.hud-tr { top: 38px; right: 14px; }
 .hud-corner-tag.hud-bl { bottom: 12px; left: 14px; }
 .hud-corner-tag.hud-br { bottom: 12px; right: 14px; }
@@ -220,39 +220,17 @@ body::before {
   .surveillance-hud-overlay { display: none; }
 }
 
-::selection {
-  background: var(--c-blood);
-  color: #ffffff;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-::-webkit-scrollbar-track {
-  background: #000;
-  border-left: 3px solid var(--border-raw);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--c-acid);
-  border: 2px solid #000;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--c-blood);
-}
-
 /* --------------------------------------------------------------------------
    03. MARQUEE INSTABILITY TICKER
    -------------------------------------------------------------------------- */
 .hazard-ticker-tape {
-  background: #000000;
-  color: var(--c-acid);
-  border-bottom: 3.5px solid #000000;
+  background: var(--bg-inset);
+  color: var(--text-dim);
+  border-bottom: 2px solid var(--border-raw);
   font-family: var(--font-industrial);
   font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   padding: 5px 0;
   overflow: hidden;
   white-space: nowrap;
@@ -278,9 +256,9 @@ body::before {
    04. HUD BAR & LIVE DECAY CLOCK
    -------------------------------------------------------------------------- */
 .sys-hud-ribbon {
-  background: #000000;
-  color: #ffffff;
-  border-bottom: 3.5px solid var(--border-raw);
+  background: var(--bg-inset);
+  color: var(--text-dim);
+  border-bottom: 2px solid var(--border-raw);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 800;
@@ -304,64 +282,64 @@ body::before {
 }
 
 .hud-item {
-  color: #888888;
+  color: var(--text-ghost);
 }
 
 .hud-val {
-  color: var(--c-acid);
-  font-weight: 900;
+  color: var(--text-main);
+  font-weight: 800;
 }
 
 .text-alert {
-  color: var(--c-blood) !important;
-  text-shadow: 0 0 6px var(--c-blood);
+  color: var(--text-dim) !important;
+  text-shadow: none;
 }
 
 .hud-sep {
-  color: var(--c-blood);
-  font-weight: 900;
+  color: var(--border-raw);
+  font-weight: 800;
 }
 
 .hud-led-pulse {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: var(--c-blood);
-  box-shadow: 0 0 10px var(--c-blood);
-  animation: ledFault 1s infinite steps(2, start);
+  width: 7px;
+  height: 7px;
+  background: var(--text-dim);
+  animation: ledFault 1.2s infinite steps(2, start);
 }
 
 @keyframes ledFault {
-  50% { opacity: 0.15; }
+  50% { opacity: 0.2; }
 }
 
 /* Decay Engine Trigger Button */
 .chaos-trigger-btn {
-  background: var(--c-blood);
-  color: #ffffff;
-  border: 2px solid #ffffff;
+  background: var(--bg-surface);
+  color: var(--text-dim);
+  border: 1.5px solid var(--border-raw);
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 800;
   padding: 3px 8px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  box-shadow: 2px 2px 0px #000;
+  box-shadow: 2px 2px 0px #060805;
   transition: transform 0.08s ease, filter 0.08s ease;
 }
 
 .chaos-trigger-btn:hover {
-  background: var(--c-acid);
-  color: #000;
-  transform: translate(-2px, -2px) rotate(-1deg);
-  box-shadow: 4px 4px 0px #fff;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #060805;
 }
 
 .chaos-warn {
-  font-size: 13px;
-  color: var(--c-acid);
+  font-size: 12px;
+  color: var(--text-dim);
 }
 .chaos-trigger-btn:hover .chaos-warn { color: #000; }
 
@@ -431,24 +409,24 @@ body::before {
 
 .logo-box:hover {
   transform: translate(-3px, -3px) rotate(-1.5deg);
-  box-shadow: 8px 8px 0px var(--c-blood);
-  filter: contrast(130%);
+  box-shadow: 8px 8px 0px #040603;
 }
 
 .header-logo-svg {
   flex-shrink: 0;
-  border: 1px solid var(--c-acid);
+  border: 1px solid var(--border-raw);
 }
 
 .logo-bracket {
-  color: var(--c-acid);
+  color: var(--text-dim);
   font-weight: 900;
   font-size: 17px;
 }
 
 .logo-prefix {
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border: 1px solid var(--border-raw);
   padding: 2px 7px;
   font-size: 14px;
   font-weight: 900;
@@ -456,7 +434,7 @@ body::before {
 }
 
 .logo-sep {
-  color: var(--c-acid);
+  color: var(--text-dim);
   font-weight: 900;
 }
 
@@ -464,16 +442,16 @@ body::before {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 800;
-  color: #9aa7be;
+  color: var(--text-dim);
   letter-spacing: 0.08em;
 }
 
 :root[data-theme="dark"] .logo-node-tag {
-  color: var(--c-acid);
+  color: var(--text-dim);
 }
 
 .terminal-cursor {
-  color: var(--c-acid);
+  color: var(--text-dim);
   font-weight: 900;
   animation: blinkCursor 0.7s infinite steps(2, start);
 }
@@ -506,13 +484,14 @@ body::before {
 }
 
 .brutal-btn-toggle:hover {
-  background: var(--c-acid);
-  color: #000;
+  background: var(--bg-canvas);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0px var(--border-raw);
 }
 
-.breaker-label { color: var(--c-blood); }
+.breaker-label { color: var(--text-dim); }
 
 .lang-selector-box {
   display: inline-flex;
@@ -524,8 +503,8 @@ body::before {
 }
 
 .lang-current {
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-main);
   padding: 4px 8px;
   border: 2px solid var(--border-raw);
 }
@@ -548,8 +527,9 @@ body::before {
 }
 
 .brutal-lang-link:hover {
-  background: var(--c-acid);
-  color: #000;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-1px, -1px);
 }
 
@@ -581,26 +561,28 @@ body::before {
 }
 
 .brutal-menu-link .menu-idx {
-  color: var(--c-blood);
+  color: var(--text-dim);
   font-size: 11px;
 }
 
 .brutal-menu-link:hover {
-  background: var(--c-acid);
-  color: #000000;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-3px, -3px) rotate(-1.5deg);
   box-shadow: 6px 6px 0px var(--border-raw);
 }
 
-.brutal-menu-link:hover .menu-idx { color: #000000; }
+.brutal-menu-link:hover .menu-idx { color: var(--text-dim); }
 
 .brutal-menu-link.active {
-  background: var(--c-blood);
-  color: #ffffff;
-  box-shadow: inset 3px 3px 0px rgba(0,0,0,0.5);
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
+  box-shadow: inset 3px 3px 0px rgba(0,0,0,0.7);
 }
 
-.brutal-menu-link.active .menu-idx { color: var(--c-acid); }
+.brutal-menu-link.active .menu-idx { color: var(--text-dim); }
 
 /* --------------------------------------------------------------------------
    06. FRACTURED HERO CHASSIS & MECHANICAL CRACK SHARDS
@@ -622,8 +604,8 @@ body::before {
 }
 
 :root[data-theme="dark"] .anti-design-hero {
-  border-color: #2e384c;
-  box-shadow: 8px 8px 0px var(--c-acid);
+  border-color: var(--border-raw);
+  box-shadow: 8px 8px 0px #040603;
 }
 
 /* Mechanical Corner Mounting Bolts */
@@ -646,15 +628,15 @@ body::before {
   position: absolute;
   width: 18px;
   height: 18px;
-  background: var(--c-blood);
-  border: 2px solid #000;
+  background: var(--bg-inset);
+  border: 2px solid var(--border-raw);
   z-index: 30;
   transition: transform 0.12s cubic-bezier(0.1, 0.9, 0.2, 1);
   pointer-events: none;
 }
 .shard-tl { top: -8px; left: -8px; transform: rotate(-5deg); }
-.shard-tr { top: -8px; right: -8px; transform: rotate(12deg); background: var(--c-acid); }
-.shard-bl { bottom: -8px; left: -8px; transform: rotate(8deg); background: var(--c-toxic); }
+.shard-tr { top: -8px; right: -8px; transform: rotate(12deg); background: var(--bg-surface); }
+.shard-bl { bottom: -8px; left: -8px; transform: rotate(8deg); background: var(--bg-inset); }
 .shard-br { bottom: -8px; right: -8px; transform: rotate(-15deg); }
 
 /* Shatter snap trigger on hover: "tık" diye düşer */
@@ -679,8 +661,8 @@ body::before {
   font-weight: 900;
   letter-spacing: 0.08em;
   padding: 4px 10px;
-  border: 2px solid #000000;
-  box-shadow: 3px 3px 0px #000000;
+  border: 2px solid var(--border-raw);
+  box-shadow: 3px 3px 0px #040603;
   z-index: 25;
   pointer-events: none;
   white-space: nowrap;
@@ -690,23 +672,23 @@ body::before {
   top: -14px;
   right: 50px;
   background: var(--hazard-stripe);
-  color: #ffffff;
+  color: var(--text-main);
   transform: rotate(-3deg);
 }
 
 .sticker-audit {
   bottom: -13px;
   right: 170px;
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-dim);
   transform: rotate(3deg);
 }
 
 .sticker-acid-punk {
   top: 50%;
   right: -16px;
-  background: var(--c-acid);
-  color: #000000;
+  background: var(--bg-inset);
+  color: var(--text-ghost);
   transform: rotate(90deg);
 }
 
@@ -714,8 +696,8 @@ body::before {
   bottom: -14px;
   left: 36px;
   background: #000000;
-  color: var(--c-blood);
-  border: 2px dashed var(--c-blood);
+  color: var(--text-ghost);
+  border: 2px dashed var(--border-raw);
   transform: rotate(-2deg);
 }
 
@@ -740,11 +722,11 @@ body::before {
   gap: 6px;
 }
 
-.spec-icon { color: var(--c-blood); }
+.spec-icon { color: var(--text-dim); }
 
 .spec-code {
-  background: #000;
-  color: var(--c-acid);
+  background: var(--bg-inset);
+  color: var(--text-main);
   padding: 3px 8px;
   border: 1px solid var(--border-raw);
 }
@@ -753,7 +735,7 @@ body::before {
   display: inline-flex;
   align-items: center;
   border: 2px solid var(--border-raw);
-  background: #000;
+  background: var(--bg-inset);
 }
 
 .hazard-stripes {
@@ -766,7 +748,7 @@ body::before {
   font-family: var(--font-industrial);
   font-size: 11px;
   font-weight: 900;
-  color: #ffffff;
+  color: var(--text-main);
   padding: 3px 10px;
 }
 
@@ -774,7 +756,7 @@ body::before {
 .ascii-art-screen {
   background: var(--bg-inset);
   border: 3px solid var(--border-raw);
-  box-shadow: inset 0 0 16px rgba(197, 178, 22, 0.06);
+  box-shadow: none;
   margin-bottom: 24px;
   overflow: hidden;
 }
@@ -796,19 +778,19 @@ body::before {
 }
 
 .ascii-status {
-  color: var(--c-blood);
+  color: var(--text-dim);
   font-weight: 900;
 }
 
 .ascii-code {
-  color: #aba22d;
+  color: #728268;
   font-family: var(--font-mono);
   font-size: clamp(10px, 1.35vw, 12.5px);
   line-height: 1.25;
   padding: 12px 14px;
   margin: 0;
   overflow-x: auto;
-  text-shadow: 0 0 5px rgba(171, 162, 45, 0.35);
+  text-shadow: none;
   white-space: pre;
 }
 
@@ -839,8 +821,8 @@ body::before {
   transition: transform 0.1s ease;
 }
 
-.l-o { background: var(--c-acid); color: #13190c; transform: rotate(-3deg); }
-.l-b { background: var(--c-blood); color: #d4dcc0; transform: rotate(3deg); }
+.l-o { background: var(--bg-inset); color: var(--text-main); border-color: var(--border-raw); transform: rotate(-3deg); }
+.l-b { background: var(--bg-surface); color: var(--text-main); border-color: var(--border-raw); transform: rotate(3deg); }
 
 .r-letter:hover {
   transform: scale(1.18) rotate(0deg) !important;
@@ -848,8 +830,8 @@ body::before {
 }
 
 .apparatus-box {
-  background: var(--c-iodine);
-  color: #d4dcc0;
+  background: var(--bg-inset);
+  color: var(--text-dim);
   padding: 6px 12px;
   border: 3px solid var(--border-raw);
   font-family: var(--font-industrial);
@@ -861,14 +843,14 @@ body::before {
   transform: rotate(-2deg);
 }
 
-.app-tag { color: var(--c-acid); font-size: 10px; }
+.app-tag { color: var(--text-dim); font-size: 10px; }
 
 /* Redacted Bar (Hover to De-redact) */
 .redacted-block {
   background: var(--bg-inset);
   color: var(--bg-inset);
   padding: 8px 14px;
-  border: 2px solid var(--c-blood);
+  border: 2px solid var(--border-raw);
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 900;
@@ -880,21 +862,21 @@ body::before {
 }
 
 .redacted-block:hover {
-  background: var(--c-blood);
-  color: #d4dcc0;
+  background: var(--bg-surface);
+  color: var(--text-main);
   transform: scale(1.05) rotate(0deg);
-  box-shadow: 4px 4px 0px var(--c-acid);
+  box-shadow: 4px 4px 0px #040603;
 }
 
 .ransom-badge {
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 900;
-  background: var(--c-toxic);
-  color: #ffffff;
-  border: 2.5px solid #000;
+  background: var(--bg-inset);
+  color: var(--text-dim);
+  border: 2.5px solid var(--border-raw);
   padding: 4px 8px;
-  box-shadow: 3px 3px 0px #000;
+  box-shadow: 3px 3px 0px #040603;
   transform: rotate(-5deg);
 }
 
@@ -947,18 +929,19 @@ body::before {
   box-shadow: 6px 6px 0px var(--border-raw);
 }
 
-.chip-red { border-left: 8px solid var(--c-blood); }
-.chip-acid { border-left: 8px solid var(--c-acid); }
-.chip-cyan { border-left: 8px solid var(--c-cyan); }
-.chip-orange { border-left: 8px solid var(--c-toxic); }
+.chip-red { border-left: 6px solid var(--border-raw); }
+.chip-acid { border-left: 6px solid var(--text-dim); }
+.chip-cyan { border-left: 6px solid var(--border-raw); }
+.chip-orange { border-left: 6px solid var(--text-ghost); }
 
 .spec-chip .chip-idx {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 900;
-  background: #000;
-  color: #fff;
+  background: var(--bg-inset);
+  color: var(--text-main);
   padding: 2px 6px;
+  border: 1px solid var(--border-raw);
 }
 
 .spec-chip .chip-title {
@@ -1000,8 +983,9 @@ body::before {
 }
 
 .social-icons a:hover {
-  background: var(--c-acid);
-  color: #000;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0px var(--border-raw);
 }
@@ -1010,11 +994,11 @@ body::before {
   font-family: var(--font-industrial);
   font-size: 11px;
   font-weight: 900;
-  color: var(--c-blood);
-  border: 3px solid var(--c-blood);
+  color: var(--text-dim);
+  border: 2.5px solid var(--border-raw);
   padding: 6px 14px;
   transform: rotate(-2deg);
-  box-shadow: 3px 3px 0px var(--c-blood);
+  box-shadow: 3px 3px 0px #040603;
 }
 
 /* --------------------------------------------------------------------------
@@ -1034,8 +1018,8 @@ body::before {
 }
 
 .stamp-dystopian-banner {
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-surface);
+  color: var(--text-main);
   border: 3px solid var(--border-raw);
   padding: 6px 16px;
   font-family: var(--font-industrial);
@@ -1049,7 +1033,7 @@ body::before {
 }
 
 .stamp-dystopian-banner .stamp-pulse {
-  color: var(--c-acid);
+  color: var(--text-dim);
   font-size: 14px;
 }
 
@@ -1123,10 +1107,10 @@ body::before {
   box-shadow: 2px 2px 0px #000;
 }
 
-.chunk-tl { top: -6px; left: -6px; transform: rotate(-8deg); background: var(--c-acid); }
-.chunk-tr { top: -6px; right: -6px; transform: rotate(14deg); background: var(--c-blood); }
-.chunk-bl { bottom: -6px; left: -6px; transform: rotate(6deg); background: var(--c-toxic); }
-.chunk-br { bottom: -6px; right: -6px; transform: rotate(-12deg); background: var(--c-cyan); }
+.chunk-tl { top: -6px; left: -6px; transform: rotate(-8deg); background: var(--bg-inset); border: 1px solid var(--border-raw); }
+.chunk-tr { top: -6px; right: -6px; transform: rotate(14deg); background: var(--bg-surface); border: 1px solid var(--border-raw); }
+.chunk-bl { bottom: -6px; left: -6px; transform: rotate(6deg); background: var(--bg-inset); border: 1px solid var(--border-raw); }
+.chunk-br { bottom: -6px; right: -6px; transform: rotate(-12deg); background: var(--bg-surface); border: 1px solid var(--border-raw); }
 
 /* Shatter snap trigger: "tık" diye sağdan soldan fırlar */
 .fracture-card:hover .chunk-tr,
@@ -1156,13 +1140,13 @@ body::before {
   position: absolute;
   width: 6px;
   height: 6px;
-  background: var(--c-acid);
-  border: 1px solid #000;
+  background: var(--text-ghost);
+  border: 1px solid var(--border-raw);
   opacity: 0;
   pointer-events: none;
 }
 .dp-1 { top: 0; right: 26px; }
-.dp-2 { top: 16px; right: 0; background: var(--c-blood); width: 8px; height: 5px; }
+.dp-2 { top: 16px; right: 0; background: var(--bg-inset); width: 8px; height: 5px; }
 .dp-3 { top: -4px; right: 14px; background: #000; }
 
 .fracture-card:hover .dp-1,
@@ -1192,8 +1176,8 @@ body::before {
   height: 42px;
   background: repeating-linear-gradient(
     0deg,
-    var(--c-blood),
-    var(--c-blood) 4px,
+    var(--border-raw),
+    var(--border-raw) 4px,
     transparent 4px,
     transparent 7px
   );
@@ -1207,31 +1191,32 @@ body::before {
 .anti-design-hero:hover .fracture-crack-seam {
   opacity: 1;
   transform: rotate(38deg) scaleY(1.4);
-  background: var(--c-acid);
+  background: var(--text-dim);
 }
 
 .shatter-corner-tag {
   position: absolute;
   top: -12px;
   right: 18px;
-  background: var(--c-blood);
-  color: #ffffff;
-  border: 2px solid #000;
+  background: var(--bg-surface);
+  color: var(--text-dim);
+  border: 2px solid var(--border-raw);
   padding: 3px 10px;
   font-family: var(--font-industrial);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
   transform: rotate(2.5deg);
-  box-shadow: 3px 3px 0px #000;
+  box-shadow: 3px 3px 0px #040603;
   z-index: 10;
   transition: transform 0.08s cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
 .fracture-card:hover .shatter-corner-tag {
   transform: translate(12px, -8px) rotate(12deg);
-  background: var(--c-acid);
-  color: #000;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
 }
 
 :root[data-theme="dark"] .fracture-card {
@@ -1240,7 +1225,7 @@ body::before {
 }
 
 :root[data-theme="dark"] .fracture-card:hover {
-  border-color: var(--c-acid);
+  border-color: var(--text-dim);
   box-shadow: 8px 8px 0px #040603;
 }
 
@@ -1265,27 +1250,28 @@ body::before {
   gap: 6px;
 }
 
-.docket-prefix { color: var(--c-acid); }
+.docket-prefix { color: var(--text-dim); }
 
 .docket-num {
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-canvas);
+  color: var(--text-main);
   padding: 2px 8px;
+  border: 1px solid var(--border-raw);
 }
 
 .docket-hatch-pattern {
   flex: 1;
   height: 12px;
   background: var(--hazard-stripe);
-  border-left: 2px solid #fff;
-  border-right: 2px solid #fff;
+  border-left: 2px solid var(--border-raw);
+  border-right: 2px solid var(--border-raw);
 }
 
 .docket-status-badge {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 900;
-  color: #ffffff;
+  color: var(--text-dim);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1294,7 +1280,7 @@ body::before {
 .status-pip {
   width: 8px;
   height: 8px;
-  background: var(--c-blood);
+  background: var(--border-raw);
 }
 
 /* Card Body */
@@ -1318,18 +1304,18 @@ body::before {
 }
 
 .title-direct-link:hover {
-  color: var(--c-blood);
-  text-shadow: 2px 2px 0px var(--c-acid);
+  color: var(--text-main);
+  text-decoration: underline 3px var(--border-raw);
 }
 
 .brutal-draft-hint {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 900;
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-dim);
   padding: 2px 6px;
-  border: 1px solid #000;
+  border: 1px solid var(--border-raw);
 }
 
 .brutal-card-summary {
@@ -1395,7 +1381,7 @@ body::before {
 }
 
 .badge-key {
-  color: var(--c-blood);
+  color: var(--text-dim);
   font-size: 10px;
 }
 
@@ -1404,30 +1390,30 @@ body::before {
   font-size: 13px;
   font-weight: 900;
   text-decoration: none;
-  background: #000000;
-  color: #ffffff;
-  border: 3px solid #000000;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border: 3px solid var(--border-raw);
   padding: 8px 16px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 3px 3px 0px var(--c-acid);
+  box-shadow: 3px 3px 0px #040603;
   transition: all 0.12s ease;
 }
 
 :root[data-theme="dark"] .docket-action-btn {
-  background: var(--c-acid);
-  color: #13190c;
-  border-color: var(--c-acid);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--border-raw);
   box-shadow: 3px 3px 0px #040603;
 }
 
 .fracture-card:hover .docket-action-btn {
-  background: var(--c-blood);
-  color: #d4dcc0;
-  border-color: var(--c-blood);
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0px #040603;
+  box-shadow: 5px 5px 0px #040603;
 }
 
 /* --------------------------------------------------------------------------
@@ -1468,26 +1454,27 @@ body::before {
   gap: 8px;
 }
 
-.sec-dot { color: var(--c-blood); }
+.sec-dot { color: var(--text-dim); }
 
 .sec-id {
-  background: var(--c-acid);
-  color: #000;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-raw);
   padding: 2px 8px;
 }
 
 .spec-status-pill {
-  background: var(--c-blood);
-  color: #fff;
+  background: var(--bg-inset);
+  color: var(--text-dim);
   padding: 3px 10px;
-  border: 1px solid #fff;
+  border: 1px solid var(--border-raw);
 }
 
 .status-indicator {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background: #00ff66;
+  background: var(--text-dim);
   margin-right: 6px;
 }
 
@@ -1503,9 +1490,9 @@ body::before {
   margin-bottom: 16px;
 }
 
-.prompt-user { color: var(--c-blood); }
-.prompt-path { color: var(--c-acid); }
-.prompt-cmd { color: var(--c-toxic); }
+.prompt-user { color: var(--text-dim); }
+.prompt-path { color: var(--text-dim); }
+.prompt-cmd { color: var(--text-ghost); }
 
 .brutal-single-title {
   font-family: var(--font-heading);
@@ -1514,13 +1501,13 @@ body::before {
   line-height: 1.15;
   letter-spacing: -0.03em;
   margin: 0 0 16px 0;
-  border-left: 10px solid var(--c-blood);
+  border-left: 10px solid var(--border-raw);
   padding-left: 18px;
 }
 
 .glitch-title {
   position: relative;
-  text-shadow: 2px 0 var(--c-blood), -2px 0 var(--c-cyan);
+  text-shadow: none;
 }
 
 .brutal-single-desc {
@@ -1534,7 +1521,7 @@ body::before {
   margin-bottom: 18px;
 }
 
-.desc-bracket { color: var(--c-blood); font-weight: 900; }
+.desc-bracket { color: var(--text-dim); font-weight: 900; }
 
 .brutal-single-content {
   padding: 36px 34px;
@@ -1559,7 +1546,7 @@ body::before {
 
 .brutal-single-content h2::before {
   content: '§';
-  color: var(--c-blood);
+  color: var(--text-dim);
   font-size: 26px;
 }
 
@@ -1572,20 +1559,20 @@ body::before {
 
 .brutal-single-content h3::before {
   content: '>>';
-  color: var(--c-toxic);
+  color: var(--text-ghost);
   margin-right: 8px;
 }
 
 .brutal-single-content a {
   color: var(--text-main);
-  text-decoration: underline 3px var(--c-toxic);
+  text-decoration: underline 2px var(--border-raw);
   text-underline-offset: 4px;
   font-weight: 800;
 }
 
 .brutal-single-content a:hover {
-  background: var(--c-acid);
-  color: #000;
+  background: var(--bg-inset);
+  color: var(--text-main);
   text-decoration: none;
 }
 
@@ -1593,7 +1580,7 @@ body::before {
 .brutal-single-content blockquote {
   background: var(--bg-inset);
   border: 3px solid var(--border-raw);
-  border-left: 12px solid var(--c-blood);
+  border-left: 12px solid var(--border-raw);
   padding: 18px 24px;
   margin: 2.2em 0;
   font-family: var(--font-mono);
@@ -1605,7 +1592,7 @@ body::before {
   display: block;
   font-weight: 900;
   font-size: 12px;
-  color: var(--c-blood);
+  color: var(--text-dim);
   letter-spacing: 0.1em;
   margin-bottom: 8px;
 }
@@ -1622,8 +1609,8 @@ body::before {
 }
 
 .brutal-single-content th {
-  background: #000000;
-  color: var(--c-acid);
+  background: var(--bg-inset);
+  color: var(--text-main);
   padding: 12px 14px;
   text-align: left;
   font-weight: 900;
@@ -1648,7 +1635,7 @@ body::before {
 
 :root[data-theme="dark"] .post-content pre,
 :root[data-theme="dark"] .post-content .highlight {
-  border-color: #2b3548 !important;
+  border-color: var(--border-raw) !important;
   box-shadow: 6px 6px 0px #000000 !important;
 }
 
@@ -1671,9 +1658,9 @@ p code, li code {
   top: 10px;
   right: 10px;
   z-index: 20;
-  background: #000000;
-  color: var(--c-acid);
-  border: 2.5px solid var(--c-acid);
+  background: var(--bg-inset);
+  color: var(--text-dim);
+  border: 2px solid var(--border-raw);
   box-shadow: 3px 3px 0px #000;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1684,9 +1671,9 @@ p code, li code {
 }
 
 .brutal-copy-btn:hover {
-  background: var(--c-blood);
-  color: #fff;
-  border-color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-1px, -1px);
 }
 
@@ -1719,7 +1706,7 @@ p code, li code {
   font-family: var(--font-industrial);
   font-size: 12px;
   font-weight: 900;
-  color: var(--c-blood);
+  color: var(--text-dim);
   margin-bottom: 10px;
   display: block;
 }
@@ -1749,13 +1736,14 @@ p code, li code {
 }
 
 .brutal-tag-link:hover {
-  background: var(--c-acid);
-  color: #000;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-2px, -2px) rotate(-1deg);
   box-shadow: 5px 5px 0px var(--border-raw);
 }
 
-.tag-hash { color: var(--c-blood); }
+.tag-hash { color: var(--text-dim); }
 
 /* --------------------------------------------------------------------------
    10. SEARCH PAGE (UNIX SHELL GREP)
@@ -1763,7 +1751,7 @@ p code, li code {
 .brutal-search-wrap { margin-top: 28px; }
 
 .terminal-search-shell {
-  background: #000000;
+  background: var(--bg-surface);
   border: 4px solid var(--border-raw);
   box-shadow: var(--shadow-hard-lg);
   margin-top: 24px;
@@ -1785,13 +1773,14 @@ p code, li code {
 
 .shell-dots { display: flex; gap: 6px; }
 .shell-dots .dot { width: 10px; height: 10px; border: 1.5px solid var(--border-raw); }
-.d-red { background: var(--c-blood); }
-.d-yel { background: var(--c-acid); }
-.d-grn { background: var(--c-cyan); }
+.d-red { background: var(--border-raw); }
+.d-yel { background: var(--text-dim); }
+.d-grn { background: var(--text-ghost); }
 
 .shell-status {
-  background: var(--c-acid);
-  color: #13190c;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-raw);
   padding: 2px 8px;
   font-weight: 900;
 }
@@ -1811,7 +1800,7 @@ p code, li code {
   font-family: var(--font-mono);
   font-size: 20px;
   font-weight: 900;
-  color: var(--c-acid);
+  color: var(--text-dim);
 }
 
 .brutal-search-input {
@@ -1822,20 +1811,20 @@ p code, li code {
   font-family: var(--font-mono);
   font-size: 16px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 .search-prompt-kbd {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 900;
-  color: var(--c-toxic);
-  border: 1px solid var(--c-toxic);
+  color: var(--text-dim);
+  border: 1px solid var(--border-raw);
   padding: 2px 6px;
 }
 
 .brutal-search-results li {
-  background: #101420;
+  background: var(--bg-surface);
   border: 3px solid var(--border-raw);
   box-shadow: 4px 4px 0px var(--border-raw);
   margin-bottom: 14px;
@@ -1843,12 +1832,13 @@ p code, li code {
 }
 
 .brutal-search-results li:hover {
-  background: var(--c-acid);
+  background: var(--bg-inset);
+  border-color: var(--text-dim);
   transform: translate(-3px, -3px);
   box-shadow: 6px 6px 0px var(--border-raw);
 }
 
-.brutal-search-results li:hover a { color: #000000; }
+.brutal-search-results li:hover a { color: var(--text-main); }
 
 /* --------------------------------------------------------------------------
    11. TAXONOMY REGISTRY
@@ -1859,8 +1849,9 @@ p code, li code {
   font-family: var(--font-industrial);
   font-size: 12px;
   font-weight: 900;
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border: 2px solid var(--border-raw);
   padding: 8px 16px;
   margin-bottom: 24px;
   display: inline-block;
@@ -1885,7 +1876,8 @@ p code, li code {
 
 .brutal-term-card:hover {
   transform: translate(-3px, -3px) rotate(-1deg);
-  background: var(--c-acid);
+  background: var(--bg-inset);
+  border-color: var(--text-dim);
   box-shadow: 7px 7px 0px var(--border-raw);
 }
 
@@ -1901,18 +1893,20 @@ p code, li code {
   font-weight: 900;
 }
 
-.brutal-term-card:hover .term-link { color: #000; }
+.brutal-term-card:hover .term-link { color: var(--text-main); }
 
 .term-count-badge {
-  background: #000000;
-  color: #ffffff;
+  background: var(--bg-canvas);
+  color: var(--text-main);
+  border: 1px solid var(--border-raw);
   font-size: 11px;
   padding: 2px 7px;
   font-weight: 900;
 }
 
 .brutal-term-card:hover .term-count-badge {
-  background: var(--c-blood);
+  background: var(--bg-surface);
+  color: var(--text-main);
 }
 
 /* --------------------------------------------------------------------------
@@ -1929,9 +1923,9 @@ p code, li code {
 .footer-hazard-tape {
   display: flex;
   align-items: center;
-  background: var(--c-toxic);
-  color: #000000;
-  border-bottom: 3px solid #000000;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-bottom: 3px solid var(--border-raw);
 }
 
 .tape-stripes {
@@ -1960,7 +1954,7 @@ p code, li code {
 }
 
 .footer-block .block-title {
-  color: var(--c-acid);
+  color: var(--text-main);
   font-weight: 900;
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -1971,7 +1965,7 @@ p code, li code {
 .t-line .t-val { color: #ffffff; font-weight: 900; }
 
 .barcode-text {
-  color: var(--c-acid);
+  color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 900;
@@ -1981,8 +1975,8 @@ p code, li code {
 
 .audit-stamp-seal {
   display: inline-block;
-  border: 3px solid var(--c-blood);
-  color: var(--c-blood);
+  border: 2.5px solid var(--border-raw);
+  color: var(--text-dim);
   padding: 4px 10px;
   font-family: var(--font-industrial);
   font-size: 11px;
@@ -1992,14 +1986,14 @@ p code, li code {
 }
 
 .brutal-link {
-  color: var(--c-acid);
-  text-decoration: underline;
+  color: var(--text-main);
+  text-decoration: underline var(--border-raw);
   font-weight: 900;
 }
 
 .brutal-link:hover {
-  background: var(--c-blood);
-  color: #fff;
+  background: var(--bg-inset);
+  color: var(--text-main);
 }
 
 /* Mechanical Elevator Button */
@@ -2008,10 +2002,10 @@ p code, li code {
   bottom: 24px;
   right: 24px;
   z-index: 100;
-  background: var(--c-acid);
-  color: #000000;
-  border: 3.5px solid #000000;
-  box-shadow: 4px 4px 0px #000000;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 3.5px solid var(--border-raw);
+  box-shadow: 4px 4px 0px #040603;
   padding: 10px 14px;
   font-family: var(--font-industrial);
   font-size: 12px;
@@ -2024,10 +2018,11 @@ p code, li code {
 }
 
 .brutal-top-link:hover {
-  background: var(--c-blood);
-  color: #ffffff;
+  background: var(--bg-inset);
+  color: var(--text-main);
+  border-color: var(--text-dim);
   transform: translate(-3px, -3px);
-  box-shadow: 7px 7px 0px #000000;
+  box-shadow: 7px 7px 0px #040603;
 }
 
 /* --------------------------------------------------------------------------
@@ -2040,16 +2035,16 @@ body.decay-active {
 @keyframes phosphorSmear {
   0% { filter: blur(0px) contrast(100%); }
   92% { filter: blur(0px) contrast(100%); }
-  94% { filter: blur(1.5px) contrast(140%) hue-rotate(15deg); }
+  94% { filter: blur(1.5px) contrast(140%); }
   96% { filter: blur(0px) contrast(100%); }
-  98% { filter: blur(2.5px) contrast(160%) hue-rotate(-20deg); }
+  98% { filter: blur(2.5px) contrast(160%); }
   100% { filter: blur(0px) contrast(100%); }
 }
 
 body.decay-active h1,
 body.decay-active h2,
 body.decay-active .r-letter {
-  text-shadow: 4px 0 var(--c-blood), -4px 0 var(--c-cyan) !important;
+  text-shadow: none !important;
 }
 
 body.decay-active .fracture-card {
@@ -2083,9 +2078,9 @@ body.decay-active .fracture-card:nth-child(odd) {
 
 @keyframes phosphorSmearWave {
   0% { filter: blur(0px) contrast(100%); }
-  22% { filter: blur(5px) contrast(220%) hue-rotate(60deg); transform: skewX(-3deg); }
-  50% { filter: blur(2px) contrast(160%) hue-rotate(-30deg); transform: skewX(1deg); }
-  75% { filter: blur(3.5px) contrast(190%); }
+  22% { filter: blur(5px) contrast(180%); transform: skewX(-3deg); }
+  50% { filter: blur(2px) contrast(140%); transform: skewX(1deg); }
+  75% { filter: blur(3.5px) contrast(160%); }
   100% { filter: blur(0px) contrast(100%); transform: none; }
 }
 
@@ -2113,7 +2108,7 @@ body.decay-active .fracture-card:nth-child(odd) {
   font-weight: 900;
   user-select: none;
   cursor: pointer;
-  border: 1.5px solid var(--c-acid);
+  border: 1.5px solid var(--border-raw);
   position: relative;
   transition: all 0.15s ease;
 }
@@ -2126,17 +2121,17 @@ body.decay-active .fracture-card:nth-child(odd) {
 
 .redacted-block:hover,
 .redacted-block.revealed {
-  background: var(--c-blood);
-  color: #ffffff;
-  border-color: #ffffff;
-  box-shadow: 4px 4px 0px #000;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--border-raw);
+  box-shadow: 4px 4px 0px #040603;
 }
 
 .redacted-block:hover .redacted-text,
 .redacted-block.revealed .redacted-text {
   filter: blur(0px);
   opacity: 1;
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 /* --------------------------------------------------------------------------
@@ -2158,7 +2153,7 @@ body.decay-active .fracture-card:nth-child(odd) {
 
 /* NEGATIVE PANIC FLASH (Mikro Kernel Panik Sinyali) */
 body.panic-flash {
-  filter: invert(100%) hue-rotate(180deg) contrast(150%) !important;
+  filter: invert(100%) contrast(150%) !important;
   transition: none !important;
 }
 
@@ -2173,9 +2168,9 @@ body {
 
 /* AUDIO TRIGGER BUTTON IN HUD */
 .audio-trigger-btn {
-  background: #11141c;
-  color: #8892a6;
-  border: 2px solid #2a3346;
+  background: var(--bg-inset);
+  color: var(--text-dim);
+  border: 2px solid var(--border-raw);
   padding: 3px 10px;
   font-family: var(--font-industrial);
   font-size: 11px;
@@ -2188,25 +2183,25 @@ body {
 }
 
 .audio-trigger-btn .audio-icon {
-  color: var(--c-acid);
+  color: var(--text-dim);
   font-size: 13px;
 }
 
 .audio-trigger-btn:hover {
-  background: var(--c-acid);
-  color: #000;
-  border-color: #000;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--text-dim);
 }
 
 .audio-trigger-btn.audio-active {
-  background: var(--c-blood);
-  color: #ffffff;
-  border-color: #ffffff;
-  box-shadow: 0 0 10px var(--c-blood);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--text-dim);
+  box-shadow: none;
 }
 
 .audio-trigger-btn.audio-active .audio-icon {
-  color: #ffffff;
+  color: var(--text-main);
   animation: audioPulse 0.8s infinite alternate;
 }
 
@@ -2228,7 +2223,7 @@ body {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  filter: drop-shadow(0 0 18px rgba(255, 0, 60, 0.9));
+  filter: drop-shadow(0 0 14px rgba(0, 0, 0, 0.95));
 }
 
 .void-watcher-presence.spawning {
@@ -2260,13 +2255,13 @@ body {
   background: #020305;
   border: 2px solid #000;
   border-radius: 50% !important;
-  box-shadow: inset 0 0 8px #000, 0 0 14px rgba(255, 0, 60, 0.6);
+  box-shadow: inset 0 0 8px #000, 0 0 10px rgba(0, 0, 0, 0.85);
 }
 
 .sclera {
   width: 100%;
   height: 100%;
-  background: radial-gradient(ellipse at center, #f4efe1 35%, #d1c8b2 75%, #3d1017 100%);
+  background: radial-gradient(ellipse at center, #8a8e84 35%, #5a6054 75%, #1d211a 100%);
   position: relative;
   display: flex;
   align-items: center;
@@ -2279,19 +2274,19 @@ body {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(255, 0, 60, 0.6) 1px, transparent 1px),
-    radial-gradient(circle at 85% 70%, rgba(255, 0, 60, 0.5) 1.5px, transparent 1.5px),
-    linear-gradient(45deg, transparent 46%, rgba(200, 0, 40, 0.35) 48%, rgba(200, 0, 40, 0.35) 52%, transparent 54%),
-    linear-gradient(-35deg, transparent 47%, rgba(220, 0, 40, 0.3) 49%, rgba(220, 0, 40, 0.3) 51%, transparent 53%);
+    radial-gradient(circle at 10% 20%, rgba(30, 36, 28, 0.6) 1px, transparent 1px),
+    radial-gradient(circle at 85% 70%, rgba(30, 36, 28, 0.5) 1.5px, transparent 1.5px),
+    linear-gradient(45deg, transparent 46%, rgba(30, 36, 28, 0.4) 48%, rgba(30, 36, 28, 0.4) 52%, transparent 54%),
+    linear-gradient(-35deg, transparent 47%, rgba(30, 36, 28, 0.4) 49%, rgba(30, 36, 28, 0.4) 51%, transparent 53%);
   pointer-events: none;
 }
 
-/* Predator Amber / Acid Iris */
+/* Cold Weathered Slate-Charcoal Iris */
 .iris {
   width: 22px;
   height: 22px;
   border-radius: 50% !important;
-  background: radial-gradient(circle, var(--c-acid) 0%, #857814 45%, var(--c-blood) 80%, #000000 100%);
+  background: radial-gradient(circle, #525c48 0%, #30372b 55%, #121510 100%);
   border: 1.5px solid #000;
   box-shadow: inset 0 0 4px #000;
   position: relative;
@@ -2329,7 +2324,7 @@ body {
   width: 100%;
   height: 50%;
   background: var(--bg-canvas);
-  border-bottom: 2px solid var(--c-blood);
+  border-bottom: 2px solid var(--border-raw);
   z-index: 10;
   transition: transform 0.28s cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -2342,7 +2337,7 @@ body {
 .eyelid-bottom {
   bottom: 0;
   border-bottom: none;
-  border-top: 2px solid var(--c-blood);
+  border-top: 2px solid var(--border-raw);
   transform: translateY(0%);
 }
 
@@ -2394,7 +2389,7 @@ body {
   height: 38px;
   margin-top: -19px;
   margin-left: -19px;
-  border: 1.5px solid var(--c-acid);
+  border: 1.5px solid var(--text-dim);
   border-radius: 50% !important;
   transition: border-color 0.12s, transform 0.12s;
 }
@@ -2412,7 +2407,7 @@ body {
 .reticle-cross::after {
   content: "";
   position: absolute;
-  background: var(--c-acid);
+  background: var(--text-dim);
 }
 
 .reticle-cross::before {
@@ -2427,8 +2422,8 @@ body {
   left: 28px;
   top: -10px;
   background: rgba(0, 0, 0, 0.85);
-  border: 1px solid var(--c-acid);
-  color: var(--c-acid);
+  border: 1px solid var(--border-raw);
+  color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 900;
@@ -2439,19 +2434,19 @@ body {
 
 /* Hover Lock on interactive elements */
 .stalker-reticle.reticle-lock .reticle-box {
-  border-color: var(--c-blood);
+  border-color: var(--text-dim);
   transform: scale(1.3) rotate(45deg);
-  box-shadow: 0 0 10px var(--c-blood);
+  box-shadow: none;
 }
 
 .stalker-reticle.reticle-lock .reticle-cross::before,
 .stalker-reticle.reticle-lock .reticle-cross::after {
-  background: var(--c-blood);
+  background: var(--text-dim);
 }
 
 .stalker-reticle.reticle-lock .reticle-coords {
-  border-color: var(--c-blood);
-  color: var(--c-blood);
+  border-color: var(--border-raw);
+  color: var(--text-dim);
 }
 
 @media (max-width: 900px) {
@@ -2462,7 +2457,7 @@ body {
    ABOUT DOSSIER PLATE (Sızdırılmış Personel Tehdit Dosyası)
    ========================================================================== */
 .about-dossier-mode {
-  border-color: var(--c-blood) !important;
+  border-color: var(--border-raw) !important;
 }
 
 .dossier-id-card-plate {
@@ -2479,7 +2474,7 @@ body {
 }
 
 :root[data-theme="dark"] .dossier-id-card-plate {
-  border-color: var(--c-blood);
+  border-color: var(--border-raw);
   box-shadow: 8px 8px 0px #040603;
 }
 
@@ -2500,8 +2495,8 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: var(--c-blood);
-  box-shadow: 0 0 6px var(--c-blood);
+  background: var(--text-dim);
+  box-shadow: none;
   animation: scanlineSweep 2.2s infinite ease-in-out;
   z-index: 5;
 }
@@ -2518,7 +2513,7 @@ body {
 
 .dossier-barcode {
   background: var(--bg-inset);
-  color: var(--c-acid);
+  color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 900;
@@ -2554,7 +2549,11 @@ body {
 }
 
 .text-neon {
-  color: var(--c-acid) !important;
+  color: var(--text-main) !important;
+}
+
+.text-alert {
+  color: var(--text-dim) !important;
 }
 
 .dossier-stamp-seal {
@@ -2562,15 +2561,15 @@ body {
   align-self: flex-start;
   margin-top: 8px;
   background: transparent;
-  color: var(--c-blood);
-  border: 3px solid var(--c-blood);
+  color: var(--text-dim);
+  border: 2.5px solid var(--border-raw);
   padding: 5px 12px;
   font-family: var(--font-industrial);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.12em;
   transform: rotate(-2deg);
-  box-shadow: 3px 3px 0px var(--c-blood);
+  box-shadow: 3px 3px 0px #040603;
 }
 
 @media (max-width: 768px) {

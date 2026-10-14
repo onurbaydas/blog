@@ -1,7 +1,8 @@
 .post-content pre.mermaid {
-  background: #fff;
-  color: #000;
-  border-radius: var(--radius);
+  background: var(--code-block-bg);
+  color: var(--text-main);
+  border: 3px solid var(--border-raw);
+  border-radius: 0 !important;
   padding: 16px;
   overflow-x: auto;
   text-align: center;
