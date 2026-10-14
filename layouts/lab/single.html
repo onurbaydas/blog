@@ -1,0 +1,314 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<div class="lab-container fracture-container">
+  {{- /* Top Industrial Chassis Header */ -}}
+  <div class="radar-telemetry-chassis">
+    <div class="chassis-header-row">
+      <div class="chassis-title-wrap">
+        <span class="chassis-tag">[ INFRA_TOPOLOGY // #04 ]</span>
+        <h1 class="chassis-headline">{{ if $is_en }}MULTI-USER GPU CLUSTER & STORAGE LAB BLUEPRINT{{ else }}ÇOK KULLANICILI GPU KÜMESİ VE DEPOLAMA LABORATUVARI MİMARİSİ{{ end }}</h1>
+      </div>
+      <div class="chassis-status-pill">
+        <span class="status-indicator"></span>
+        <span class="status-name">{{ if $is_en }}RACK: 42U // ENCL-01 ACTIVE{{ else }}KABİNET: 42U // ENCL-01 AKTİF{{ end }}</span>
+      </div>
+    </div>
+    <div class="chassis-desc">
+      {{ if $is_en }}
+      Physical hardware blueprint and architecture layout for our multi-user deep learning compute fabric, TrueNAS SCALE enterprise ZFS storage pool, Kerberos-federated identity broker, and 100GbE RoCE v2 low-latency networking. Click on any rack unit below to inspect hardware telemetry and topology.
+      {{ else }}
+      Çok kullanıcılı derin öğrenme hesaplama kümesi, TrueNAS SCALE kurumsal ZFS depolama havuzu, Kerberos federasyonlu kimlik yönetimi ve 100GbE RoCE v2 düşük gecikmeli ağ mimarisi. Donanım telemetrisini ve topolojisini incelemek için aşağıdaki kabin ünitelerine tıklayın.
+      {{ end }}
+    </div>
+  </div>
+
+  {{- /* Interactive 42U Rack & Inspector Split View */ -}}
+  <div class="rack-lab-layout">
+    {{- /* 42U Server Rack Chassis */ -}}
+    <div class="rack-frame-card">
+      <div class="rack-header-strip">
+        <span class="r-badge">RACK_ID: TR-IST-RACK-07</span>
+        <span class="r-dim">42U EIA-310-D STANDARD</span>
+      </div>
+
+      <div class="rack-chassis-stack" id="rack-unit-stack">
+        {{- /* Top of Rack Switch */ -}}
+        <div class="rack-unit u-switch active" data-unit="switch-01" data-title="TOR-SWITCH-01" data-type="NETWORK_CORE">
+          <span class="u-num">41-42U</span>
+          <span class="u-name">ARISTA 7060X 32x100GbE QSFP28 [RoCE v2 Fabric]</span>
+          <span class="u-status ok">● 100G</span>
+        </div>
+
+        <div class="rack-unit u-blank"><span class="u-num">39-40U</span><span class="u-name">AIRFLOW BAFFLE // CABLE MANAGEMENT</span></div>
+
+        {{- /* GPU Compute Node 01 */ -}}
+        <div class="rack-unit u-gpu" data-unit="gpu-01" data-title="GPU-NODE-01" data-type="HPC_ACCELERATOR">
+          <span class="u-num">33-38U</span>
+          <span class="u-name">SUPERMICRO 4U // 2x EPYC 9654 // 8x NVIDIA A100 80GB SXM4</span>
+          <span class="u-status alert">● 640GB VRAM</span>
+        </div>
+
+        <div class="rack-unit u-blank"><span class="u-num">31-32U</span><span class="u-name">AIRFLOW BAFFLE // THERMAL BUFFER</span></div>
+
+        {{- /* GPU Compute Node 02 */ -}}
+        <div class="rack-unit u-gpu" data-unit="gpu-02" data-title="GPU-NODE-02" data-type="INFERENCE_ACCELERATOR">
+          <span class="u-num">25-30U</span>
+          <span class="u-name">SUPERMICRO 4U // 2x EPYC 9354 // 4x RTX 4090 + 2x RTX 6000 Ada</span>
+          <span class="u-status ok">● 192GB VRAM</span>
+        </div>
+
+        <div class="rack-unit u-blank"><span class="u-num">23-24U</span><span class="u-name">PDU DUAL-CIRCUIT FEED // 3-PHASE 16A</span></div>
+
+        {{- /* Storage Cluster */ -}}
+        <div class="rack-unit u-storage" data-unit="storage-01" data-title="STOR-TRUENAS-01" data-type="ENTERPRISE_ZFS">
+          <span class="u-num">17-22U</span>
+          <span class="u-name">TRUENAS SCALE 4U // 24x 18TB EXOS SAS [RAIDZ2] // NVMe ZIL</span>
+          <span class="u-status ok">● 432TB RAW</span>
+        </div>
+
+        <div class="rack-unit u-blank"><span class="u-num">15-16U</span><span class="u-name">AIRFLOW BAFFLE // OPTICAL PATCH PANEL</span></div>
+
+        {{- /* Control Plane Node 01 */ -}}
+        <div class="rack-unit u-ctrl" data-unit="ctrl-01" data-title="CTRL-K8S-01" data-type="IDENTITY_CONTROL">
+          <span class="u-num">13-14U</span>
+          <span class="u-name">DELL R650 1U // AD/SSSD KDC // SLURM CONTROLLER // OPA</span>
+          <span class="u-status ok">● PRIMARY</span>
+        </div>
+
+        {{- /* Control Plane Node 02 */ -}}
+        <div class="rack-unit u-ctrl" data-unit="ctrl-02" data-title="CTRL-K8S-02" data-type="FAILOVER_CONTROL">
+          <span class="u-num">11-12U</span>
+          <span class="u-name">DELL R650 1U // HIGH AVAILABILITY SECONDARY REPLICA</span>
+          <span class="u-status ok">● STANDBY</span>
+        </div>
+
+        <div class="rack-unit u-blank"><span class="u-num">01-10U</span><span class="u-name">APC SYMMETRA 16kVA ON-LINE UPS MODULES</span></div>
+      </div>
+    </div>
+
+    {{- /* Unit Telemetry Inspector Drawer */ -}}
+    <div class="inspector-card" id="rack-inspector">
+      <div class="inspector-top-tag">
+        <span id="inspect-tag">[ UNIT_INSPECTOR // TOR-SWITCH-01 ]</span>
+        <span class="inspect-mode" id="inspect-type">NETWORK_FABRIC</span>
+      </div>
+
+      <div class="inspector-body">
+        <h2 class="inspect-title" id="inspect-name">Arista 7060X 32-Port 100GbE QSFP28 Switch</h2>
+        <div class="inspect-desc" id="inspect-desc">
+          High-performance spine-leaf switch providing RoCE v2 (RDMA over Converged Ethernet) lossless transmission for GPU inter-node communication and TrueNAS NFS-over-RDMA high-speed dataset access.
+        </div>
+
+        <div class="inspect-specs-grid" id="inspect-specs">
+          <div class="spec-cell"><span class="c-key">THROUGHPUT:</span> <strong class="c-val">6.4 Tbps Wire-Speed</strong></div>
+          <div class="spec-cell"><span class="c-key">PORT CONFIG:</span> <strong class="c-val">32x 100G QSFP28</strong></div>
+          <div class="spec-cell"><span class="c-key">LATENCY:</span> <strong class="c-val text-neon">450ns Cut-Through</strong></div>
+          <div class="spec-cell"><span class="c-key">PFC / ECN:</span> <strong class="c-val text-alert">Priority Flow Control Enabled</strong></div>
+        </div>
+
+        <div class="inspect-telemetry-box">
+          <div class="t-head">{{ if $is_en }}LIVE SENSOR TELEMETRY:{{ else }}CANLI SENSÖR TELEMETRİSİ:{{ end }}</div>
+          <div class="sensor-bars">
+            <div class="sensor-row">
+              <span class="s-label">ASIC TEMP:</span>
+              <div class="s-track"><div class="s-fill" style="width: 48%;"></div></div>
+              <span class="s-val">42°C</span>
+            </div>
+            <div class="sensor-row">
+              <span class="s-label">FAN SPEED:</span>
+              <div class="s-track"><div class="s-fill" style="width: 55%;"></div></div>
+              <span class="s-val">6,200 RPM</span>
+            </div>
+            <div class="sensor-row">
+              <span class="s-label">LOAD (PACKETS/S):</span>
+              <div class="s-track"><div class="s-fill" style="width: 34%;"></div></div>
+              <span class="s-val">18.4 Mpps</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspect-actions">
+          <span class="action-note">{{ if $is_en }}INTERCONNECTED TIERS:{{ else }}BAĞLANTILI KATMANLAR:{{ end }}</span>
+          <div class="tier-tags" id="inspect-tiers">
+            <span class="tier-tag">RoCE v2 RDMA</span>
+            <span class="tier-tag">100G Mellanox CX6</span>
+            <span class="tier-tag">Jumbo Frames 9000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{- /* Identity & Storage Kerberos Architecture Breakdown */ -}}
+  <div class="lab-deepdive-section">
+    <div class="section-badge-header">
+      <span class="sec-dot">■</span>
+      <span class="sec-title">{{ if $is_en }}IDENTITY & KERBEROS STORAGE FEDERATION ARCHITECTURE{{ else }}KİMLİK VE KERBEROS DEPOLAMA FEDERASYON MİMARİSİ{{ end }}</span>
+    </div>
+
+    <div class="arch-cards-grid">
+      <div class="arch-card">
+        <h3 class="arch-title">01 // Active Directory & SSSD Broker</h3>
+        <p>
+          {{ if $is_en }}
+          Centralized user lifecycle management. Users authenticate via Active Directory Kerberos V5. SSSD on compute nodes provides deterministic POSIX UID/GID resolution, avoiding colliding ranges across multi-tenant GPU workspaces.
+          {{ else }}
+          Merkezi kullanıcı yaşam döngüsü yönetimi. Kullanıcılar Active Directory Kerberos V5 ile kimlik doğrular. Hesaplama düğümlerindeki SSSD, çok kullanıcılı GPU çalışma alanlarında çakışmaları engelleyen deterministik POSIX UID/GID çözümü sunar.
+          {{ end }}
+        </p>
+        <div class="arch-code-snippet">
+          <code>[domain/AD.LAB]<br>id_provider = ad<br>auth_provider = krb5<br>krb5_realm = AD.LAB.INTERNAL<br>ldap_id_mapping = False</code>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <h3 class="arch-title">02 // TrueNAS SCALE & NFSv4.2 krb5p</h3>
+        <p>
+          {{ if $is_en }}
+          Shared high-capacity datasets exported exclusively with <code>sec=krb5p</code> (RPC integrity + packet encryption). Eliminates standard NFS spoofing risks where rootless containers masquerade as other researchers' UIDs.
+          {{ else }}
+          Yüksek kapasiteli paylaşımlı veri havuzları yalnızca <code>sec=krb5p</code> (RPC bütünlük ve paket şifreleme) ile dışa aktarılır. Rootless konteynerlerin diğer araştırmacıların UID'lerini taklit etme riskini tamamen ortadan kaldırır.
+          {{ end }}
+        </p>
+        <div class="arch-code-snippet">
+          <code>mount -t nfs4 -o proto=rdma,port=20049,sec=krb5p truenas.lab:/mnt/tank/datasets /mnt/datasets</code>
+        </div>
+      </div>
+
+      <div class="arch-card">
+        <h3 class="arch-title">03 // Slurm GPU Scheduler & OPA Gates</h3>
+        <p>
+          {{ if $is_en }}
+          Workload orchestration across A100 SXM4 and RTX 4090 pools. Enforces strict cgroup v2 GPU memory limits, MIG slicing (Multi-Instance GPU), and Open Policy Agent validation preventing unprivileged host root escalation.
+          {{ else }}
+          A100 SXM4 ve RTX 4090 havuzları üzerinde iş yükü orkestrasyonu. Katı cgroup v2 GPU bellek sınırları, MIG dilimleme ve kök haklarına erişimi engelleyen Open Policy Agent yetkilendirme doğrulamaları uygulanır.
+          {{ end }}
+        </p>
+        <div class="arch-code-snippet">
+          <code>srun --partition=a100 --gpus=2 --cpus-per-task=16 --mem=128G --pty bash</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const rackUnits = document.querySelectorAll('.rack-unit[data-unit]');
+  const inspectTag = document.getElementById('inspect-tag');
+  const inspectType = document.getElementById('inspect-type');
+  const inspectName = document.getElementById('inspect-name');
+  const inspectDesc = document.getElementById('inspect-desc');
+  const inspectSpecs = document.getElementById('inspect-specs');
+  const inspectTiers = document.getElementById('inspect-tiers');
+
+  const unitData = {
+    'switch-01': {
+      tag: '[ UNIT_INSPECTOR // TOR-SWITCH-01 ]',
+      type: 'NETWORK_CORE',
+      name: 'Arista 7060X 32-Port 100GbE QSFP28 Switch',
+      desc: 'High-performance spine-leaf switch providing RoCE v2 (RDMA over Converged Ethernet) lossless transmission for GPU inter-node communication and TrueNAS NFS-over-RDMA high-speed dataset access.',
+      specs: [
+        { k: 'THROUGHPUT:', v: '6.4 Tbps Wire-Speed' },
+        { k: 'PORT CONFIG:', v: '32x 100G QSFP28' },
+        { k: 'LATENCY:', v: '450ns Cut-Through', cls: 'text-neon' },
+        { k: 'PFC / ECN:', v: 'Priority Flow Control Active', cls: 'text-alert' }
+      ],
+      tiers: ['RoCE v2 RDMA', '100G Mellanox CX6', 'Jumbo Frames 9000 MTU', 'LACP Bonding']
+    },
+    'gpu-01': {
+      tag: '[ UNIT_INSPECTOR // GPU-NODE-01 ]',
+      type: 'HPC_ACCELERATOR',
+      name: 'Supermicro 4U // 8x NVIDIA A100 80GB SXM4 Fabric',
+      desc: 'Primary deep learning training powerhouse. Connected via NVLink 600 GB/s inter-GPU mesh and dual 100GbE Mellanox ConnectX-6 NICs for distributed PyTorch / Slurm jobs.',
+      specs: [
+        { k: 'PROCESSORS:', v: '2x AMD EPYC 9654 (192 Cores / 384 Threads)' },
+        { k: 'SYSTEM RAM:', v: '1.5 TB DDR5-4800 ECC Registered' },
+        { k: 'VRAM TOTAL:', v: '640 GB HBM2e High-Bandwidth', cls: 'text-neon' },
+        { k: 'INTERCONNECT:', v: 'NVLink 3.0 (600 GB/s) + 2x 100GbE RoCE', cls: 'text-alert' }
+      ],
+      tiers: ['PyTorch DDP', 'Slurm Workload Manager', 'NVIDIA Fabric Manager', 'cgroup v2']
+    },
+    'gpu-02': {
+      tag: '[ UNIT_INSPECTOR // GPU-NODE-02 ]',
+      type: 'INFERENCE_ACCELERATOR',
+      name: 'Supermicro 4U // 4x RTX 4090 24GB + 2x RTX 6000 Ada',
+      desc: 'High-throughput LLM inference and batch fine-tuning node. Optimized for vLLM, TensorRT-LLM, and multi-tenant student researcher interactive environments.',
+      specs: [
+        { k: 'PROCESSORS:', v: '2x AMD EPYC 9354 (64 Cores / 128 Threads)' },
+        { k: 'SYSTEM RAM:', v: '768 GB DDR5-4800 ECC' },
+        { k: 'VRAM TOTAL:', v: '192 GB GDDR6X / ECC', cls: 'text-neon' },
+        { k: 'STORAGE:', v: '4x 3.84TB Kioxia CM6 NVMe U.3 Scratch', cls: 'text-alert' }
+      ],
+      tiers: ['vLLM Server', 'TensorRT-LLM', 'Slurm Interactive', 'Docker Rootless']
+    },
+    'storage-01': {
+      tag: '[ UNIT_INSPECTOR // STOR-TRUENAS-01 ]',
+      type: 'ENTERPRISE_ZFS',
+      name: 'TrueNAS SCALE 4U // 24x 18TB Seagate Exos Enterprise',
+      desc: 'Mission-critical distributed storage engine. Dual RAIDZ2 vdevs (2x 12-disk) configured with NVMe Optane SLOG and high-speed NFSv4.2 Kerberos RPC exports.',
+      specs: [
+        { k: 'RAW CAPACITY:', v: '432 TB Enterprise SAS3' },
+        { k: 'USABLE CAPACITY:', v: '286 TiB Parity Deducted', cls: 'text-neon' },
+        { k: 'ZIL / SLOG:', v: '2x Intel Optane P5800X 800GB Mirror', cls: 'text-alert' },
+        { k: 'NETWORK:', v: 'Dual 100GbE RoCE v2 with NFS-RDMA' }
+      ],
+      tiers: ['OpenZFS 2.2', 'sec=krb5p Kerberos', 'NFSv4.2 RPC', 'ZSTD-1 Compression']
+    },
+    'ctrl-01': {
+      tag: '[ UNIT_INSPECTOR // CTRL-K8S-01 ]',
+      type: 'IDENTITY_CONTROL',
+      name: 'Dell PowerEdge R650 1U // Primary Control Plane',
+      desc: 'Hosts core cluster infrastructure services: Active Directory Domain Controller, MIT Kerberos KDC, SSSD Identity Provider, Slurmctld daemon, and Open Policy Agent.',
+      specs: [
+        { k: 'PROCESSOR:', v: 'Intel Xeon Gold 6338 (32 Cores)' },
+        { k: 'MEMORY:', v: '128 GB DDR4-3200 ECC' },
+        { k: 'SERVICES:', v: 'SSSD, MIT Kerberos, Slurm, OPA Gatekeeper', cls: 'text-neon' },
+        { k: 'FAILOVER:', v: 'Corosync / Pacemaker Heartbeat Active', cls: 'text-alert' }
+      ],
+      tiers: ['Active Directory', 'MIT Kerberos KDC', 'SSSD Broker', 'OPA Policy Engine']
+    },
+    'ctrl-02': {
+      tag: '[ UNIT_INSPECTOR // CTRL-K8S-02 ]',
+      type: 'FAILOVER_CONTROL',
+      name: 'Dell PowerEdge R650 1U // Secondary Control Plane',
+      desc: 'Hot standby replica. Replicates Kerberos keytabs, LDAP directory trees, and etcd cluster state in real time for zero-downtime controller failover.',
+      specs: [
+        { k: 'PROCESSOR:', v: 'Intel Xeon Gold 6338 (32 Cores)' },
+        { k: 'MEMORY:', v: '128 GB DDR4-3200 ECC' },
+        { k: 'ROLE:', v: 'Secondary Active Replica', cls: 'text-neon' },
+        { k: 'STATE REPLICATION:', v: 'DRBD + etcd Raft Quorum Healthy', cls: 'text-alert' }
+      ],
+      tiers: ['etcd Raft', 'Kerberos Secondary KDC', 'Slurm Backupctld', 'Keepalived VIP']
+    }
+  };
+
+  rackUnits.forEach(unit => {
+    unit.addEventListener('click', function() {
+      rackUnits.forEach(u => u.classList.remove('active'));
+      this.classList.add('active');
+
+      const id = this.getAttribute('data-unit');
+      const data = unitData[id];
+      if (!data) return;
+
+      inspectTag.textContent = data.tag;
+      inspectType.textContent = data.type;
+      inspectName.textContent = data.name;
+      inspectDesc.textContent = data.desc;
+
+      inspectSpecs.innerHTML = data.specs.map(s => `
+        <div class="spec-cell">
+          <span class="c-key">${s.k}</span>
+          <strong class="c-val ${s.cls || ''}">${s.v}</strong>
+        </div>
+      `).join('');
+
+      inspectTiers.innerHTML = data.tiers.map(t => `<span class="tier-tag">${t}</span>`).join('');
+    });
+  });
+});
+</script>
+
+{{- end }}{{/* end main */}}

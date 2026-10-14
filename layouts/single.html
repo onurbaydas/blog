@@ -10,9 +10,15 @@
       <span class="sec-label">{{ if $is_about }}{{ if $is_en }}DOSSIER_TYPE:{{ else }}DOSYA_TÜRÜ:{{ end }}{{ else }}{{ if $is_en }}DOCUMENT_SPEC:{{ else }}DOKÜMAN_TÜRÜ:{{ end }}{{ end }}</span>
       <span class="sec-id">{{ if $is_about }}SUBJECT_DOSSIER // PERSONNEL_SECURITY_AUDIT{{ else }}INCIDENT_ANALYSIS // {{ if not .Date.IsZero }}{{ .Date | time.Format "2006-01-02" }}{{ else }}CURRENT{{ end }}{{ end }}</span>
     </div>
-    <div class="spec-status-pill">
-      <span class="status-indicator"></span>
-      <span class="status-name">{{ if $is_about }}{{ if $is_en }}CLEARANCE: REVOKED // LEVEL-4{{ else }}GÜVENLİK_İZİNLERİ: İPTAL{{ end }}{{ else }}{{ if $is_en }}AUDIT_UNRESOLVED // RING-0{{ else }}GÜVENLİK_ANOMALİSİ{{ end }}{{ end }}</span>
+    <div class="spec-right-group">
+      <button type="button" class="dossier-print-btn" onclick="window.print();" title="{{ if $is_en }}Export Classified Whitepaper Dossier (Ctrl+P / PDF){{ else }}Gizli Teknik Raporu Yazdır (Ctrl+P / PDF){{ end }}">
+        <span class="btn-icon">🖨</span>
+        <span class="btn-text">[ {{ if $is_en }}PRINT DOSSIER{{ else }}RAPORU YAZDIR{{ end }} ]</span>
+      </button>
+      <div class="spec-status-pill">
+        <span class="status-indicator"></span>
+        <span class="status-name">{{ if $is_about }}{{ if $is_en }}CLEARANCE: REVOKED // LEVEL-4{{ else }}GÜVENLİK_İZİNLERİ: İPTAL{{ end }}{{ else }}{{ if $is_en }}AUDIT_UNRESOLVED // RING-0{{ else }}GÜVENLİK_ANOMALİSİ{{ end }}{{ end }}</span>
+      </div>
     </div>
   </div>
 

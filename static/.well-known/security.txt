@@ -1,0 +1,8 @@
+Contact: mailto:onurbaydas@pm.me
+Contact: https://github.com/onurbaydas
+Encryption: https://onurbaydas.online/pubkey.asc
+Canonical: https://onurbaydas.online/.well-known/security.txt
+Preferred-Languages: tr, en
+Policy: https://onurbaydas.online/canary/
+Hiring: https://onurbaydas.online/about/
+Expires: 2027-12-31T23:59:59.000Z

@@ -1,0 +1,347 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<div class="runbooks-container fracture-container">
+  {{- /* Top Industrial Spec Header */ -}}
+  <div class="radar-telemetry-chassis">
+    <div class="chassis-header-row">
+      <div class="chassis-title-wrap">
+        <span class="chassis-tag">[ FIELD_RUNBOOKS // #05 ]</span>
+        <h1 class="chassis-headline">{{ if $is_en }}EMERGENCY PRODUCTION RUNBOOKS & TRIAGE CHEATSHEETS{{ else }}ACİL DURUM ÜRETİM RUNBOOKLARI VE MÜDAHALE REHBERLERİ{{ end }}</h1>
+      </div>
+      <div class="chassis-status-pill">
+        <span class="status-indicator"></span>
+        <span class="status-name">{{ if $is_en }}TRIAGE_ACTIVE // 6 STANDARD OPERATING PROCEDURES{{ else }}MÜDAHALE_AKTİF // 6 STANDART OPERASYON PROSEDÜRÜ{{ end }}</span>
+      </div>
+    </div>
+    <div class="chassis-desc">
+      {{ if $is_en }}
+      High-pressure incident response checklists, recovery one-liners, and debugging triage procedures. Verified against production Linux kernels, TrueNAS OpenZFS pools, Kerberos identity brokers, and multi-tenant GPU fabrics.
+      {{ else }}
+      Kritik sistem kesintilerinde hızlı müdahale kontrol listeleri, tek satırlık kurtarma komutları ve çekirdek seviyesinde hata ayıklama prosedürleri. Üretim ortamındaki Linux çekirdekleri, TrueNAS OpenZFS havuzları, Kerberos kimlik sunucuları ve GPU altyapılarında bizzat test edilmiştir.
+      {{ end }}
+    </div>
+  </div>
+
+  {{- /* Grep & Filter Controls */ -}}
+  <div class="runbook-filter-bar">
+    <div class="terminal-search-strip">
+      <span class="prompt-sym">&gt; grep -E</span>
+      <input type="text" id="runbook-search" class="terminal-input" placeholder="{{ if $is_en }}Filter runbooks by error code, command, or keyword (Press '/' to search)...{{ else }}Hata kodu, komut veya anahtar kelime ara ('/' tuşuna bas)...{{ end }}" autocomplete="off" spellcheck="false">
+      <button id="runbook-clear-btn" class="terminal-clear-btn">[ESC / CLR]</button>
+    </div>
+
+    <div class="runbook-cat-pills" id="runbook-pills">
+      <button class="cat-pill active" data-cat="all">[ ALL_PROCEDURES ]</button>
+      <button class="cat-pill" data-cat="sec">[ SECURITY_CVE ]</button>
+      <button class="cat-pill" data-cat="storage">[ ZFS_STORAGE ]</button>
+      <button class="cat-pill" data-cat="auth">[ SSSD_KERBEROS ]</button>
+      <button class="cat-pill" data-cat="kernel">[ KERNEL_EBPF ]</button>
+      <button class="cat-pill" data-cat="gpu">[ GPU_HARDWARE ]</button>
+    </div>
+  </div>
+
+  {{- /* Runbooks Docket Grid */ -}}
+  <div class="runbooks-grid" id="runbooks-grid">
+
+    {{- /* RUNBOOK 01: DOCKER OPA BYPASS */ -}}
+    <article class="runbook-card brutal-card-docket" data-cat="sec" data-search="cve-2024-41110 docker opa authz fail-open bypass silent security patch contain">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P0-CRITICAL</span>
+          <span class="docket-num">SOP-SEC-01</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[CONTAINER_SECURITY]</span>
+      </div>
+      <h2 class="runbook-title">{{ if $is_en }}Docker Authz Plugin (OPA) Fail-Open Bypass Containment{{ else }}Docker OPA Yetkilendirme Bypass (CVE-2024-41110) Acil Müdahale{{ end }}</h2>
+      <p class="runbook-desc">
+        {{ if $is_en }}
+        Mitigate silent authorization bypass when Docker daemon fails to forward Content-Length 0 requests to OPA authorization plugins. Enforce strict fail-close daemon configuration.
+        {{ else }}
+        Docker daemon'un Content-Length 0 isteklerini OPA yetkilendirme eklentisine iletememesi sonucu oluşan sessiz bypass açığını engeller. Daemon'ı katı fail-close moduna zorlar.
+        {{ end }}
+      </p>
+      <div class="runbook-cmd-box">
+        <span class="cmd-label">{{ if $is_en }}EMERGENCY MITIGATION COMMANDS:{{ else }}ACİL MÜDAHALE KOMUTLARI:{{ end }}</span>
+        <pre><code># 1. Audit active docker authz plugins
+docker info --format '{{ "{{" }}json .Plugins.Authorization{{ "}}" }}'
+
+# 2. Block direct docker socket access immediately
+chmod 660 /var/run/docker.sock
+systemctl restart docker-authz-opa
+
+# 3. Patch /etc/docker/daemon.json for fail-close
+cat &lt;&lt;'EOF' &gt; /etc/docker/daemon.json
+{
+  "authorization-plugins": ["opa-docker-authz:latest"],
+  "userland-proxy": false,
+  "live-restore": true
+}
+EOF
+systemctl reload docker</code></pre>
+        <button type="button" class="copy-cmd-btn">[ {{ if $is_en }}COPY RUNBOOK{{ else }}RUNBOOK'U KOPYALA{{ end }} ]</button>
+      </div>
+    </article>
+
+    {{- /* RUNBOOK 02: NFS STALE HANDLE */ -}}
+    <article class="runbook-card brutal-card-docket" data-cat="storage" data-search="nfs estale 116 stale file handle kerberos krb5 krb5p ticket expiry rpc mount">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P1-HIGH</span>
+          <span class="docket-num">SOP-STOR-02</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[TRUENAS_NFSv4]</span>
+      </div>
+      <h2 class="runbook-title">{{ if $is_en }}NFSv4.2 Stale File Handle (ESTALE 116) & Kerberos Expiry Flush{{ else }}NFSv4.2 Bayat Dosya Tanıtıcısı (ESTALE 116) ve Kerberos Bilet Yenileme{{ end }}</h2>
+      <p class="runbook-desc">
+        {{ if $is_en }}
+        Recover hung mounts caused by server-side inode replacement, ZFS snapshot rollbacks, or expired Kerberos user session TGTs without rebooting client compute nodes.
+        {{ else }}
+        ZFS anlık görüntü geri alımları veya süresi dolan Kerberos TGT biletleri sonucu askıda kalan NFS bağlama noktalarını istemciyi yeniden başlatmadan kurtarma prosedürü.
+        {{ end }}
+      </p>
+      <div class="runbook-cmd-box">
+        <span class="cmd-label">{{ if $is_en }}LAZY UNMOUNT & KEYTAB REFRESH:{{ else }}LAZY UNMOUNT VE BİLET YENİLEME:{{ end }}</span>
+        <pre><code># 1. Flush hung NFS client cache and unmount lazily
+umount -l /mnt/datasets
+
+# 2. Refresh machine host Kerberos keytab
+kinit -k -t /etc/krb5.keytab host/$(hostname -f)
+
+# 3. Invalidate kernel RPC idmap cache
+nfsidmap -c
+
+# 4. Remount with explicit Kerberos encryption
+mount -t nfs4 -o proto=rdma,port=20049,sec=krb5p,timeo=600,retrans=2 truenas.lab:/mnt/tank/datasets /mnt/datasets</code></pre>
+        <button type="button" class="copy-cmd-btn">[ {{ if $is_en }}COPY RUNBOOK{{ else }}RUNBOOK'U KOPYALA{{ end }} ]</button>
+      </div>
+    </article>
+
+    {{- /* RUNBOOK 03: SSSD CACHE FLUSH */ -}}
+    <article class="runbook-card brutal-card-docket" data-cat="auth" data-search="sssd ldap active directory cache purge sss_cache getent passwd uid gid collision">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P1-HIGH</span>
+          <span class="docket-num">SOP-AUTH-03</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[ACTIVE_DIRECTORY]</span>
+      </div>
+      <h2 class="runbook-title">{{ if $is_en }}SSSD / Active Directory Cache Invalidation & Offline Purge{{ else }}SSSD / Active Directory Önbellek Sıfırlama ve Çevrimdışı Temizleme{{ end }}</h2>
+      <p class="runbook-desc">
+        {{ if $is_en }}
+        Resolve stale POSIX UID/GID mappings, group membership desynchronization, and LDAP offline loop locks across cluster nodes after Active Directory schema edits.
+        {{ else }}
+        Active Directory grup güncellemeleri sonrası oluşan bayat POSIX UID/GID eşleşmelerini ve SSSD çevrimdışı kilitlenmelerini anında temizleme adımları.
+        {{ end }}
+      </p>
+      <div class="runbook-cmd-box">
+        <span class="cmd-label">{{ if $is_en }}SSSD PURGE & NSS REFRESH:{{ else }}SSSD TEMİZLİK VE NSS YENİLEME:{{ end }}</span>
+        <pre><code># 1. Stop SSSD daemon cleanly
+systemctl stop sssd
+
+# 2. Invalidate memory DB caches
+sss_cache -E
+
+# 3. Purge corrupted local LDB database files
+rm -f /var/lib/sss/db/* /var/lib/sss/mc/*
+
+# 4. Restart SSSD and verify deterministic POSIX resolution
+systemctl start sssd
+getent passwd operator_ob
+id -a operator_ob</code></pre>
+        <button type="button" class="copy-cmd-btn">[ {{ if $is_en }}COPY RUNBOOK{{ else }}RUNBOOK'U KOPYALA{{ end }} ]</button>
+      </div>
+    </article>
+
+    {{- /* RUNBOOK 04: ZFS POOL RESCUE */ -}}
+    <article class="runbook-card brutal-card-docket" data-cat="storage" data-search="zfs zpool corrupted pool import scrub panic degraded readonly rescue">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P0-CRITICAL</span>
+          <span class="docket-num">SOP-ZFS-04</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[OPENZFS_RECOVERY]</span>
+      </div>
+      <h2 class="runbook-title">{{ if $is_en }}ZFS Corrupted Pool Import & Scrub Panic Recovery{{ else }}Bozulmuş ZFS Havuzunu Salt Okunur İçe Aktarma ve Kurtarma{{ end }}</h2>
+      <p class="runbook-desc">
+        {{ if $is_en }}
+        Emergency procedure when a ZFS pool triggers a kernel panic or refusal to import due to metadata corruption, damaged uberblocks, or power loss in mid-transaction.
+        {{ else }}
+        Güç kesintisi veya metadata hasarı nedeniyle çekirdek paniği üreten veya import edilemeyen ZFS havuzlarını güvenli bir şekilde salt okunur modda kurtarma adımları.
+        {{ end }}
+      </p>
+      <div class="runbook-cmd-box">
+        <span class="cmd-label">{{ if $is_en }}READ-ONLY RECOVERY IMPORT:{{ else }}SALT OKUNUR KURTARMA İÇE AKTARIMI:{{ end }}</span>
+        <pre><code># 1. Search for existing pools without importing
+zpool import
+
+# 2. Force read-only import, rewinding damaged transactions
+zpool import -f -F -o readonly=on tank
+
+# 3. If standard rewind fails, perform extreme transaction rollback
+zpool import -f -F -X -o readonly=on tank
+
+# 4. Immediately stream critical datasets to remote replication target
+zfs send -v tank/critical@snapshot | zfs receive backup_tank/critical</code></pre>
+        <button type="button" class="copy-cmd-btn">[ {{ if $is_en }}COPY RUNBOOK{{ else }}RUNBOOK'U KOPYALA{{ end }} ]</button>
+      </div>
+    </article>
+
+    {{- /* RUNBOOK 05: EBPF DEBUGGING */ -}}
+    <article class="runbook-card brutal-card-docket" data-cat="kernel" data-search="ebpf bpftrace kernel trace execsnoop tcpretrans biolatency opensnoop performance">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P2-OPERATIONAL</span>
+          <span class="docket-num">SOP-EBPF-05</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[LINUX_KERNEL]</span>
+      </div>
+      <h2 class="runbook-title">{{ if $is_en }}Production eBPF Kernel Tracing & Latency Diagnostics{{ else }}Üretim Ortamında eBPF ile Çekirdek Hata Ayıklama ve Gecikme Analizi{{ end }}</h2>
+      <p class="runbook-desc">
+        {{ if $is_en }}
+        Zero-overhead live kernel tracing one-liners. Capture short-lived rogue processes, TCP packet drops, and NVMe block I/O tail latency bottlenecks without restarting daemons.
+        {{ else }}
+        Sıfır yük ile çalışan canlı çekirdek izleme tek satırlıkları. Kısa ömürlü kaçak süreçleri, TCP paket kayıplarını ve NVMe depolama gecikmelerini tespit edin.
+        {{ end }}
+      </p>
+      <div class="runbook-cmd-box">
+        <span class="cmd-label">{{ if $is_en }}EBPF BPFTRACE ONE-LINERS:{{ else }}EBPF BPFTRACE TEK SATIRLIKLARI:{{ end }}</span>
+        <pre><code># 1. Trace all process executions in real time with parent PID
+bpftrace -e 'tracepoint:syscalls:sys_enter_execve { printf("%s (pid=%d, ppid=%d): %s\n", comm, pid, curtask->parent->pid, str(args->filename)); }'
+
+# 2. Profile NVMe / ZFS disk I/O latency distribution (Microseconds)
+biolatency-bpfcc -m 10 1
+
+# 3. Intercept TCP retransmissions with source/dest IP and ports
+tcpretrans-bpfcc -l
+
+# 4. Detect permission denied access attempts across kernel VFS
+bpftrace -e 'kretprobe:vfs_open /retval == -13/ { printf("EACCES: pid=%d comm=%s\n", pid, comm); }'</code></pre>
+        <button type="button" class="copy-cmd-btn">[ {{ if $is_en }}COPY RUNBOOK{{ else }}RUNBOOK'U KOPYALA{{ end }} ]</button>
+      </div>
+    </article>
+
+    {{- /* RUNBOOK 06: GPU HANG RESET */ -}}
+    <article class="runbook-card brutal-card-docket" data-cat="gpu" data-search="nvidia gpu reset xid error pcie aer hang cuda out of memory sxm4 4090 a100">
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          <span class="cve-warning-tag">P1-HIGH</span>
+          <span class="docket-num">SOP-GPU-06</span>
+        </div>
+        <div class="docket-hatch-pattern"></div>
+        <span class="badge-source">[CUDA_ACCELERATION]</span>
+      </div>
+      <h2 class="runbook-title">{{ if $is_en }}NVIDIA GPU Hang, Xid Error & PCIe AER Recovery (No Node Reboot){{ else }}NVIDIA GPU Kilitlenmesi, Xid Hatası ve Düğüm Yeniden Başlatmadan Sıfırlama{{ end }}</h2>
+      <p class="runbook-desc">
+        {{ if $is_en }}
+        Recover unresponsive NVIDIA A100 / RTX 4090 GPUs after CUDA memory illegal address faults, Xid 31/79 crashes, or PCIe bus link drops without rebooting the 192-core host node.
+        {{ else }}
+        CUDA bellek ihlali, Xid 31/79 çökmeleri veya PCIe bağlantı kopmalarında 192 çekirdekli ana sunucuyu yeniden başlatmadan GPU'yu sıfırlama yöntemi.
+        {{ end }}
+      </p>
+      <div class="runbook-cmd-box">
+        <span class="cmd-label">{{ if $is_en }}SURGICAL GPU RESET SEQUENCE:{{ else }}CERRAHİ GPU SIFIRLAMA ADIMLARI:{{ end }}</span>
+        <pre><code># 1. Identify offending process locking GPU memory
+fuser -v /dev/nvidia*
+kill -9 $(fuser /dev/nvidia0 2&gt;/dev/null)
+
+# 2. Stop NVIDIA persistence daemon & Slurm compute agent
+systemctl stop slurmd
+systemctl stop nvidia-persistenced
+
+# 3. Trigger hardware PCIe secondary bus reset on GPU index 0
+nvidia-smi --gpu-reset -i 0
+
+# 4. Verify GPU responds to NVML telemetry queries
+nvidia-smi -i 0 --query-gpu=temperature.gpu,utilization.gpu,memory.used --format=csv
+systemctl start nvidia-persistenced
+systemctl start slurmd</code></pre>
+        <button type="button" class="copy-cmd-btn">[ {{ if $is_en }}COPY RUNBOOK{{ else }}RUNBOOK'U KOPYALA{{ end }} ]</button>
+      </div>
+    </article>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('runbook-search');
+  const clearBtn = document.getElementById('runbook-clear-btn');
+  const catBtns = document.querySelectorAll('#runbook-pills .cat-pill');
+  const cards = document.querySelectorAll('#runbooks-grid .runbook-card');
+
+  let activeCat = 'all';
+
+  function filterRunbooks() {
+    const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+
+    cards.forEach(card => {
+      const cat = card.getAttribute('data-cat');
+      const searchData = (card.getAttribute('data-search') + ' ' + card.innerText).toLowerCase();
+
+      const catMatches = (activeCat === 'all') || (cat === activeCat);
+      const queryMatches = !q || searchData.includes(q);
+
+      if (catMatches && queryMatches) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', filterRunbooks);
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      filterRunbooks();
+    });
+  }
+
+  catBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.getAttribute('data-cat');
+      filterRunbooks();
+    });
+  });
+
+  // Global hotkey '/'
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '/' && document.activeElement !== searchInput) {
+      e.preventDefault();
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    } else if (e.key === 'Escape' && document.activeElement === searchInput) {
+      searchInput.value = '';
+      searchInput.blur();
+      filterRunbooks();
+    }
+  });
+
+  // Copy code buttons
+  document.querySelectorAll('.runbook-card .copy-cmd-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const codeBlock = this.parentElement.querySelector('pre code');
+      if (codeBlock) {
+        navigator.clipboard.writeText(codeBlock.innerText);
+        const originalText = this.innerText;
+        this.innerText = '[ COPIED // BUFFER READY ]';
+        setTimeout(() => this.innerText = originalText, 2000);
+      }
+    });
+  });
+});
+</script>
+
+{{- end }}{{/* end main */}}

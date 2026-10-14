@@ -47,6 +47,14 @@
                 <span class="sep">//</span>
                 <span>BASE: <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank" class="brutal-link">PAPERMOD</a></span>
             </div>
+
+            <div class="engine-credit" style="margin-top: 6px;">
+                <span><a href="{{ if $is_en }}/en/canary/{{ else }}/canary/{{ end }}" class="brutal-link">[ CANARY ]</a></span>
+                <span class="sep">//</span>
+                <span><a href="{{ if $is_en }}/en/pgp/{{ else }}/pgp/{{ end }}" class="brutal-link">[ PGP KEY ]</a></span>
+                <span class="sep">//</span>
+                <span><a href="/.well-known/security.txt" class="brutal-link">[ SECURITY.TXT ]</a></span>
+            </div>
         </div>
     </div>
 </footer>
@@ -60,6 +68,7 @@
 {{- end }}
 
 {{- partial "extend_footer.html" . }}
+{{- partial "terminal.html" . }}
 
 {{- /* Core scripts & Brutalist Enhancements */ -}}
 {{- /* VOID WATCHER: The Two Terrifying Eyes That Suddenly Spawn At Random Page Edges */ -}}

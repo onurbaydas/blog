@@ -1,0 +1,315 @@
+{{- $is_en := eq site.Language.Lang "en" }}
+
+{{- /* VT100 Brutalist Interactive Terminal Overlay */ -}}
+<div id="brutal-terminal-modal" class="terminal-modal-overlay" style="display: none;" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Interactive TTY Console">
+  <div class="terminal-chassis">
+    {{- /* Terminal Window Titlebar */ -}}
+    <div class="terminal-titlebar">
+      <div class="term-title-left">
+        <span class="term-led-dot"></span>
+        <span class="term-title-text">[ TTY-01 // OB-SYS-CONSOLE // PTY/0 ]</span>
+      </div>
+      <div class="term-title-meta">
+        <span class="term-meta-tag">BAUD: 115200 8N1</span>
+        <span class="term-meta-tag text-neon">ONLINE</span>
+        <button id="term-close-btn" class="term-btn-close" title="Close Terminal (Esc)">[X]</button>
+      </div>
+    </div>
+
+    {{- /* Terminal Screen Output */ -}}
+    <div class="terminal-screen" id="term-screen">
+      <div class="term-banner">
+================================================================================
+  ONUR BAYDAS // INDUSTRIAL SYSTEMS & KERNEL TTY CONSOLE (v2.4)
+  Type '<span class="term-highlight">help</span>' for available commands. Press '<span class="term-highlight">~</span>' or '<span class="term-highlight">Esc</span>' to exit.
+================================================================================
+      </div>
+      <div id="term-output-lines"></div>
+      
+      {{- /* Active Input Line */ -}}
+      <div class="term-input-line">
+        <span class="term-prompt">operator@ob-edge:~$ </span>
+        <input type="text" id="term-cli-input" class="term-cli-field" autofocus autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+  </div>
+</div>
+
+{{- /* Docked TTY Trigger Button in Bottom Left */ -}}
+<button id="terminal-trigger-btn" class="brutal-term-trigger" type="button" title="{{ if $is_en }}Open Interactive VT100 Terminal (~ or Alt+K){{ else }}İnteraktif VT100 Terminalini Aç (~ veya Alt+K){{ end }}">
+  <span class="trigger-led"></span>
+  <span class="trigger-label">[ TTY // ~ ]</span>
+</button>
+
+<script>
+(function() {
+  const modal = document.getElementById('brutal-terminal-modal');
+  const triggerBtn = document.getElementById('terminal-trigger-btn');
+  const closeBtn = document.getElementById('term-close-btn');
+  const cliInput = document.getElementById('term-cli-input');
+  const outputLines = document.getElementById('term-output-lines');
+  const screen = document.getElementById('term-screen');
+
+  if (!modal || !cliInput) return;
+
+  const isEn = document.documentElement.lang === 'en';
+  let history = [];
+  let historyIdx = -1;
+
+  function toggleTerminal() {
+    const isHidden = modal.style.display === 'none';
+    if (isHidden) {
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      cliInput.focus();
+      scrollBottom();
+    } else {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function scrollBottom() {
+    if (screen) screen.scrollTop = screen.scrollHeight;
+  }
+
+  if (triggerBtn) triggerBtn.addEventListener('click', toggleTerminal);
+  if (closeBtn) closeBtn.addEventListener('click', toggleTerminal);
+
+  // Global keybindings: `~` or `Alt + K`
+  document.addEventListener('keydown', function(e) {
+    const tag = (document.activeElement.tagName || '').toLowerCase();
+    const isEditing = (tag === 'input' || tag === 'textarea') && document.activeElement !== cliInput;
+
+    if ((e.key === '`' || e.key === '~') && !isEditing) {
+      e.preventDefault();
+      toggleTerminal();
+    } else if (e.altKey && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      toggleTerminal();
+    } else if (e.key === 'Escape' && modal.style.display !== 'none') {
+      e.preventDefault();
+      toggleTerminal();
+    }
+  });
+
+  const commands = {
+    help: () => `
+Available system commands:
+  help              Display this command index
+  uname -a          Print kernel architecture & node specs
+  whoami            Print current security context & UID
+  uptime            Display system runtime and load averages
+  posts             List recent technical architecture deep dives
+  radar             Display live systems & security intelligence feed
+  tools             List interactive systems engineering calculators
+  lab               Inspect 42U multi-user GPU cluster topology
+  runbooks          List emergency production incident runbooks
+  canary            Inspect current warrant canary declaration
+  pgp               Print PGP public key fingerprint
+  cat &lt;file&gt;        Read file (/etc/motd, /proc/cpuinfo, /security.txt)
+  cve &lt;id&gt;          Query known vulnerability details (e.g. CVE-2024-41110)
+  ping &lt;host&gt;       Simulate ICMP round-trip latency
+  dmesg             Dump simulated kernel ring buffer telemetry
+  clear             Clear terminal screen
+  exit              Close terminal session
+`,
+    'uname -a': () => `Linux onurbaydas-edge 6.12.0-rc2-industrial #1 SMP PREEMPT_DYNAMIC Wed Oct 14 16:00:00 UTC 2026 x86_64 GNU/Linux`,
+    uname: () => `Linux`,
+    whoami: () => `operator (uid=1000, gid=1000, subuid=100000:65536) [groups=1000(operator),27(sudo),998(docker),999(slurm)]`,
+    uptime: () => ` 16:00:00 up 42 days, 18:24,  1 user,  load average: 1.42, 1.88, 2.05 [192 AMD EPYC Cores]`,
+    canary: () => `
+[!] WARRANT CANARY STATUS: ACTIVE // NO INTERCEPTION ORDERS
+Period: 2026-Q4 | Verified: 14-Oct-2026 16:00 UTC
+Witness: Bitcoin Block 865,492 | OpenPGP Fingerprint: 4A8E 9B21 C3F0 7E85 D902 B11A 5E43 F709 881B D0A4
+Run 'cat /canary.txt' or visit /canary/ for full legal declaration.
+`,
+    pgp: () => `
+PGP Key ID: 0x5E43F709881BD0A4
+Fingerprint: 4A8E 9B21 C3F0 7E85 D902 B11A 5E43 F709 881B D0A4
+Key Block Download: https://onurbaydas.online/pubkey.asc
+`,
+    posts: () => `
+Recent technical post-mortems and architecture breakdowns:
+  1. [DOCKER-AUTHZ-OPA] CVE-2024-41110: Silent Fail-Open in Docker Auth Plugins
+     URL: ${isEn ? '/en/posts/docker-authz-opa-fail-open/' : '/posts/docker-authz-opa-fail-open/'}
+  2. [LINUX-UID-MISMATCH] Rootless Containers, NFSv4 & Kerberos UID Mapping
+     URL: ${isEn ? '/en/posts/nfs-uid-mismatch-kerberos/' : '/posts/nfs-uid-mismatch-kerberos/'}
+  3. [RADAR-DIGEST] Daily Systems & Security Intelligence Wire
+     URL: ${isEn ? '/en/radar/' : '/radar/'}
+`,
+    tools: () => `
+Interactive Systems Engineering Tools:
+  1. Linux User Namespace UID/GID Subuid/Subgid Mapping Visualizer
+  2. CVSS v3.1 Risk & Exploitability Vector Calculator
+  3. OpenZFS Capacity, Ashift & Recordsize Optimizer
+  URL: ${isEn ? '/en/tools/' : '/tools/'}
+`,
+    lab: () => `
+========================================================================
+ RACK TR-IST-RACK-07 // 42U TOPOLOGY
+========================================================================
+ [41-42U] TOR-SWITCH-01  : Arista 7060X 32x100GbE RoCE v2 Fabric [ONLINE]
+ [33-38U] GPU-NODE-01    : Supermicro 4U // 8x A100 80GB SXM4 (640GB VRAM)
+ [25-30U] GPU-NODE-02    : Supermicro 4U // 4x RTX 4090 + 2x RTX 6000 Ada
+ [17-22U] STOR-TRUENAS-01: 24x 18TB SAS Exos [RAIDZ2 432TB] // sec=krb5p
+ [13-14U] CTRL-K8S-01    : Dell R650 // AD/SSSD KDC + Slurm Controller
+ [11-12U] CTRL-K8S-02    : Dell R650 // Secondary Quorum Replica [STANDBY]
+ Visit ${isEn ? '/en/lab/' : '/lab/'} for interactive hardware inspector.
+========================================================================
+`,
+    runbooks: () => `
+Emergency Production Runbooks (SOP):
+  - SOP-SEC-01 : Docker OPA Authz Bypass (CVE-2024-41110) Containment
+  - SOP-STOR-02: NFSv4.2 Stale File Handle (ESTALE 116) Recovery
+  - SOP-AUTH-03: SSSD / Active Directory Cache Invalidation (sss_cache -E)
+  - SOP-ZFS-04 : ZFS Corrupted Pool Read-Only Recovery Import
+  - SOP-EBPF-05: Production eBPF Kernel Tracing One-Liners
+  - SOP-GPU-06 : NVIDIA GPU PCIe Hang & Xid Reset without Node Reboot
+  Visit ${isEn ? '/en/runbooks/' : '/runbooks/'} for full runnable checklists.
+`,
+    dmesg: () => `
+[    0.000000] Linux version 6.12.0-rc2-industrial (root@build-edge) (gcc 14.2)
+[    0.004120] Command line: BOOT_IMAGE=/vmlinuz-6.12 intel_iommu=on iommu=pt
+[    1.849102] mlx5_core 0000:03:00.0: Link up: 100Gbps Full Duplex (RoCE v2 active)
+[    2.109482] OPA_DOCKER_AUTHZ: Registered netfilter socket hook at /var/run/docker.sock
+[    2.418291] nfs4_idmap: Kernel keytab authenticated principal host/edge.lab@AD.LAB.INTERNAL
+[    3.109201] nvidia-fs: GDS (GPUDirect Storage) module initialized successfully
+[    4.204910] BPF: prog_id 849 type 13 [sched_cls] attached to dev eth0 [XDP_PASS]
+`,
+    clear: () => {
+      outputLines.innerHTML = '';
+      return null;
+    },
+    exit: () => {
+      toggleTerminal();
+      return null;
+    }
+  };
+
+  function executeCommand(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+
+    history.push(trimmed);
+    historyIdx = history.length;
+
+    // Append prompt + cmd
+    const cmdLine = document.createElement('div');
+    cmdLine.className = 'term-history-cmd';
+    cmdLine.innerHTML = `<span class="term-prompt">operator@ob-edge:~$ </span><span class="term-cmd-text">${escapeHtml(trimmed)}</span>`;
+    outputLines.appendChild(cmdLine);
+
+    const parts = trimmed.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    const fullCmd = trimmed.toLowerCase();
+
+    let response = '';
+
+    if (commands[fullCmd]) {
+      response = commands[fullCmd]();
+    } else if (commands[cmd]) {
+      response = commands[cmd](args);
+    } else if (cmd === 'cat') {
+      const file = args[0] || '';
+      if (file === '/etc/motd') {
+        response = `NOTICE: UNAUTHORIZED ACCESS TO THIS COMPUTATIONAL APPARATUS IS MONITORED.\nAll shell activity is audited via eBPF sys_enter_execve probes.`;
+      } else if (file === '/etc/resolv.conf') {
+        response = `nameserver 10.0.0.2\nnameserver 1.1.1.1\nsearch lab.internal ad.lab.internal`;
+      } else if (file === '/etc/subuid') {
+        response = `operator:100000:65536\nrootless_svc:165536:65536`;
+      } else if (file === '/proc/cpuinfo') {
+        response = `model name\t: AMD EPYC 9654 96-Core Processor\ncpu MHz\t\t: 2400.000\ncache size\t: 384 MB L3\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core invpcid ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves clzero xsaveerptr rdpru wbnoinvd arat`;
+      } else if (file === '/canary.txt' || file === 'canary.txt') {
+        response = `WARRANT CANARY: NO SECRET GOVERNMENT SUBPOENAS OR NSLs SERVED AS OF 14-OCT-2026.\nFull text available at /canary/`;
+      } else if (file === '/security.txt' || file === 'security.txt') {
+        response = `Contact: mailto:onurbaydas@pm.me\nEncryption: https://onurbaydas.online/pubkey.asc\nCanonical: https://onurbaydas.online/.well-known/security.txt`;
+      } else {
+        response = `cat: ${file || 'missing operand'}: No such file or directory. Try /etc/motd, /proc/cpuinfo, /security.txt`;
+      }
+    } else if (cmd === 'cve') {
+      const cveId = (args[0] || '').toUpperCase();
+      if (cveId.includes('2024-41110')) {
+        response = `
+[CVE-2024-41110] SEVERITY: CRITICAL (CVSS 9.8)
+TITLE: Docker Authz Plugin Content-Length 0 Authorization Bypass
+DESCRIPTION: An authorization bypass vulnerability in Docker Engine when configured with an Authz plugin allowing unprivileged requests with 0 length bodies to bypass policy evaluation.
+AFFECTED: Docker &lt; 27.1.1, &lt; 26.1.5, &lt; 25.0.6
+DEEP DIVE POST: /posts/docker-authz-opa-fail-open/
+`;
+      } else {
+        response = `cve: '${args[0] || ''}' not cached in local buffer. Check /radar/ for live CVE streams or visit https://nvd.nist.gov/vuln/detail/${cveId}`;
+      }
+    } else if (cmd === 'ping') {
+      const host = args[0] || 'truenas.lab';
+      response = `
+PING ${host} (10.0.0.10) 56(84) bytes of data.
+64 bytes from 10.0.0.10: icmp_seq=1 ttl=64 time=0.082 ms
+64 bytes from 10.0.0.10: icmp_seq=2 ttl=64 time=0.076 ms
+64 bytes from 10.0.0.10: icmp_seq=3 ttl=64 time=0.079 ms
+--- ${host} ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 0.076/0.079/0.082/0.002 ms (RoCE v2 Low-Latency)
+`;
+    } else if (cmd === 'radar') {
+      response = `
+FETCHING SYSTEMS & SECURITY RADAR INTEL...
+[KERNEL] Linux 6.12-rc2 Mainline Released (Bcachefs & Sched-Ext updates)
+[CVE] CVE-2024-41110 Docker Authz Silent Fail-Open Bypass (NVD 9.8)
+[INFRA] OpenZFS 2.2.6 Storage Pool Scrub Panic Patched
+[GITHUB] eBPF XDP Layer-4 Load Balancer for Multi-Tenant Clusters
+Visit ${isEn ? '/en/radar/' : '/radar/'} for live grep filtering.
+`;
+    } else {
+      response = `bash: ${cmd}: command not found. Type 'help' for available commands.`;
+    }
+
+    if (response !== null) {
+      const respEl = document.createElement('div');
+      respEl.className = 'term-output-block';
+      respEl.innerHTML = `<pre>${response}</pre>`;
+      outputLines.appendChild(respEl);
+    }
+
+    scrollBottom();
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  cliInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const cmd = cliInput.value;
+      cliInput.value = '';
+      executeCommand(cmd);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (history.length > 0 && historyIdx > 0) {
+        historyIdx--;
+        cliInput.value = history[historyIdx];
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIdx < history.length - 1) {
+        historyIdx++;
+        cliInput.value = history[historyIdx];
+      } else {
+        historyIdx = history.length;
+        cliInput.value = '';
+      }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const current = cliInput.value.toLowerCase().trim();
+      const known = ['help', 'uname', 'uname -a', 'whoami', 'uptime', 'posts', 'radar', 'tools', 'lab', 'runbooks', 'canary', 'pgp', 'cat', 'cve', 'ping', 'dmesg', 'clear', 'exit'];
+      const match = known.find(k => k.startsWith(current));
+      if (match) cliInput.value = match;
+    }
+  });
+
+  // Clicking anywhere on the screen refocuses the prompt
+  screen.addEventListener('click', () => cliInput.focus());
+})();
+</script>

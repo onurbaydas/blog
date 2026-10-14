@@ -1,0 +1,581 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<div class="tools-container fracture-container">
+  {{- /* Top Spec Header */ -}}
+  <div class="radar-telemetry-chassis">
+    <div class="chassis-header-row">
+      <div class="chassis-title-wrap">
+        <span class="chassis-tag">[ SYS_TOOLKIT // #03 ]</span>
+        <h1 class="chassis-headline">{{ if $is_en }}INTERACTIVE SYSTEMS ENGINEERING TOOLS{{ else }}İNTERAKTİF SİSTEM MÜHENDİSLİĞİ ARAÇLARI{{ end }}</h1>
+      </div>
+      <div class="chassis-status-pill">
+        <span class="status-indicator"></span>
+        <span class="status-name">{{ if $is_en }}CLIENT_SIDE // ZERO_TELEMETRY{{ else }}İSTEMCİ_TARAFLI // SIFIR_VERİ_SIZINTISI{{ end }}</span>
+      </div>
+    </div>
+    <div class="chassis-desc">
+      {{ if $is_en }}
+      Field-tested calculation engines for Linux kernel namespaces, CVSS vector evaluation, and enterprise ZFS storage architectures. All computations execute locally in your browser sandbox without network requests.
+      {{ else }}
+      Linux çekirdek ad alanları (namespaces), CVSS güvenlik açığı vektör analizi ve kurumsal ZFS depolama mimarileri için sahada test edilmiş hesaplama motorları. Tüm işlemler tarayıcınızın yerel sandbox ortamında gerçekleşir, harici sunucuya veri gönderilmez.
+      {{ end }}
+    </div>
+  </div>
+
+  {{- /* Tool Navigation Tabs */ -}}
+  <div class="tools-tabs-bar" role="tablist">
+    <button class="tool-tab-btn active" data-tool="subuid" role="tab" aria-selected="true">
+      <span class="tab-idx">[01]</span>
+      <span class="tab-title">{{ if $is_en }}UID/GID NAMESPACE MAPPER{{ else }}UID/GID AD ALANI EŞLEYİCİ{{ end }}</span>
+    </button>
+    <button class="tool-tab-btn" data-tool="cvss" role="tab" aria-selected="false">
+      <span class="tab-idx">[02]</span>
+      <span class="tab-title">{{ if $is_en }}CVSS v3.1 RISK MATRIX{{ else }}CVSS v3.1 RİSK MATRİSİ{{ end }}</span>
+    </button>
+    <button class="tool-tab-btn" data-tool="zfs" role="tab" aria-selected="false">
+      <span class="tab-idx">[03]</span>
+      <span class="tab-title">{{ if $is_en }}ZFS ASHIFT & RECORDSIZE{{ else }}ZFS ASHIFT & RECORDSIZE{{ end }}</span>
+    </button>
+  </div>
+
+  {{- /* ================= TOOL 1: SUBUID / SUBGID MAPPER ================= */ -}}
+  <div id="tool-panel-subuid" class="tool-panel active">
+    <div class="tool-chassis-card">
+      <div class="card-top-tag">
+        <span>TOOL_01 // KERNEL_USER_NS_TRANSLATOR</span>
+        <span class="text-dim">RFC / Linux 3.8+ user_namespaces(7)</span>
+      </div>
+      
+      <div class="tool-desc-box">
+        {{ if $is_en }}
+        Map rootless container (Podman / Rootless Docker) and NFSv4 squash UIDs to host kernel VFS permissions. Resolve permissions anomalies before deployment.
+        {{ else }}
+        Rootless konteyner (Podman / Rootless Docker) ve NFSv4 squash UID'lerini ana makine çekirdek VFS izinlerine eşleyin. İzin anormalliklerini yayına almadan önce simüle edin.
+        {{ end }}
+      </div>
+
+      <div class="tool-form-grid">
+        <div class="tool-input-group">
+          <label class="tool-label" for="subuid-start">
+            <span class="label-code">/etc/subuid START_UID</span>
+            <span class="label-hint">{{ if $is_en }}Allocated subuid start{{ else }}Ayrılan başlangıç UID{{ end }}</span>
+          </label>
+          <input type="number" id="subuid-start" class="brutal-input" value="100000" min="1000" max="4294967295">
+        </div>
+
+        <div class="tool-input-group">
+          <label class="tool-label" for="subuid-count">
+            <span class="label-code">SUBUID_COUNT (RANGE)</span>
+            <span class="label-hint">{{ if $is_en }}Allocated range count{{ else }}Ayrılan UID aralık adedi{{ end }}</span>
+          </label>
+          <input type="number" id="subuid-count" class="brutal-input" value="65536" min="1" max="4294967295">
+        </div>
+
+        <div class="tool-input-group">
+          <label class="tool-label" for="container-uid">
+            <span class="label-code">CONTAINER_TARGET_UID</span>
+            <span class="label-hint">{{ if $is_en }}UID inside container (0=root, 1000=app){{ else }}Konteyner içi UID (0=root, 1000=uygulama){{ end }}</span>
+          </label>
+          <input type="number" id="container-uid" class="brutal-input" value="0" min="0" max="65535">
+        </div>
+
+        <div class="tool-input-group">
+          <label class="tool-label" for="nfs-mode">
+            <span class="label-code">NFSv4 MOUNT EXPORT MODE</span>
+            <span class="label-hint">{{ if $is_en }}Storage Kerberos / RPC idmap{{ else }}Depolama Kerberos / RPC idmap{{ end }}</span>
+          </label>
+          <select id="nfs-mode" class="brutal-select">
+            <option value="none">{{ if $is_en }}Local VFS / Bind Mount (No NFS){{ else }}Yerel VFS / Bind Mount (NFS Yok){{ end }}</option>
+            <option value="krb5p">{{ if $is_en }}NFSv4.2 with Kerberos (sec=krb5p + rpc.idmapd){{ else }}NFSv4.2 Kerberos (sec=krb5p + rpc.idmapd){{ end }}</option>
+            <option value="squash">{{ if $is_en }}NFSv3 / Unmapped root_squash (nobody:65534){{ else }}NFSv3 / Eşleşmeyen root_squash (nobody:65534){{ end }}</option>
+          </select>
+        </div>
+      </div>
+
+      {{- /* Output Visualization Box */ -}}
+      <div class="tool-output-chassis">
+        <div class="output-header">[ {{ if $is_en }}KERNEL VFS RESOLUTION MATRIX{{ else }}ÇEKİRDEK VFS ÇÖZÜMLEME MATRİSİ{{ end }} ]</div>
+        <div class="matrix-diagram">
+          <div class="matrix-box">
+            <span class="m-title">{{ if $is_en }}INSIDE CONTAINER{{ else }}KONTEYNER İÇİ{{ end }}</span>
+            <span class="m-badge" id="res-container-uid">UID 0 (root)</span>
+            <span class="m-sub">Namespace View</span>
+          </div>
+          <div class="matrix-arrow">➔ [ kernel uid_map ] ➔</div>
+          <div class="matrix-box">
+            <span class="m-title">{{ if $is_en }}HOST KERNEL VFS{{ else }}ANA MAKİNE ÇEKİRDEĞİ{{ end }}</span>
+            <span class="m-badge text-alert" id="res-host-uid">UID 100000</span>
+            <span class="m-sub">Physical Inode Owner</span>
+          </div>
+          <div class="matrix-arrow">➔ [ storage transport ] ➔</div>
+          <div class="matrix-box">
+            <span class="m-title">{{ if $is_en }}STORAGE / NFS RESULT{{ else }}DEPOLAMA / NFS SONUCU{{ end }}</span>
+            <span class="m-badge" id="res-nfs-uid">UID 100000</span>
+            <span class="m-sub" id="res-nfs-desc">Direct Disk Allocation</span>
+          </div>
+        </div>
+
+        <div class="cmd-box">
+          <span class="cmd-label">{{ if $is_en }}GENERATED RUN COMMAND & /etc/subuid SPEC:{{ else }}ÜRETİLEN ÇALIŞTIRMA KOMUTU VE /etc/subuid TANIMI:{{ end }}</span>
+          <pre class="cmd-code"><code id="res-cli-cmd">podman run --user 0 --uidmap 0:100000:65536 -v /data/storage:/storage:Z alpine</code></pre>
+          <button type="button" class="copy-cmd-btn" id="btn-copy-subuid">[ {{ if $is_en }}COPY COMMAND{{ else }}KOMUTU KOPYALA{{ end }} ]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{- /* ================= TOOL 2: CVSS v3.1 RISK MATRIX ================= */ -}}
+  <div id="tool-panel-cvss" class="tool-panel">
+    <div class="tool-chassis-card">
+      <div class="card-top-tag">
+        <span>TOOL_02 // FIRST.ORG CVSS_v3.1_SCORING_ENGINE</span>
+        <span class="text-dim">Common Vulnerability Scoring System</span>
+      </div>
+
+      <div class="tool-desc-box">
+        {{ if $is_en }}
+        Interactive Common Vulnerability Scoring System (v3.1) calculator. Real-time mathematical calculation of Base Score, Exploitability, and Impact metrics matching NIST NVD standards.
+        {{ else }}
+        İnteraktif Ortak Güvenlik Açığı Puanlama Sistemi (CVSS v3.1) hesaplayıcısı. NIST NVD standartlarıyla birebir örtüşen Temel Skor, Sömürülebilirlik ve Etki metriklerinin gerçek zamanlı matematiksel hesaplaması.
+        {{ end }}
+      </div>
+
+      <div class="cvss-metrics-layout">
+        <div class="cvss-metric-group">
+          <span class="group-title">{{ if $is_en }}EXPLOITABILITY METRICS{{ else }}SÖMÜRÜLEBİLİRLİK METRİKLERİ{{ end }}</span>
+          
+          <div class="metric-row">
+            <span class="metric-name">Attack Vector (AV):</span>
+            <div class="btn-pill-group" data-metric="AV">
+              <button type="button" class="pill-btn active" data-val="N">Network [N]</button>
+              <button type="button" class="pill-btn" data-val="A">Adjacent [A]</button>
+              <button type="button" class="pill-btn" data-val="L">Local [L]</button>
+              <button type="button" class="pill-btn" data-val="P">Physical [P]</button>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <span class="metric-name">Attack Complexity (AC):</span>
+            <div class="btn-pill-group" data-metric="AC">
+              <button type="button" class="pill-btn active" data-val="L">Low [L]</button>
+              <button type="button" class="pill-btn" data-val="H">High [H]</button>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <span class="metric-name">Privileges Required (PR):</span>
+            <div class="btn-pill-group" data-metric="PR">
+              <button type="button" class="pill-btn active" data-val="N">None [N]</button>
+              <button type="button" class="pill-btn" data-val="L">Low [L]</button>
+              <button type="button" class="pill-btn" data-val="H">High [H]</button>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <span class="metric-name">User Interaction (UI):</span>
+            <div class="btn-pill-group" data-metric="UI">
+              <button type="button" class="pill-btn active" data-val="N">None [N]</button>
+              <button type="button" class="pill-btn" data-val="R">Required [R]</button>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <span class="metric-name">Scope (S):</span>
+            <div class="btn-pill-group" data-metric="S">
+              <button type="button" class="pill-btn active" data-val="U">Unchanged [U]</button>
+              <button type="button" class="pill-btn" data-val="C">Changed [C]</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cvss-metric-group">
+          <span class="group-title">{{ if $is_en }}IMPACT METRICS (CIA TRIAD){{ else }}ETKİ METRİKLERİ (G-B-E ÜÇLÜSÜ){{ end }}</span>
+          
+          <div class="metric-row">
+            <span class="metric-name">Confidentiality (C):</span>
+            <div class="btn-pill-group" data-metric="C">
+              <button type="button" class="pill-btn active" data-val="H">High [H]</button>
+              <button type="button" class="pill-btn" data-val="L">Low [L]</button>
+              <button type="button" class="pill-btn" data-val="N">None [N]</button>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <span class="metric-name">Integrity (I):</span>
+            <div class="btn-pill-group" data-metric="I">
+              <button type="button" class="pill-btn active" data-val="H">High [H]</button>
+              <button type="button" class="pill-btn" data-val="L">Low [L]</button>
+              <button type="button" class="pill-btn" data-val="N">None [N]</button>
+            </div>
+          </div>
+
+          <div class="metric-row">
+            <span class="metric-name">Availability (A):</span>
+            <div class="btn-pill-group" data-metric="A">
+              <button type="button" class="pill-btn active" data-val="H">High [H]</button>
+              <button type="button" class="pill-btn" data-val="L">Low [L]</button>
+              <button type="button" class="pill-btn" data-val="N">None [N]</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{- /* CVSS Results Dashboard */ -}}
+      <div class="cvss-result-board">
+        <div class="score-display-box">
+          <span class="score-sub">{{ if $is_en }}BASE SCORE{{ else }}TEMEL PUAN{{ end }}</span>
+          <div class="score-number critical" id="cvss-score-num">9.8</div>
+          <span class="score-level-badge critical" id="cvss-severity-badge">CRITICAL</span>
+        </div>
+
+        <div class="score-breakdown">
+          <div class="score-item">
+            <span class="s-key">{{ if $is_en }}Exploitability Subscore:{{ else }}Sömürülebilirlik Alt Puanı:{{ end }}</span>
+            <strong class="s-val" id="cvss-sub-exploit">3.9</strong>
+          </div>
+          <div class="score-item">
+            <span class="s-key">{{ if $is_en }}Impact Subscore:{{ else }}Etki Alt Puanı:{{ end }}</span>
+            <strong class="s-val" id="cvss-sub-impact">5.9</strong>
+          </div>
+          <div class="score-item">
+            <span class="s-key">{{ if $is_en }}Vector String:{{ else }}Vektör Dizgesi:{{ end }}</span>
+            <code class="s-val vector-code" id="cvss-vector-str">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</code>
+          </div>
+          <button type="button" class="copy-cmd-btn" id="btn-copy-cvss">[ {{ if $is_en }}COPY CVSS VECTOR{{ else }}CVSS VEKTÖRÜNÜ KOPYALA{{ end }} ]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{- /* ================= TOOL 3: ZFS ASHIFT & RECORDSIZE ================= */ -}}
+  <div id="tool-panel-zfs" class="tool-panel">
+    <div class="tool-chassis-card">
+      <div class="card-top-tag">
+        <span>TOOL_03 // OPENZFS_CAPACITY_AND_VDEV_OPTIMIZER</span>
+        <span class="text-dim">RAIDZ Parity, Ashift & Recordsize Engine</span>
+      </div>
+
+      <div class="tool-desc-box">
+        {{ if $is_en }}
+        Determine actual net usable storage capacity, RAIDZ parity losses, and allocation padding penalties for OpenZFS pools (TrueNAS SCALE / Proxmox VE).
+        {{ else }}
+        OpenZFS depolama havuzları (TrueNAS SCALE / Proxmox VE) için net kullanılabilir kapasiteyi, RAIDZ parite kayıplarını ve dolgu alanı (padding) maliyetlerini hesaplayın.
+        {{ end }}
+      </div>
+
+      <div class="tool-form-grid">
+        <div class="tool-input-group">
+          <label class="tool-label" for="zfs-drive-count">
+            <span class="label-code">DRIVE_COUNT</span>
+            <span class="label-hint">{{ if $is_en }}Total disks in VDEV{{ else }}VDEV içindeki disk sayısı{{ end }}</span>
+          </label>
+          <input type="number" id="zfs-drive-count" class="brutal-input" value="8" min="2" max="60">
+        </div>
+
+        <div class="tool-input-group">
+          <label class="tool-label" for="zfs-drive-size">
+            <span class="label-code">DRIVE_CAPACITY (TB)</span>
+            <span class="label-hint">{{ if $is_en }}Manufacturer disk size in TB{{ else }}Üretici disk boyutu (TB){{ end }}</span>
+          </label>
+          <select id="zfs-drive-size" class="brutal-select">
+            <option value="4">4 TB</option>
+            <option value="8">8 TB</option>
+            <option value="12">12 TB</option>
+            <option value="16">16 TB</option>
+            <option value="18" selected>18 TB (Enterprise SAS/SATA)</option>
+            <option value="20">20 TB</option>
+            <option value="22">22 TB</option>
+            <option value="24">24 TB</option>
+          </select>
+        </div>
+
+        <div class="tool-input-group">
+          <label class="tool-label" for="zfs-raid-type">
+            <span class="label-code">TOPOLOGY / RAID_LEVEL</span>
+            <span class="label-hint">{{ if $is_en }}Parity redundancy level{{ else }}Parite yedeklilik seviyesi{{ end }}</span>
+          </label>
+          <select id="zfs-raid-type" class="brutal-select">
+            <option value="mirror">{{ if $is_en }}Mirror (RAID-10 Equivalent - 2-Way){{ else }}Mirror (RAID-10 Eşdeğeri - 2-Yönlü){{ end }}</option>
+            <option value="raidz1">{{ if $is_en }}RAIDZ1 (1 Disk Parity - RAID-5){{ else }}RAIDZ1 (1 Disk Parite - RAID-5){{ end }}</option>
+            <option value="raidz2" selected>{{ if $is_en }}RAIDZ2 (2 Disk Parite - RAID-6){{ else }}RAIDZ2 (2 Disk Parite - RAID-6){{ end }}</option>
+            <option value="raidz3">{{ if $is_en }}RAIDZ3 (3 Disk Parity - High Resiliency){{ else }}RAIDZ3 (3 Disk Parite - Yüksek Direnç){{ end }}</option>
+          </select>
+        </div>
+
+        <div class="tool-input-group">
+          <label class="tool-label" for="zfs-workload">
+            <span class="label-code">TARGET_WORKLOAD_PROFILE</span>
+            <span class="label-hint">{{ if $is_en }}Recommended recordsize{{ else }}Önerilen recordsize{{ end }}</span>
+          </label>
+          <select id="zfs-workload" class="brutal-select">
+            <option value="16k">{{ if $is_en }}PostgreSQL / MySQL OLTP Database (16K){{ else }}PostgreSQL / MySQL OLTP Veritabanı (16K){{ end }}</option>
+            <option value="64k">{{ if $is_en }}Virtual Machines / ZFS zvol RAW Disks (64K){{ else }}Sanal Makineler / zvol Disk Kalıpları (64K){{ end }}</option>
+            <option value="128k" selected>{{ if $is_en }}General File Server / Documents (128K Default){{ else }}Genel Dosya Paylaşımı / Belgeler (128K Varsayılan){{ end }}</option>
+            <option value="1m">{{ if $is_en }}AI Dataset / Large Video / Zarr / Tar Backups (1M){{ else }}Yapay Zeka Veriseti / Video / Zarr / Yedekleme (1M){{ end }}</option>
+          </select>
+        </div>
+      </div>
+
+      {{- /* ZFS Results Output */ -}}
+      <div class="tool-output-chassis">
+        <div class="output-header">[ {{ if $is_en }}ZFS STORAGE POOL METRICS & ALLOCATION{{ else }}ZFS DEPOLAMA HAVUZU METRİKLERİ VE TAHSİS{{ end }} ]</div>
+        <div class="zfs-stats-grid">
+          <div class="stat-card">
+            <span class="st-title">{{ if $is_en }}RAW CAPACITY{{ else }}HAM KAPASİTE{{ end }}</span>
+            <span class="st-num" id="zfs-raw-cap">144.0 TB</span>
+            <span class="st-desc">Total drive physical bytes</span>
+          </div>
+          <div class="stat-card">
+            <span class="st-title">{{ if $is_en }}NET USABLE STORAGE{{ else }}NET KULLANILABİLİR ALAN{{ end }}</span>
+            <span class="st-num text-neon" id="zfs-net-usable">96.8 TiB</span>
+            <span class="st-desc">Parity & slop-space deducted</span>
+          </div>
+          <div class="stat-card">
+            <span class="st-title">{{ if $is_en }}PARITY OVERHEAD{{ else }}PARİTE KAYBI{{ end }}</span>
+            <span class="st-num text-alert" id="zfs-parity-loss">25.0%</span>
+            <span class="st-desc">Redundancy protection</span>
+          </div>
+          <div class="stat-card">
+            <span class="st-title">{{ if $is_en }}RECOMMENDED ASHIFT{{ else }}ÖNERİLEN ASHIFT{{ end }}</span>
+            <span class="st-num">ashift=12</span>
+            <span class="st-desc">4096-byte Advanced Format</span>
+          </div>
+        </div>
+
+        <div class="cmd-box">
+          <span class="cmd-label">{{ if $is_en }}OPTIMAL POOL CREATION & DATASET TUNING COMMANDS:{{ else }}OPTİMAL HAVUZ OLUŞTURMA VE RECORDSIZE AYAR KOMUTU:{{ end }}</span>
+          <pre class="cmd-code"><code id="zfs-cli-cmd">zpool create -o ashift=12 -O compression=zstd -O atime=off tank raidz2 sda sdb sdc sdd sde sdf sdg sdh
+zfs set recordsize=128k tank/dataset</code></pre>
+          <button type="button" class="copy-cmd-btn" id="btn-copy-zfs">[ {{ if $is_en }}COPY ZFS COMMANDS{{ else }}ZFS KOMUTLARINI KOPYALA{{ end }} ]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tabBtns = document.querySelectorAll('.tool-tab-btn');
+  const panels = document.querySelectorAll('.tool-panel');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      const targetId = `tool-panel-${btn.dataset.tool}`;
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) targetPanel.classList.add('active');
+    });
+  });
+
+  const subuidStartEl = document.getElementById('subuid-start');
+  const subuidCountEl = document.getElementById('subuid-count');
+  const containerUidEl = document.getElementById('container-uid');
+  const nfsModeEl = document.getElementById('nfs-mode');
+
+  function updateSubuid() {
+    if (!subuidStartEl || !containerUidEl) return;
+    const start = parseInt(subuidStartEl.value, 10) || 100000;
+    const count = parseInt(subuidCountEl.value, 10) || 65536;
+    const cUid = parseInt(containerUidEl.value, 10) || 0;
+    const nfsMode = nfsModeEl.value;
+
+    let hostUid = start + cUid;
+    if (cUid >= count) {
+      document.getElementById('res-host-uid').textContent = 'ERROR // OUT OF BOUNDS';
+      return;
+    }
+
+    document.getElementById('res-container-uid').textContent = `UID ${cUid} (${cUid === 0 ? 'root' : 'app'})`;
+    document.getElementById('res-host-uid').textContent = `UID ${hostUid}`;
+
+    let nfsUidText = `UID ${hostUid}`;
+    let nfsDescText = 'Direct Disk Allocation';
+
+    if (nfsMode === 'krb5p') {
+      nfsUidText = `UID ${hostUid} (Mapped via rpc.idmapd)`;
+      nfsDescText = 'Kerberos Principal Verified';
+    } else if (nfsMode === 'squash') {
+      nfsUidText = 'UID 65534 (nobody:nogroup)';
+      nfsDescText = 'ROOT_SQUASH FORCED / PERMISSION DENIED RISK';
+    }
+
+    document.getElementById('res-nfs-uid').textContent = nfsUidText;
+    document.getElementById('res-nfs-desc').textContent = nfsDescText;
+
+    const cmd = `podman run --user ${cUid} --uidmap 0:${start}:${count} -v /data/storage:/storage:Z alpine\n# /etc/subuid & /etc/subgid entry:\noperator:${start}:${count}`;
+    document.getElementById('res-cli-cmd').textContent = cmd;
+  }
+
+  [subuidStartEl, subuidCountEl, containerUidEl, nfsModeEl].forEach(el => {
+    if (el) el.addEventListener('input', updateSubuid);
+    if (el) el.addEventListener('change', updateSubuid);
+  });
+  updateSubuid();
+
+  const copySubuidBtn = document.getElementById('btn-copy-subuid');
+  if (copySubuidBtn) {
+    copySubuidBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(document.getElementById('res-cli-cmd').innerText);
+      copySubuidBtn.innerText = '[ COPIED // BUFFER READY ]';
+      setTimeout(() => copySubuidBtn.innerText = '[ COPY COMMAND ]', 2000);
+    });
+  }
+
+  const cvssValues = {
+    AV: { N: 0.85, A: 0.62, L: 0.55, P: 0.2 },
+    AC: { L: 0.77, H: 0.44 },
+    PR: {
+      U: { N: 0.85, L: 0.62, H: 0.27 },
+      C: { N: 0.85, L: 0.68, H: 0.50 }
+    },
+    UI: { N: 0.85, R: 0.62 },
+    C: { H: 0.56, L: 0.22, N: 0 },
+    I: { H: 0.56, L: 0.22, N: 0 },
+    A: { H: 0.56, L: 0.22, N: 0 }
+  };
+
+  const selectedCvss = {
+    AV: 'N', AC: 'L', PR: 'N', UI: 'N', S: 'U', C: 'H', I: 'H', A: 'H'
+  };
+
+  document.querySelectorAll('.btn-pill-group').forEach(group => {
+    const metric = group.dataset.metric;
+    group.querySelectorAll('.pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCvss[metric] = btn.dataset.val;
+        calculateCvss();
+      });
+    });
+  });
+
+  function calculateCvss() {
+    const av = cvssValues.AV[selectedCvss.AV];
+    const ac = cvssValues.AC[selectedCvss.AC];
+    const pr = cvssValues.PR[selectedCvss.S][selectedCvss.PR];
+    const ui = cvssValues.UI[selectedCvss.UI];
+    const c = cvssValues.C[selectedCvss.C];
+    const i = cvssValues.I[selectedCvss.I];
+    const a = cvssValues.A[selectedCvss.A];
+
+    const iss = 1 - ((1 - c) * (1 - i) * (1 - a));
+    let impact = 0;
+    if (selectedCvss.S === 'U') {
+      impact = 6.42 * iss;
+    } else {
+      impact = 7.52 * (iss - 0.029) - 3.25 * Math.pow(iss - 0.02, 15);
+    }
+
+    const exploitability = 8.22 * av * ac * pr * ui;
+    let baseScore = 0;
+
+    if (impact <= 0) {
+      baseScore = 0;
+    } else {
+      if (selectedCvss.S === 'U') {
+        baseScore = Math.min(10, Math.ceil((Math.min(impact + exploitability, 10)) * 10) / 10);
+      } else {
+        baseScore = Math.min(10, Math.ceil((Math.min(1.08 * (impact + exploitability), 10)) * 10) / 10);
+      }
+    }
+
+    const scoreStr = baseScore.toFixed(1);
+    const scoreEl = document.getElementById('cvss-score-num');
+    const badgeEl = document.getElementById('cvss-severity-badge');
+
+    scoreEl.textContent = scoreStr;
+    scoreEl.className = 'score-number';
+    badgeEl.className = 'score-level-badge';
+
+    let sev = 'NONE';
+    if (baseScore >= 9.0) sev = 'CRITICAL';
+    else if (baseScore >= 7.0) sev = 'HIGH';
+    else if (baseScore >= 4.0) sev = 'MEDIUM';
+    else if (baseScore > 0.0) sev = 'LOW';
+
+    scoreEl.classList.add(sev.toLowerCase());
+    badgeEl.classList.add(sev.toLowerCase());
+    badgeEl.textContent = sev;
+
+    document.getElementById('cvss-sub-exploit').textContent = (Math.ceil(exploitability * 10) / 10).toFixed(1);
+    document.getElementById('cvss-sub-impact').textContent = (Math.ceil(impact * 10) / 10).toFixed(1);
+
+    const vec = `CVSS:3.1/AV:${selectedCvss.AV}/AC:${selectedCvss.AC}/PR:${selectedCvss.PR}/UI:${selectedCvss.UI}/S:${selectedCvss.S}/C:${selectedCvss.C}/I:${selectedCvss.I}/A:${selectedCvss.A}`;
+    document.getElementById('cvss-vector-str').textContent = vec;
+  }
+
+  const copyCvssBtn = document.getElementById('btn-copy-cvss');
+  if (copyCvssBtn) {
+    copyCvssBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(document.getElementById('cvss-vector-str').innerText);
+      copyCvssBtn.innerText = '[ COPIED // BUFFER READY ]';
+      setTimeout(() => copyCvssBtn.innerText = '[ COPY CVSS VECTOR ]', 2000);
+    });
+  }
+
+  const zfsDriveCountEl = document.getElementById('zfs-drive-count');
+  const zfsDriveSizeEl = document.getElementById('zfs-drive-size');
+  const zfsRaidTypeEl = document.getElementById('zfs-raid-type');
+  const zfsWorkloadEl = document.getElementById('zfs-workload');
+
+  function updateZfs() {
+    if (!zfsDriveCountEl) return;
+    const drives = parseInt(zfsDriveCountEl.value, 10) || 8;
+    const driveSizeTb = parseFloat(zfsDriveSizeEl.value) || 18;
+    const raidType = zfsRaidTypeEl.value;
+    const workload = zfsWorkloadEl.value;
+
+    const rawCapTb = drives * driveSizeTb;
+    let dataDrives = drives;
+    let parityDrives = 0;
+
+    if (raidType === 'mirror') {
+      dataDrives = Math.floor(drives / 2);
+      parityDrives = drives - dataDrives;
+    } else if (raidType === 'raidz1') {
+      parityDrives = 1;
+      dataDrives = Math.max(1, drives - 1);
+    } else if (raidType === 'raidz2') {
+      parityDrives = 2;
+      dataDrives = Math.max(1, drives - 2);
+    } else if (raidType === 'raidz3') {
+      parityDrives = 3;
+      dataDrives = Math.max(1, drives - 3);
+    }
+
+    const rawTibPerDrive = driveSizeTb * 0.909495;
+    const netUsableTib = (dataDrives * rawTibPerDrive) * 0.96875;
+    const parityRatio = ((parityDrives / drives) * 100).toFixed(1);
+
+    document.getElementById('zfs-raw-cap').textContent = `${rawCapTb.toFixed(1)} TB`;
+    document.getElementById('zfs-net-usable').textContent = `${netUsableTib.toFixed(1)} TiB`;
+    document.getElementById('zfs-parity-loss').textContent = `${parityRatio}%`;
+
+    const driveLetters = ['sda', 'sdb', 'sdc', 'sdd', 'sde', 'sdf', 'sdg', 'sdh', 'sdi', 'sdj', 'sdk', 'sdl'].slice(0, Math.min(drives, 12)).join(' ');
+    const cli = `zpool create -o ashift=12 -O compression=zstd -O atime=off tank ${raidType === 'mirror' ? 'mirror' : raidType} ${driveLetters} ...\nzfs set recordsize=${workload} tank/production`;
+    document.getElementById('zfs-cli-cmd').textContent = cli;
+  }
+
+  [zfsDriveCountEl, zfsDriveSizeEl, zfsRaidTypeEl, zfsWorkloadEl].forEach(el => {
+    if (el) el.addEventListener('input', updateZfs);
+    if (el) el.addEventListener('change', updateZfs);
+  });
+  updateZfs();
+
+  const copyZfsBtn = document.getElementById('btn-copy-zfs');
+  if (copyZfsBtn) {
+    copyZfsBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(document.getElementById('zfs-cli-cmd').innerText);
+      copyZfsBtn.innerText = '[ COPIED // BUFFER READY ]';
+      setTimeout(() => copyZfsBtn.innerText = '[ COPY ZFS COMMANDS ]', 2000);
+    });
+  }
+});
+</script>
+
+{{- end }}{{/* end main */}}

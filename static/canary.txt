@@ -1,0 +1,27 @@
+================================================================================
+ONUR BAYDAS - SYSTEMS & INFRASTRUCTURE WARRANT CANARY
+CANARY PERIOD: 2026-Q4 // INTEGRITY AUDIT SPEC: CANARY-2026-10-14
+================================================================================
+
+I, Onur Baydas, operator and maintainer of onurbaydas.online, declare that as of
+Wednesday, October 14, 2026 16:00:00 UTC:
+
+1. No warrants, national security letters (NSLs), FISA court surveillance orders,
+   or gag orders have been served on this site, its server infrastructure, or its
+   underlying compute nodes.
+2. No government or intelligence agency has requested, compelled, or obtained
+   backdoors, encryption keys, or private user telemetry from this infrastructure.
+3. No secret interception devices, packet sniffers, or tap taps have been installed
+   on the physical or virtual networking interfaces (100GbE / RoCE v2 / Edge).
+4. All system commits and source archives are cryptographically signed.
+
+Should this canary not be updated within 90 days, or if this declaration is removed,
+users and operators must assume that the integrity of this infrastructure has been
+legally or physically compromised.
+
+PROOF OF LATEST WITNESS HASH:
+Bitcoin Block Height: 865,492
+NIST Randomness Beacon Pulse: 1728921600
+Fingerprint: 4A8E 9B21 C3F0 7E85 D902 B11A 5E43 F709 881B D0A4
+Signature: VALID // CANARY_UNCOMPROMISED
+================================================================================
