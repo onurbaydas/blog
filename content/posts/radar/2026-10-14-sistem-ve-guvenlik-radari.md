@@ -1,10 +1,11 @@
 ---
 title: "Sistem ve Güvenlik Radarı: 14 Ekim 2026"
-date: 2026-10-14T15:25:41+03:00
+date: 2026-10-14T15:34:11+03:00
 draft: false
 tags: ["Radar", "Sistem", "Güvenlik", "Linux", "CVE"]
 categories: ["Radar"]
 summary: "Günün öne çıkan Linux çekirdeği güncellemeleri, kritik CVE/güvenlik analizleri, depolama mimarileri ve altyapı gelişmeleri."
+translationKey: "radar-2026-10-14"
 showToc: true
 TocOpen: false
 ---
@@ -57,7 +58,7 @@ TocOpen: false
 - **[open-telemetry/opentelemetry-ebpf-instrumentation: Zero-code OpenTelemetry instrumentation powered by eBPF](https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation)** (`GitHub Trending`)  
   [C ★590] Zero-code OpenTelemetry instrumentation powered by eBPF
 - **[cilium/tetragon: eBPF-based Security Observability and Runtime Enforcement](https://github.com/cilium/tetragon)** (`GitHub Trending`)  
-  [C ★5072] eBPF-based Security Observability and Runtime Enforcement
+  [C ★5073] eBPF-based Security Observability and Runtime Enforcement
 
 ## ⚙️ Depolama, Ağ ve Kurumsal Mimariler
 
@@ -70,21 +71,21 @@ TocOpen: false
 
 ## ⚡ Yapay Zeka Altyapısı ve GPU Hesaplama
 
+- **[The AI race: China's open-weight models trail US closed models by just 7 months](https://www.reddit.com/r/LocalLLaMA/comments/1x5pjv7/the_ai_race_chinas_openweight_models_trail_us/)** (`r/LocalLLaMA` · [Tartışma](https://www.reddit.com/r/LocalLLaMA/comments/1x5pjv7/the_ai_race_chinas_openweight_models_trail_us/))  
+  Source: whatmodel.sh , an open source AI leaderboard I built (and launched here yesterday). Every point comes from published benchmark results: 22,113 of them across 987 benchmarks, from 1,011 sources, each one linked to where it was published.
 - **[Anthropic Executive Says Open-Source AI Models Are Higher Risk](https://www.reddit.com/r/LocalLLaMA/comments/1x5nyd3/anthropic_executive_says_opensource_ai_models_are/)** (`r/LocalLLaMA` · [Tartışma](https://www.reddit.com/r/LocalLLaMA/comments/1x5nyd3/anthropic_executive_says_opensource_ai_models_are/))  
   https://www.bloomberg.com/news/articles/2026-10-14/anthropic-executive-says-open-source-ai-models-are-higher-risk...
 - **[Someone is running Qwen 27B at ~20 tok/s on a jailbroken PS5's GPU](https://www.reddit.com/r/LocalLLaMA/comments/1x5ak2n/someone_is_running_qwen_27b_at_20_toks_on_a/)** (`r/LocalLLaMA` · [Tartışma](https://www.reddit.com/r/LocalLLaMA/comments/1x5ak2n/someone_is_running_qwen_27b_at_20_toks_on_a/))  
   submitted by /u/LatentSpacer [link] [comments]
-- **[The Roadmap to Mastering Agentic AI Systems in 2026](https://www.kdnuggets.com/the-roadmap-to-mastering-agentic-ai-systems-in-2026)** (`KDnuggets`)  
-  A four-level technical roadmap for building agentic AI systems, from single cognitive loops and stateful memory through multi-agent swarms and production observability.
 
 ## 🌐 Mühendislik Topluluğu ve Tartışmalar
 
 - **[AOSP Source Releases Are So Late Developers Disassemble Libraries to Report Bugs](https://github.com/android/ndk/issues/2260)** (`Hacker News: Best` · [Topluluk Tartışması](https://news.ycombinator.com/item?id=50083130))  
   Article URL: https://github.com/android/ndk/issues/2260 Comments URL: https://news.ycombinator.com/item?id=50083130 Points: 302 # Comments: 142
-- **[Redesigning source control at Anthropic](https://www.anthropic.com/engineering/redesigning-source-control)** (`Hacker News: Best` · [Topluluk Tartışması](https://news.ycombinator.com/item?id=50073633))  
-  Article URL: https://www.anthropic.com/engineering/redesigning-source-control Comments URL: https://news.ycombinator.com/item?id=50073633 Points: 794 # Comments: 833
-- **[Introducing Firefox Enterprise](https://blog.mozilla.org/en/firefox/introducing-firefox-enterprise/)** (`Lobsters` · [Topluluk Tartışması](https://lobste.rs/s/7xg9rm/introducing_firefox_enterprise))  
-  Introducing Firefox Enterprise
+- **[Redesigning source control at Anthropic](https://www.anthropic.com/engineering/redesigning-source-control)** (`Lobsters` · [Topluluk Tartışması](https://lobste.rs/s/5ucftp/redesigning_source_control_at_anthropic))  
+  Redesigning source control at Anthropic
+- **[US law enforcement and intel agency docs: since 2021, the FBI, DHS, and NYPD have viewed AI as both a facilitator of violent extremism and a target for attacks (The Guardian)](https://www.techmeme.com/261014/p16#a261014p16)** (`Techmeme`)  
+  The Guardian : US law enforcement and intel agency docs: since 2021, the FBI, DHS, and NYPD have viewed AI as both a facilitator of violent extremism and a target for attacks — From the FBI to local police departments, US authorities are increasingly warning...
 
 ---
 📡 *Tüm canlı akışı ve anlık filtrelemeyi [onurbaydas.online/radar](/radar/) sayfasından takip edebilir, kaynak listesini [OPML formatında](/radar/sources.opml) indirebilirsiniz.*

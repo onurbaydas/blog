@@ -117,10 +117,11 @@ INTERNAL_ARTICLES = [
     {
         "id": "docker-authz-opa",
         "title_tr": "OPA ile Docker Authorization: Sessiz Fail-Open ve Canlı Ortamdan Dersler",
-        "title_en": "Docker Authorization with OPA: Silent Fail-Open",
+        "title_en": "Docker Authorization with OPA: Silent Fail-Open and Real-World Lessons",
         "url_tr": "/posts/docker-authz-opa/",
         "url_en": "/en/posts/docker-authz-opa/",
-        "badge": "OB_ANALİZİ // DOCKER_OPA_FAIL_OPEN",
+        "badge_tr": "OB_ANALİZİ // DOCKER_AUTHZ_OPA",
+        "badge_en": "OB_ANALYSIS // DOCKER_AUTHZ_OPA",
         "keywords": [
             "opa", "open policy agent", "rego", "docker authorization",
             "docker authz", "fail-open", "cve-2024-41110", "docker daemon",
@@ -133,7 +134,8 @@ INTERNAL_ARTICLES = [
         "title_en": "One User, Two UIDs: NFSv4, Kerberos, and Docker on TrueNAS",
         "url_tr": "/posts/nfs-uid-mismatch/",
         "url_en": "/en/posts/nfs-uid-mismatch/",
-        "badge": "OB_ANALİZİ // NFSv4_KERBEROS_SSSD",
+        "badge_tr": "OB_ANALİZİ // NFSv4_KERBEROS_SSSD",
+        "badge_en": "OB_ANALYSIS // NFSv4_KERBEROS_SSSD",
         "keywords": [
             "truenas", "nfs", "nfsv4", "kerberos", "sssd", "active directory",
             "uid", "gid", "nobody:nogroup", "pam_mount", "zfs dataset",
@@ -481,13 +483,18 @@ def update_radar_data(new_items, kernel_status):
     now_tr = now_utc + timedelta(hours=3)
     months_tr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
                  "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    months_en = ["January", "February", "March", "April", "May", "June",
+                 "July", "August", "September", "October", "November", "December"]
     human_time_tr = f"{now_tr.day} {months_tr[now_tr.month - 1]} {now_tr.year} {now_tr.strftime('%H:%M')}"
+    human_time_en = f"{months_en[now_utc.month - 1]} {now_utc.day}, {now_utc.year} {now_utc.strftime('%H:%M')} UTC"
 
     cve_count = sum(1 for it in final_items if it.get("is_cve"))
 
     radar_payload = {
         "last_updated": now_tr.strftime("%Y-%m-%dT%H:%M:%S+03:00"),
         "last_updated_human": human_time_tr,
+        "last_updated_human_tr": human_time_tr,
+        "last_updated_human_en": human_time_en,
         "total_items": len(final_items),
         "cve_alerts_count": cve_count,
         "kernel_watchdog": kernel_status,
@@ -502,18 +509,18 @@ def update_radar_data(new_items, kernel_status):
     return radar_payload
 
 def generate_daily_digest(radar_data):
-    """Generates a daily digest post in content/posts/radar/ with cross-references and CVE links."""
+    """Generates bilingual daily digest posts in content/posts/radar/ with cross-references and CVE links."""
     os.makedirs(POSTS_RADAR_DIR, exist_ok=True)
 
     now_utc = datetime.now(timezone.utc)
     now_tr = now_utc + timedelta(hours=3)
     months_tr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
                  "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    months_en = ["January", "February", "March", "April", "May", "June",
+                 "July", "August", "September", "October", "November", "December"]
     date_str = now_tr.strftime("%Y-%m-%d")
-    human_date = f"{now_tr.day} {months_tr[now_tr.month - 1]} {now_tr.year}"
-
-    post_filename = f"{date_str}-sistem-ve-guvenlik-radari.md"
-    post_path = os.path.join(POSTS_RADAR_DIR, post_filename)
+    human_date_tr = f"{now_tr.day} {months_tr[now_tr.month - 1]} {now_tr.year}"
+    human_date_en = f"{months_en[now_utc.month - 1]} {now_utc.day}, {now_utc.year}"
 
     all_items = radar_data.get("items", [])
     if not all_items:
@@ -530,110 +537,208 @@ def generate_daily_digest(radar_data):
     ai_items = [it for it in all_items if it.get("category") == "ai" and it not in cve_items][:3]
     comm_items = [it for it in all_items if it.get("category") == "community" and it not in cve_items][:3]
 
-    content = []
-    content.append("---")
-    content.append(f"title: \"Sistem ve Güvenlik Radarı: {human_date}\"")
-    content.append(f"date: {now_tr.strftime('%Y-%m-%dT%H:%M:%S+03:00')}")
-    content.append("draft: false")
-    content.append("tags: [\"Radar\", \"Sistem\", \"Güvenlik\", \"Linux\", \"CVE\"]")
-    content.append("categories: [\"Radar\"]")
-    content.append("summary: \"Günün öne çıkan Linux çekirdeği güncellemeleri, kritik CVE/güvenlik analizleri, depolama mimarileri ve altyapı gelişmeleri.\"")
-    content.append("showToc: true")
-    content.append("TocOpen: false")
-    content.append("---")
-    content.append("")
-    content.append(f"> **OPERASYONEL RAPOR // {date_str}**  ")
-    content.append(f"> Bu bülten, [Canlı Sistem Radarı](/radar/) üzerinde toplanan 25+ otoriter kaynaktan derlenmiş; kural tabanlı puanlama ile filtrelenmiş günün en kritik gelişmelerini içerir.")
-    content.append("")
+    # --- 1. TURKISH DIGEST POST ---
+    content_tr = []
+    content_tr.append("---")
+    content_tr.append(f"title: \"Sistem ve Güvenlik Radarı: {human_date_tr}\"")
+    content_tr.append(f"date: {now_tr.strftime('%Y-%m-%dT%H:%M:%S+03:00')}")
+    content_tr.append("draft: false")
+    content_tr.append("tags: [\"Radar\", \"Sistem\", \"Güvenlik\", \"Linux\", \"CVE\"]")
+    content_tr.append("categories: [\"Radar\"]")
+    content_tr.append("summary: \"Günün öne çıkan Linux çekirdeği güncellemeleri, kritik CVE/güvenlik analizleri, depolama mimarileri ve altyapı gelişmeleri.\"")
+    content_tr.append(f"translationKey: \"radar-{date_str}\"")
+    content_tr.append("showToc: true")
+    content_tr.append("TocOpen: false")
+    content_tr.append("---")
+    content_tr.append("")
+    content_tr.append(f"> **OPERASYONEL RAPOR // {date_str}**  ")
+    content_tr.append(f"> Bu bülten, [Canlı Sistem Radarı](/radar/) üzerinde toplanan 25+ otoriter kaynaktan derlenmiş; kural tabanlı puanlama ile filtrelenmiş günün en kritik gelişmelerini içerir.")
+    content_tr.append("")
 
-    # Kernel Watchdog Status Header
     if kernel_info.get("status") == "ONLINE":
-        content.append(f"> 🐧 **Kernel.org Canlı Takipçisi:** `Mainline: {kernel_info.get('mainline')}` | `Stable: {kernel_info.get('stable')}` | `LTS: {kernel_info.get('longterm')}`")
-        content.append("")
+        content_tr.append(f"> 🐧 **Kernel.org Canlı Takipçisi:** `Mainline: {kernel_info.get('mainline')}` | `Stable: {kernel_info.get('stable')}` | `LTS: {kernel_info.get('longterm')}`")
+        content_tr.append("")
 
     if cve_items:
-        content.append("## 🚨 Kritik Güvenlik ve CVE Uyarıları")
-        content.append("")
+        content_tr.append("## 🚨 Kritik Güvenlik ve CVE Uyarıları")
+        content_tr.append("")
         for it in cve_items:
             cve_link = f"**[[{it['cve_id']}](https://nvd.nist.gov/vuln/detail/{it['cve_id']})]** " if it.get("cve_id") else "**[KRİTİK TEHDİT]** "
-            content.append(f"### {cve_link}[{it['title']}]({it['link']})")
-            
+            content_tr.append(f"### {cve_link}[{it['title']}]({it['link']})")
             meta_parts = [f"**Kaynak:** `{it['source']}`", f"**Skor:** `{it['score']}/10`"]
             if it.get("comments_url"):
                 meta_parts.append(f"[💬 Topluluk Tartışması]({it['comments_url']})")
-            content.append(f"- {' | '.join(meta_parts)}")
-            content.append(f"- **Özet:** {it['summary']}")
-
+            content_tr.append(f"- {' | '.join(meta_parts)}")
+            content_tr.append(f"- **Özet:** {it['summary']}")
             if it.get("related_post"):
                 rel = it["related_post"]
-                content.append(f"> 🔗 **İlgili Teknik Analizim:** [{rel['title_tr']}]({rel['url_tr']})")
-
-            content.append("")
+                content_tr.append(f"> 🔗 **İlgili Teknik Analizim:** [{rel['title_tr']}]({rel['url_tr']})")
+            content_tr.append("")
 
     if kernel_items:
-        content.append("## 🐧 Linux Çekirdeği, Donanım ve Sistem")
-        content.append("")
+        content_tr.append("## 🐧 Linux Çekirdeği, Donanım ve Sistem")
+        content_tr.append("")
         for it in kernel_items:
             discuss = f" · [Tartışma]({it['comments_url']})" if it.get("comments_url") else ""
-            content.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+            content_tr.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
             if it.get("related_post"):
                 rel = it["related_post"]
-                content.append(f"  > 🔗 *İlgili Analiz:* [{rel['title_tr']}]({rel['url_tr']})")
-        content.append("")
+                content_tr.append(f"  > 🔗 *İlgili Analiz:* [{rel['title_tr']}]({rel['url_tr']})")
+        content_tr.append("")
 
     if security_items:
-        content.append("## 🛡️ Altyapı Güvenliği & Tehdit İstihbaratı")
-        content.append("")
+        content_tr.append("## 🛡️ Altyapı Güvenliği & Tehdit İstihbaratı")
+        content_tr.append("")
         for it in security_items:
             discuss = f" · [Tartışma]({it['comments_url']})" if it.get("comments_url") else ""
-            content.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+            content_tr.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
             if it.get("related_post"):
                 rel = it["related_post"]
-                content.append(f"  > 🔗 *İlgili Analiz:* [{rel['title_tr']}]({rel['url_tr']})")
-        content.append("")
+                content_tr.append(f"  > 🔗 *İlgili Analiz:* [{rel['title_tr']}]({rel['url_tr']})")
+        content_tr.append("")
 
     if github_items:
-        content.append("## 🐙 Açık Kaynak Sistemler ve eBPF Repoları")
-        content.append("")
+        content_tr.append("## 🐙 Açık Kaynak Sistemler ve eBPF Repoları")
+        content_tr.append("")
         for it in github_items:
-            content.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`)  \n  {it['summary']}")
-        content.append("")
+            content_tr.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`)  \n  {it['summary']}")
+        content_tr.append("")
 
     if infra_items:
-        content.append("## ⚙️ Depolama, Ağ ve Kurumsal Mimariler")
-        content.append("")
+        content_tr.append("## ⚙️ Depolama, Ağ ve Kurumsal Mimariler")
+        content_tr.append("")
         for it in infra_items:
-            content.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`)  \n  {it['summary']}")
+            content_tr.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`)  \n  {it['summary']}")
             if it.get("related_post"):
                 rel = it["related_post"]
-                content.append(f"  > 🔗 *İlgili Analiz:* [{rel['title_tr']}]({rel['url_tr']})")
-        content.append("")
+                content_tr.append(f"  > 🔗 *İlgili Analiz:* [{rel['title_tr']}]({rel['url_tr']})")
+        content_tr.append("")
 
     if ai_items:
-        content.append("## ⚡ Yapay Zeka Altyapısı ve GPU Hesaplama")
-        content.append("")
+        content_tr.append("## ⚡ Yapay Zeka Altyapısı ve GPU Hesaplama")
+        content_tr.append("")
         for it in ai_items:
             discuss = f" · [Tartışma]({it['comments_url']})" if it.get("comments_url") else ""
-            content.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
-        content.append("")
+            content_tr.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+        content_tr.append("")
 
     if comm_items:
-        content.append("## 🌐 Mühendislik Topluluğu ve Tartışmalar")
-        content.append("")
+        content_tr.append("## 🌐 Mühendislik Topluluğu ve Tartışmalar")
+        content_tr.append("")
         for it in comm_items:
             discuss = f" · [Topluluk Tartışması]({it['comments_url']})" if it.get("comments_url") else ""
-            content.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
-        content.append("")
+            content_tr.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+        content_tr.append("")
 
-    content.append("---")
-    content.append("📡 *Tüm canlı akışı ve anlık filtrelemeyi [onurbaydas.online/radar](/radar/) sayfasından takip edebilir, kaynak listesini [OPML formatında](/radar/sources.opml) indirebilirsiniz.*")
+    content_tr.append("---")
+    content_tr.append("📡 *Tüm canlı akışı ve anlık filtrelemeyi [onurbaydas.online/radar](/radar/) sayfasından takip edebilir, kaynak listesini [OPML formatında](/radar/sources.opml) indirebilirsiniz.*")
 
-    full_md = "\n".join(content)
-    with open(post_path, "w", encoding="utf-8") as f:
-        f.write(full_md)
+    post_path_tr = os.path.join(POSTS_RADAR_DIR, f"{date_str}-sistem-ve-guvenlik-radari.md")
+    with open(post_path_tr, "w", encoding="utf-8") as f:
+        f.write("\n".join(content_tr))
 
-    print(f"[+] Daily digest post generated: {post_path}")
-    return post_path
+    # --- 2. ENGLISH DIGEST POST ---
+    content_en = []
+    content_en.append("---")
+    content_en.append(f"title: \"Systems & Security Radar: {human_date_en}\"")
+    content_en.append(f"date: {now_tr.strftime('%Y-%m-%dT%H:%M:%S+03:00')}")
+    content_en.append("draft: false")
+    content_en.append("tags: [\"Radar\", \"Systems\", \"Security\", \"Linux\", \"CVE\"]")
+    content_en.append("categories: [\"Radar\"]")
+    content_en.append("summary: \"Daily operational intelligence covering Linux kernel advancements, critical CVE advisories, enterprise storage, and infrastructure architecture.\"")
+    content_en.append(f"translationKey: \"radar-{date_str}\"")
+    content_en.append("showToc: true")
+    content_en.append("TocOpen: false")
+    content_en.append("---")
+    content_en.append("")
+    content_en.append(f"> **OPERATIONAL REPORT // {date_str}**  ")
+    content_en.append(f"> Curated intelligence bulletin aggregated from 25+ authoritative engineering hubs via the [Live Systems Radar](/en/radar/). Heuristically filtered for systems architecture and security severity.")
+    content_en.append("")
+
+    if kernel_info.get("status") == "ONLINE":
+        content_en.append(f"> 🐧 **Kernel.org Live Watchdog:** `Mainline: {kernel_info.get('mainline')}` | `Stable: {kernel_info.get('stable')}` | `LTS: {kernel_info.get('longterm')}`")
+        content_en.append("")
+
+    if cve_items:
+        content_en.append("## 🚨 Critical Security & CVE Advisories")
+        content_en.append("")
+        for it in cve_items:
+            cve_link = f"**[[{it['cve_id']}](https://nvd.nist.gov/vuln/detail/{it['cve_id']})]** " if it.get("cve_id") else "**[CRITICAL THREAT]** "
+            content_en.append(f"### {cve_link}[{it['title']}]({it['link']})")
+            meta_parts = [f"**Source:** `{it['source']}`", f"**Score:** `{it['score']}/10`"]
+            if it.get("comments_url"):
+                meta_parts.append(f"[💬 Discussion Wire]({it['comments_url']})")
+            content_en.append(f"- {' | '.join(meta_parts)}")
+            content_en.append(f"- **Summary:** {it['summary']}")
+            if it.get("related_post"):
+                rel = it["related_post"]
+                content_en.append(f"> 🔗 **Related Architecture Breakdown:** [{rel['title_en']}]({rel['url_en']})")
+            content_en.append("")
+
+    if kernel_items:
+        content_en.append("## 🐧 Linux Kernel, Hardware & Low-Level Systems")
+        content_en.append("")
+        for it in kernel_items:
+            discuss = f" · [Discussion]({it['comments_url']})" if it.get("comments_url") else ""
+            content_en.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+            if it.get("related_post"):
+                rel = it["related_post"]
+                content_en.append(f"  > 🔗 *Related Breakdown:* [{rel['title_en']}]({rel['url_en']})")
+        content_en.append("")
+
+    if security_items:
+        content_en.append("## 🛡️ Infrastructure Security & Threat Intelligence")
+        content_en.append("")
+        for it in security_items:
+            discuss = f" · [Discussion]({it['comments_url']})" if it.get("comments_url") else ""
+            content_en.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+            if it.get("related_post"):
+                rel = it["related_post"]
+                content_en.append(f"  > 🔗 *Related Breakdown:* [{rel['title_en']}]({rel['url_en']})")
+        content_en.append("")
+
+    if github_items:
+        content_en.append("## 🐙 Open Source Systems & eBPF Tools")
+        content_en.append("")
+        for it in github_items:
+            content_en.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`)  \n  {it['summary']}")
+        content_en.append("")
+
+    if infra_items:
+        content_en.append("## ⚙️ Enterprise Storage, Networking & Cloud Architecture")
+        content_en.append("")
+        for it in infra_items:
+            content_en.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`)  \n  {it['summary']}")
+            if it.get("related_post"):
+                rel = it["related_post"]
+                content_en.append(f"  > 🔗 *Related Breakdown:* [{rel['title_en']}]({rel['url_en']})")
+        content_en.append("")
+
+    if ai_items:
+        content_en.append("## ⚡ AI Infrastructure & GPU Acceleration")
+        content_en.append("")
+        for it in ai_items:
+            discuss = f" · [Discussion]({it['comments_url']})" if it.get("comments_url") else ""
+            content_en.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+        content_en.append("")
+
+    if comm_items:
+        content_en.append("## 🌐 Engineering Community & Technical Debates")
+        content_en.append("")
+        for it in comm_items:
+            discuss = f" · [Community Discussion]({it['comments_url']})" if it.get("comments_url") else ""
+            content_en.append(f"- **[{it['title']}]({it['link']})** (`{it['source']}`{discuss})  \n  {it['summary']}")
+        content_en.append("")
+
+    content_en.append("---")
+    content_en.append("📡 *Inspect the full interactive live stream at [onurbaydas.online/en/radar](/en/radar/) or download the curated feed list in [OPML format](/radar/sources.opml).*")
+
+    post_path_en = os.path.join(POSTS_RADAR_DIR, f"{date_str}-sistem-ve-guvenlik-radari.en.md")
+    with open(post_path_en, "w", encoding="utf-8") as f:
+        f.write("\n".join(content_en))
+
+    print(f"[+] Bilingual daily digest posts generated:\n    TR: {post_path_tr}\n    EN: {post_path_en}")
+    return post_path_tr
 
 def send_telegram_alert(radar_data):
     """Sends a summary alert to Telegram if credentials are set in environment."""

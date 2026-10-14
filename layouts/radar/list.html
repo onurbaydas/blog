@@ -61,7 +61,7 @@
       </div>
       <div class="telemetry-node">
         <span class="t-label">{{ if $is_en }}LAST_SYNC:{{ else }}SON_GÜNCELLEME:{{ end }}</span>
-        <span class="t-val">{{ .last_updated_human }}</span>
+        <span class="t-val">{{ if $is_en }}{{ .last_updated_human_en }}{{ else }}{{ .last_updated_human_tr }}{{ end }}</span>
       </div>
       <div class="telemetry-node">
         <span class="t-label">{{ if $is_en }}FEED_DEPTH:{{ else }}AKTİF_KAYIT:{{ end }}</span>
@@ -69,7 +69,7 @@
       </div>
       <div class="telemetry-node telemetry-alert">
         <span class="t-label">{{ if $is_en }}CVE_DETECTIONS:{{ else }}CVE_ALARMI:{{ end }}</span>
-        <span class="t-val">{{ .cve_alerts_count }} ALERTS</span>
+        <span class="t-val">{{ .cve_alerts_count }} {{ if $is_en }}ALERTS{{ else }}ALARM{{ end }}</span>
       </div>
     </div>
     {{- end }}
@@ -156,7 +156,7 @@
       {{- /* Internal Article Cross-Reference Callout */ -}}
       {{- with $item.related_post }}
       <div class="radar-related-docket">
-        <span class="related-badge">🔗 {{ .badge }}</span>
+        <span class="related-badge">🔗 {{ if $is_en }}{{ .badge_en }}{{ else }}{{ .badge_tr }}{{ end }}</span>
         <a href="{{ if $is_en }}{{ .url_en }}{{ else }}{{ .url_tr }}{{ end }}" class="related-link">
           {{ if $is_en }}{{ .title_en }}{{ else }}{{ .title_tr }}{{ end }} &rarr;
         </a>
@@ -165,7 +165,7 @@
 
       <footer class="radar-item-footer">
         <div class="footer-wire-info">
-          <span class="wire-category">CAT: {{ $item.category | upper }}</span>
+          <span class="wire-category">CAT: {{ if $is_en }}{{ (index $radar.categories $item.category).name_en | upper }}{{ else }}{{ (index $radar.categories $item.category).name_tr | upper }}{{ end }}</span>
           <span class="wire-separator">//</span>
           <time class="wire-time" datetime="{{ $item.published_iso }}">{{ substr $item.published_iso 0 10 }}</time>
         </div>
