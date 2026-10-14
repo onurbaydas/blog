@@ -2726,4 +2726,139 @@ body.thermal-meltdown {
   animation: pulse-terminal-led 0.6s infinite;
 }
 
+/* ==========================================================================
+   10. SERVER ROOM PEST INFESTATION (CREEPY CRAWLIES WITH PITI-PITI FEET)
+   ========================================================================== */
+.pest-infestation-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10005;
+  overflow: hidden;
+}
+
+.creepy-crawler-bug {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+  cursor: crosshair;
+  user-select: none;
+  filter: drop-shadow(2px 3px 2px rgba(0, 0, 0, 0.85));
+  will-change: transform;
+  transition: filter 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.creepy-crawler-bug:hover {
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.95)) drop-shadow(0 0 16px rgba(220, 38, 38, 0.6));
+}
+
+.bug-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Leg locomotion animations */
+@keyframes bug-leg-wiggle-alt {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(16deg); }
+}
+
+@keyframes bug-leg-wiggle-rev {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-16deg); }
+}
+
+@keyframes centipede-wave {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(1.18) skewX(5deg); }
+}
+
+@keyframes bug-panic-vibrate {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(1px, -2px); }
+  75% { transform: translate(-1px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.bug-svg .bug-leg-1,
+.bug-svg .bug-leg-4 {
+  transform-origin: 30% 30%;
+  animation: bug-leg-wiggle-alt 0.11s infinite ease-in-out;
+}
+
+.bug-svg .bug-leg-2,
+.bug-svg .bug-leg-5 {
+  transform-origin: 70% 30%;
+  animation: bug-leg-wiggle-rev 0.11s infinite ease-in-out;
+}
+
+.bug-svg .bug-leg-3,
+.bug-svg .bug-leg-6 {
+  transform-origin: 50% 50%;
+  animation: bug-leg-wiggle-alt 0.11s infinite ease-in-out;
+}
+
+.bug-svg .antenna-l {
+  transform-origin: bottom right;
+  animation: bug-leg-wiggle-alt 0.22s infinite alternate ease-in-out;
+}
+
+.bug-svg .antenna-r {
+  transform-origin: bottom left;
+  animation: bug-leg-wiggle-rev 0.22s infinite alternate ease-in-out;
+}
+
+.centipede-svg .centipede-legs {
+  animation: centipede-wave 0.09s infinite alternate ease-in-out;
+}
+
+/* Panicked Bug Rapid Flutter */
+.bug-panicked .bug-svg {
+  animation: bug-panic-vibrate 0.06s infinite linear;
+}
+
+.bug-panicked .bug-svg .bug-leg {
+  animation-duration: 0.05s !important;
+}
+
+/* Squashed splat visual */
+.bug-squashed {
+  pointer-events: none !important;
+  cursor: default !important;
+  animation: splat-burst 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+.splat-mark {
+  font-size: 2.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px #ef4444);
+  animation: splat-burst 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.splat-tag {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #ef4444;
+  background: #000;
+  border: 1px solid #ef4444;
+  padding: 1px 5px;
+  margin-top: -4px;
+  letter-spacing: 0.04em;
+  box-shadow: 2px 2px 0px #000;
+}
+
+@keyframes splat-burst {
+  0% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+  60% { transform: scale(1.35) rotate(-8deg); opacity: 1; }
+  100% { transform: scale(1.1) rotate(0deg); opacity: 1; }
+}
+
 

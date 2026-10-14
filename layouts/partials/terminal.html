@@ -123,6 +123,7 @@ Available system commands:
   daemon            Spawn evil sysadmin ASCII assistant
   selinux           Trigger SELinux AVC EPERM denial dialog
   dossier           Deploy floating visitor surveillance drone & finger :D
+  bugs / pests      Release server room insect infestation (pitter-patter feet) :D
   clear             Clear terminal screen
   exit              Close terminal session
 `,
@@ -240,6 +241,14 @@ Emergency Production Runbooks (SOP):
     defcon: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.openDefconModal();
       return '[DEFCON_SWITCHBOARD] Crisis & Catastrophe Console opened.';
+    },
+    bugs: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerBugSwarm(8);
+      return '[BIO_HAZARD] Cockroaches, centipedes, and spiders scurrying across screen with pitter-patter feet :D';
+    },
+    pests: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerBugSwarm(8);
+      return '[BIO_HAZARD] Server room pest swarm released. Watch your step!';
     },
     exit: () => {
       toggleTerminal();

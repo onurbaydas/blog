@@ -102,6 +102,12 @@
         <strong class="defcon-label">{{ if $is_en }}FLOATING SNOOPING VISITOR DOSSIER{{ else }}GEZEN ELDİVENLİ ZİYARETÇİ KÜNYESİ{{ end }}</strong>
         <span class="defcon-hint">{{ if $is_en }}Exposes IP, GPU, CPU, battery with pointing finger :D{{ else }}IP, GPU, CPU, pil ve tüm verileri gösterip gezen kutu :D{{ end }}</span>
       </button>
+
+      <button type="button" class="defcon-btn btn-bugs" id="act-bugs">
+        <span class="defcon-code">[12 // BIO_HAZARD]</span>
+        <strong class="defcon-label">{{ if $is_en }}SERVER ROOM PEST INFESTATION{{ else }}SUNUCU ODASI HAŞERE İSTİLASI (PIT-PIT){{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Creepy crawlies scurrying with pitter-patter feet :D{{ else }}Pıtı pıtı ayak sesleriyle koşan böcekler :D{{ end }}</span>
+      </button>
     </div>
 
     <div class="defcon-footer">
@@ -354,6 +360,9 @@
     <span class="dock-lbl">🫵 [TARGET_DOSSIER_EXPOSED]</span>
   </button>
 </div>
+
+{{- /* 11. SERVER ROOM PEST INFESTATION CONTAINER */ -}}
+<div id="pest-infestation-container" class="pest-infestation-container" aria-hidden="true"></div>
 
 {{- /* SCRIPT LOGIC FOR SOUNDS, MODALS, & TRIPPERS */ -}}
 <script>
@@ -827,6 +836,7 @@
   document.getElementById('act-daemon')?.addEventListener('click', () => { closeDefconModal(); triggerDaemon(); });
   document.getElementById('act-selinux')?.addEventListener('click', () => { closeDefconModal(); triggerSelinuxAlert(); });
   document.getElementById('act-dossier')?.addEventListener('click', () => { closeDefconModal(); toggleSurveillanceDrone(true); });
+  document.getElementById('act-bugs')?.addEventListener('click', () => { closeDefconModal(); triggerBugSwarm(8); });
 
   // Escape hotkey for modals
   document.addEventListener('keydown', (e) => {
@@ -1276,6 +1286,283 @@
   }, 2500);
 
   // ==========================================
+  // SERVER ROOM PEST INFESTATION (PITI PITI AYAK SESLERİ)
+  // ==========================================
+  const pestContainer = document.getElementById('pest-infestation-container');
+  let pitterPatterActive = false;
+  let pitterPatterTimer = null;
+
+  function playPitterPatterStep() {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      const f = 2700 + Math.random() * 1400;
+      osc.frequency.setValueAtTime(f, t);
+      gain.gain.setValueAtTime(0.016 + Math.random() * 0.02, t);
+      gain.gain.exponentialRampToValueAtTime(0.0002, t + 0.009);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(f, t);
+      filter.Q.setValueAtTime(3.5, t);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.009);
+    } catch(e) {}
+  }
+
+  function startPitterPatterLoop() {
+    if (pitterPatterActive) return;
+    pitterPatterActive = true;
+    function patterStep() {
+      if (!pitterPatterActive) return;
+      playPitterPatterStep();
+      const nextTap = 40 + Math.random() * 38;
+      pitterPatterTimer = setTimeout(patterStep, nextTap);
+    }
+    patterStep();
+  }
+
+  function checkPitterPatterStop() {
+    if (!pestContainer || pestContainer.querySelectorAll('.creepy-crawler-bug').length === 0) {
+      pitterPatterActive = false;
+      clearTimeout(pitterPatterTimer);
+    }
+  }
+
+  function playSquishSound() {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(360, t);
+      osc.frequency.exponentialRampToValueAtTime(65, t + 0.09);
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(480, t);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.09);
+    } catch(e) {}
+  }
+
+  const bugSVGs = {
+    roach: `
+      <svg viewBox="0 0 60 90" width="38" height="57" class="bug-svg roach-svg" aria-hidden="true">
+        <path d="M 26 28 C 18 14 6 8 2 2" stroke="#d97706" stroke-width="1.5" fill="none" class="antenna-l"/>
+        <path d="M 34 28 C 42 14 54 8 58 2" stroke="#d97706" stroke-width="1.5" fill="none" class="antenna-r"/>
+        <path d="M 24 35 L 8 22 L 2 26" stroke="#451a03" stroke-width="2.5" fill="none" class="bug-leg bug-leg-1"/>
+        <path d="M 36 35 L 52 22 L 58 26" stroke="#451a03" stroke-width="2.5" fill="none" class="bug-leg bug-leg-2"/>
+        <path d="M 22 48 L 4 48 L 0 56" stroke="#451a03" stroke-width="2.5" fill="none" class="bug-leg bug-leg-3"/>
+        <path d="M 38 48 L 56 48 L 60 56" stroke="#451a03" stroke-width="2.5" fill="none" class="bug-leg bug-leg-4"/>
+        <path d="M 24 62 L 6 74 L 2 86" stroke="#451a03" stroke-width="2.5" fill="none" class="bug-leg bug-leg-5"/>
+        <path d="M 36 62 L 54 74 L 58 86" stroke="#451a03" stroke-width="2.5" fill="none" class="bug-leg bug-leg-6"/>
+        <ellipse cx="30" cy="56" rx="14" ry="24" fill="#1c1917" stroke="#78350f" stroke-width="2"/>
+        <path d="M 20 40 C 20 30 40 30 40 40 Z" fill="#451a03"/>
+        <ellipse cx="30" cy="30" rx="8" ry="6" fill="#1c1917"/>
+      </svg>
+    `,
+    centipede: `
+      <svg viewBox="0 0 40 120" width="28" height="84" class="bug-svg centipede-svg" aria-hidden="true">
+        <path d="M 16 14 Q 8 4 4 0" stroke="#ef4444" stroke-width="1.5" fill="none"/>
+        <path d="M 24 14 Q 32 4 36 0" stroke="#ef4444" stroke-width="1.5" fill="none"/>
+        <path d="M 12 24 L 2 20 M 28 24 L 38 20 M 12 34 L 2 30 M 28 34 L 38 30 M 12 44 L 2 40 M 28 44 L 38 40 M 12 54 L 2 50 M 28 54 L 38 50 M 12 64 L 2 60 M 28 64 L 38 60 M 12 74 L 2 70 M 28 74 L 38 70 M 12 84 L 2 80 M 28 84 L 38 80 M 12 94 L 2 90 M 28 94 L 38 90 M 12 104 L 2 100 M 28 104 L 38 100" stroke="#dc2626" stroke-width="2" fill="none" class="centipede-legs"/>
+        <rect x="14" y="16" width="12" height="96" rx="6" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.5"/>
+        <line x1="14" y1="26" x2="26" y2="26" stroke="#000" stroke-width="1"/>
+        <line x1="14" y1="36" x2="26" y2="36" stroke="#000" stroke-width="1"/>
+        <line x1="14" y1="46" x2="26" y2="46" stroke="#000" stroke-width="1"/>
+        <line x1="14" y1="56" x2="26" y2="56" stroke="#000" stroke-width="1"/>
+        <line x1="14" y1="66" x2="26" y2="66" stroke="#000" stroke-width="1"/>
+        <line x1="14" y1="76" x2="26" y2="76" stroke="#000" stroke-width="1"/>
+        <line x1="14" y1="86" x2="26" y2="86" stroke="#000" stroke-width="1"/>
+      </svg>
+    `,
+    spider: `
+      <svg viewBox="0 0 80 80" width="42" height="42" class="bug-svg spider-svg" aria-hidden="true">
+        <path d="M 32 36 L 16 18 L 8 28" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-1"/>
+        <path d="M 48 36 L 64 18 L 72 28" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-2"/>
+        <path d="M 30 40 L 10 32 L 2 44" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-3"/>
+        <path d="M 50 40 L 70 32 L 78 44" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-4"/>
+        <path d="M 30 44 L 12 52 L 4 64" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-5"/>
+        <path d="M 50 44 L 68 52 L 76 64" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-6"/>
+        <path d="M 32 48 L 18 64 L 12 76" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-1"/>
+        <path d="M 48 48 L 62 64 L 68 76" stroke="#18181b" stroke-width="2.2" fill="none" class="bug-leg bug-leg-2"/>
+        <ellipse cx="40" cy="52" rx="10" ry="14" fill="#09090b" stroke="#3f3f46" stroke-width="2"/>
+        <circle cx="40" cy="36" r="7" fill="#18181b"/>
+        <circle cx="38" cy="33" r="1.5" fill="#ef4444"/>
+        <circle cx="42" cy="33" r="1.5" fill="#ef4444"/>
+      </svg>
+    `,
+    ant: `
+      <svg viewBox="0 0 50 70" width="28" height="39" class="bug-svg ant-svg" aria-hidden="true">
+        <path d="M 22 20 Q 14 8 8 6" stroke="#d97706" stroke-width="1.5" fill="none"/>
+        <path d="M 28 20 Q 36 8 42 6" stroke="#d97706" stroke-width="1.5" fill="none"/>
+        <path d="M 20 32 L 6 24 L 2 30 M 30 32 L 44 24 L 48 30 M 20 40 L 4 40 L 2 48 M 30 40 L 46 40 L 48 48 M 20 48 L 6 58 L 4 66 M 30 48 L 44 58 L 46 66" stroke="#78350f" stroke-width="2" fill="none" class="bug-leg"/>
+        <circle cx="25" cy="24" r="5" fill="#1c1917"/>
+        <ellipse cx="25" cy="36" rx="4" ry="6" fill="#451a03"/>
+        <ellipse cx="25" cy="52" rx="7" ry="10" fill="#1c1917" stroke="#92400e" stroke-width="1.5"/>
+      </svg>
+    `
+  };
+
+  function spawnBug(forcedType = null) {
+    if (!pestContainer) return;
+    const types = ['roach', 'centipede', 'spider', 'ant'];
+    const type = forcedType || types[Math.floor(Math.random() * types.length)];
+
+    const bugEl = document.createElement('div');
+    bugEl.className = `creepy-crawler-bug bug-${type}`;
+    bugEl.innerHTML = bugSVGs[type] || bugSVGs.roach;
+    pestContainer.appendChild(bugEl);
+
+    // Pick a trajectory (left to right, right to left, top to bottom, bottom to top, diagonal)
+    const sides = ['left-right', 'right-left', 'top-bottom', 'bottom-top', 'diagonal'];
+    const side = sides[Math.floor(Math.random() * sides.length)];
+
+    const winW = window.innerWidth;
+    const winH = window.innerHeight;
+
+    let currX, currY, targetX, targetY;
+    if (side === 'left-right') {
+      currX = -70;
+      currY = 80 + Math.random() * (winH - 160);
+      targetX = winW + 70;
+      targetY = currY + (Math.random() * 240 - 120);
+    } else if (side === 'right-left') {
+      currX = winW + 70;
+      currY = 80 + Math.random() * (winH - 160);
+      targetX = -70;
+      targetY = currY + (Math.random() * 240 - 120);
+    } else if (side === 'top-bottom') {
+      currX = 60 + Math.random() * (winW - 120);
+      currY = -70;
+      targetX = currX + (Math.random() * 240 - 120);
+      targetY = winH + 70;
+    } else if (side === 'bottom-top') {
+      currX = 60 + Math.random() * (winW - 120);
+      currY = winH + 70;
+      targetX = currX + (Math.random() * 240 - 120);
+      targetY = -70;
+    } else {
+      currX = Math.random() > 0.5 ? -70 : winW + 70;
+      currY = Math.random() > 0.5 ? -70 : winH + 70;
+      targetX = currX < 0 ? winW + 70 : -70;
+      targetY = currY < 0 ? winH + 70 : -70;
+    }
+
+    const angle = Math.atan2(targetY - currY, targetX - currX) * 180 / Math.PI + 90;
+    bugEl.style.transform = `translate3d(${currX}px, ${currY}px, 0) rotate(${angle}deg)`;
+
+    startPitterPatterLoop();
+
+    let speed = 4.8 + Math.random() * 3.5;
+    let isPanicked = false;
+    let isSquashed = false;
+    let pauseTicks = 0;
+
+    // Click to squash bug!
+    bugEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isSquashed) return;
+      isSquashed = true;
+      playSquishSound();
+      bugEl.classList.add('bug-squashed');
+      bugEl.innerHTML = `
+        <div class="splat-mark">💥</div>
+        <span class="splat-tag">[SQUASHED]</span>
+      `;
+      setTimeout(() => {
+        bugEl.remove();
+        checkPitterPatterStop();
+      }, 1600);
+    });
+
+    // Mouse proximity panic (dart away faster!)
+    function onDocMouseMove(e) {
+      if (isSquashed) return;
+      const dist = Math.hypot(e.clientX - currX, e.clientY - currY);
+      if (dist < 85 && !isPanicked) {
+        isPanicked = true;
+        speed *= 2.3;
+        bugEl.classList.add('bug-panicked');
+      }
+    }
+    document.addEventListener('mousemove', onDocMouseMove);
+
+    function stepMovement() {
+      if (isSquashed) {
+        document.removeEventListener('mousemove', onDocMouseMove);
+        return;
+      }
+
+      // Occasional brief micro-pause (100ms twitch) for hyper-realistic insect movement
+      if (!isPanicked && Math.random() < 0.015 && pauseTicks <= 0) {
+        pauseTicks = 6;
+      }
+
+      if (pauseTicks > 0) {
+        pauseTicks--;
+        requestAnimationFrame(stepMovement);
+        return;
+      }
+
+      const dx = targetX - currX;
+      const dy = targetY - currY;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist < speed || currX < -100 || currX > winW + 100 || currY < -100 || currY > winH + 100) {
+        document.removeEventListener('mousemove', onDocMouseMove);
+        bugEl.remove();
+        checkPitterPatterStop();
+        return;
+      }
+
+      currX += (dx / dist) * speed;
+      currY += (dy / dist) * speed;
+
+      bugEl.style.transform = `translate3d(${currX}px, ${currY}px, 0) rotate(${angle}deg)`;
+      requestAnimationFrame(stepMovement);
+    }
+
+    requestAnimationFrame(stepMovement);
+  }
+
+  function triggerBugSwarm(count = 7) {
+    showSecurityToast(isEn ? '[BIO_ALERT] Server room rack pest swarm detected scurrying on floor :D' : '[BÖCEK_ALARM] Sunucu odasında haşereler pıtı pıtı koşuyor :D');
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        spawnBug();
+      }, i * 220);
+    }
+  }
+
+  // Ambient natural bug traversal: every 32-45 seconds, a lone bug or pair scurries across!
+  setInterval(() => {
+    if (Math.random() < 0.75) {
+      spawnBug();
+      if (Math.random() < 0.45) {
+        setTimeout(spawnBug, 350);
+      }
+    }
+  }, 36000);
+
+  // ==========================================
   // EXPORT GLOBAL API FOR TERMINAL & PALETTE
   // ==========================================
   window.ObCrisisEngine = {
@@ -1293,7 +1580,9 @@
     closeDefconModal,
     showSecurityToast,
     toggleSurveillanceDrone,
-    pokeFinger
+    pokeFinger,
+    spawnBug,
+    triggerBugSwarm
   };
 })();
 </script>
