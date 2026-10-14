@@ -1,0 +1,231 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+{{- $radar := site.Data.radar }}
+
+<div class="radar-container brutal-page-chassis">
+  {{- /* Top Machine Stamped Plate */ -}}
+  <header class="page-header brutal-page-header radar-header">
+    <div class="header-blueprint-badge">
+      <span class="badge-dot">■</span>
+      <span class="badge-text">{{ if $is_en }}SYS_RADAR // REALTIME_INTEL_STREAM{{ else }}SİSTEM_RADARI // CANLI_İSTİHBARAT_AKIŞI{{ end }}</span>
+    </div>
+
+    <div class="radar-title-row">
+      <h1 class="brutal-section-title glitch-title" data-text="{{ if $is_en }}Systems & Security Radar{{ else }}Sistem ve Güvenlik Radarı{{ end }}">
+        {{ if $is_en }}Systems & Security Radar{{ else }}Sistem ve Güvenlik Radarı{{ end }}
+      </h1>
+      <div class="radar-header-actions">
+        <a href="/radar/sources.opml" download="onurbaydas-radar-sources.opml" class="brutal-btn opml-btn" title="Download OPML Feed">
+          <span class="btn-icon">↓</span>
+          <span class="btn-text">[ OPML_FEED.xml ]</span>
+        </a>
+      </div>
+    </div>
+
+    <p class="radar-desc">
+      {{ if $is_en }}
+      Curated technical feed indexing 25+ authoritative engineering hubs. Heuristically scored for Linux kernel mechanics, CVE exploits, storage internals, and infrastructure architecture.
+      {{ else }}
+      25+ otoriter mühendislik kaynağından toplanan canlı istihbarat akışı. Linux çekirdeği, kritik güvenlik açıkları (CVE), depolama mimarileri ve altyapı sistemlerine göre kural tabanlı puanlanmıştır.
+      {{ end }}
+    </p>
+
+    {{- with $radar }}
+    {{- /* Live Telemetry Bar */ -}}
+    <div class="radar-telemetry-bar">
+      <div class="telemetry-node">
+        <span class="t-label">TELEMETRY:</span>
+        <span class="t-val t-active">● ONLINE</span>
+      </div>
+      <div class="telemetry-node">
+        <span class="t-label">{{ if $is_en }}LAST_SYNC:{{ else }}SON_GÜNCELLEME:{{ end }}</span>
+        <span class="t-val">{{ .last_updated_human }}</span>
+      </div>
+      <div class="telemetry-node">
+        <span class="t-label">{{ if $is_en }}FEED_DEPTH:{{ else }}AKTİF_KAYIT:{{ end }}</span>
+        <span class="t-val">{{ .total_items }} {{ if $is_en }}ITEMS{{ else }}HABER{{ end }}</span>
+      </div>
+      <div class="telemetry-node telemetry-alert">
+        <span class="t-label">{{ if $is_en }}CVE_DETECTIONS:{{ else }}CVE_ALARMI:{{ end }}</span>
+        <span class="t-val">{{ .cve_alerts_count }} ALERTS</span>
+      </div>
+    </div>
+    {{- end }}
+  </header>
+
+  {{- with $radar }}
+  {{- /* Terminal Search & Filter Apparatus */ -}}
+  <div class="radar-controls-apparatus">
+    <div class="terminal-search-strip">
+      <span class="prompt-sym">&gt; grep -i</span>
+      <input type="text" id="radar-search-input" class="terminal-input" placeholder="{{ if $is_en }}Filter by keyword, CVE, author, or source (Press '/' to search)...{{ else }}Anahtar kelime, CVE, kaynak veya başlık ara ('/' tuşuna bas)...{{ end }}" autocomplete="off" spellcheck="false" />
+      <button id="radar-clear-btn" class="terminal-clear-btn" title="Clear filter">[ESC / CLR]</button>
+    </div>
+
+    <div class="radar-category-pills" id="radar-category-filters">
+      <button class="cat-pill active" data-cat="all">
+        <span class="cat-dot">■</span> {{ if $is_en }}ALL FEEDS{{ else }}TÜM AKIŞ{{ end }} ({{ .total_items }})
+      </button>
+      <button class="cat-pill cat-security" data-cat="security">
+        <span class="cat-dot">🛡️</span> {{ if $is_en }}SECURITY &amp; CVE{{ else }}GÜVENLİK &amp; CVE{{ end }}
+      </button>
+      <button class="cat-pill cat-kernel" data-cat="kernel">
+        <span class="cat-dot">🐧</span> {{ if $is_en }}LINUX &amp; KERNEL{{ else }}LINUX &amp; ÇEKİRDEK{{ end }}
+      </button>
+      <button class="cat-pill cat-infra" data-cat="infra">
+        <span class="cat-dot">⚙️</span> {{ if $is_en }}INFRA &amp; STORAGE{{ else }}ALTYAPI &amp; DEPOLAMA{{ end }}
+      </button>
+      <button class="cat-pill cat-ai" data-cat="ai">
+        <span class="cat-dot">⚡</span> {{ if $is_en }}AI &amp; GPU{{ else }}YAPAY ZEKA &amp; GPU{{ end }}
+      </button>
+      <button class="cat-pill cat-comm" data-cat="community">
+        <span class="cat-dot">🌐</span> {{ if $is_en }}COMMUNITY WIRE{{ else }}TOPLULUK AKIŞI{{ end }}
+      </button>
+    </div>
+  </div>
+
+  {{- /* News Stream List */ -}}
+  <div class="radar-feed-stream" id="radar-feed-stream">
+    {{- range $index, $item := .items }}
+    <article class="radar-card brutal-card-docket anti-design-card {{ if $item.is_cve }}card-cve-alert{{ else if $item.is_critical }}card-threat-alert{{ end }}" 
+             data-category="{{ $item.category }}" 
+             data-score="{{ $item.score }}"
+             data-cve="{{ if $item.is_cve }}true{{ else }}false{{ end }}"
+             data-content="{{ $item.title }} {{ $item.summary }} {{ $item.source }} {{ $item.cve_id }}">
+
+      <div class="docket-header-strip">
+        <div class="docket-id-box">
+          {{- if $item.is_cve -}}
+            <span class="cve-warning-tag">⚠ {{ $item.cve_id }}</span>
+          {{- else if $item.is_critical -}}
+            <span class="cve-warning-tag">⚠ THREAT_ALERT</span>
+          {{- else -}}
+            <span class="docket-prefix">WIRE</span>
+            <span class="docket-num">#{{ printf "%02d" (add $index 1) }}</span>
+          {{- end -}}
+        </div>
+        <div class="docket-hatch-pattern" aria-hidden="true"></div>
+        <div class="radar-meta-badges">
+          <span class="badge-source">[{{ $item.source | upper }}]</span>
+          <span class="badge-score" title="Heuristic Relevance Score">★ {{ $item.score }}/10</span>
+        </div>
+      </div>
+
+      <header class="radar-item-header">
+        <h2 class="radar-item-title">
+          <a href="{{ $item.link }}" target="_blank" rel="noopener noreferrer">
+            {{ $item.title }}
+          </a>
+        </h2>
+      </header>
+
+      <div class="radar-item-summary">
+        <p>{{ $item.summary }}</p>
+      </div>
+
+      <footer class="radar-item-footer">
+        <div class="footer-wire-info">
+          <span class="wire-category">CAT: {{ $item.category | upper }}</span>
+          <span class="wire-separator">//</span>
+          <time class="wire-time" datetime="{{ $item.published_iso }}">{{ substr $item.published_iso 0 10 }}</time>
+        </div>
+        <a href="{{ $item.link }}" target="_blank" rel="noopener noreferrer" class="radar-wire-link" title="Open Source">
+          ORIGINAL_WIRE &rarr;
+        </a>
+      </footer>
+    </article>
+    {{- end }}
+  </div>
+
+  <div id="radar-empty-message" class="radar-empty-state" style="display: none;">
+    <div class="empty-docket-box">
+      <span class="empty-code">0x00_EMPTY</span>
+      <p class="empty-title">[!] NO_RECORDS_MATCH_FILTER</p>
+      <p class="empty-sub">{{ if $is_en }}Try relaxing your search terms or switch categories.{{ else }}Arama terimini değiştirin veya kategori filtresini sıfırlayın.{{ end }}</p>
+    </div>
+  </div>
+
+  {{- else }}
+  <div class="radar-empty-state">
+    <div class="empty-docket-box">
+      <span class="empty-code">0x01_PENDING</span>
+      <p class="empty-title">[!] RADAR_FEED_INITIALIZING</p>
+      <p class="empty-sub">{{ if $is_en }}The system is currently aggregating intelligence sources. Please check back shortly.{{ else }}Sistem şu anda haber kaynaklarını tarıyor. Birkaç dakika sonra tekrar kontrol edin.{{ end }}</p>
+    </div>
+  </div>
+  {{- end }}
+</div>
+
+<script>
+(function() {
+  const searchInput = document.getElementById('radar-search-input');
+  const clearBtn = document.getElementById('radar-clear-btn');
+  const catButtons = document.querySelectorAll('#radar-category-filters .cat-pill');
+  const cards = document.querySelectorAll('#radar-feed-stream .radar-card');
+  const emptyState = document.getElementById('radar-empty-message');
+
+  let activeCategory = 'all';
+
+  function applyFilters() {
+    const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cardCat = card.getAttribute('data-category');
+      const content = (card.getAttribute('data-content') || '').toLowerCase();
+
+      const catMatches = (activeCategory === 'all') || (cardCat === activeCategory);
+      const queryMatches = !query || content.includes(query);
+
+      if (catMatches && queryMatches) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (emptyState) {
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
+  // Keyboard shortcut: Press '/' to focus search
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '/' && document.activeElement !== searchInput) {
+      e.preventDefault();
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    } else if (e.key === 'Escape' && document.activeElement === searchInput) {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.blur();
+        applyFilters();
+      }
+    }
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      if (searchInput) searchInput.value = '';
+      applyFilters();
+    });
+  }
+
+  catButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      catButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      activeCategory = this.getAttribute('data-cat');
+      applyFilters();
+    });
+  });
+})();
+</script>
+{{- end }}

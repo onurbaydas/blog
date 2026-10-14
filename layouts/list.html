@@ -51,6 +51,27 @@
 
 {{- if and .IsHome site.Params.homeInfoParams (eq $paginator.PageNumber 1) }}
 {{- partial "home_info.html" . }}
+
+{{- with site.Data.radar }}
+<aside class="radar-home-ticker">
+  <div class="ticker-left">
+    <div class="ticker-status-beacon">
+      <span class="beacon-pulse" aria-hidden="true"></span>
+      <span>{{ if $is_en }}SYS_RADAR ACTIVE{{ else }}SİSTEM RADARI AKTİF{{ end }}</span>
+    </div>
+    <div class="ticker-content">
+      <span>{{ if $is_en }}Tracking {{ .total_items }} records across 25+ authorities{{ else }}25+ kaynaktan {{ .total_items }} aktif istihbarat akışı{{ end }}</span>
+      {{- if gt .cve_alerts_count 0 }}
+      <span class="ticker-cve-pill">⚠ {{ .cve_alerts_count }} {{ if $is_en }}CVE DETECTIONS{{ else }}CVE ALARMI{{ end }}</span>
+      {{- end }}
+    </div>
+  </div>
+  <a href="/radar/" class="ticker-cta-link">
+    <span>{{ if $is_en }}OPEN RADAR TERMINAL &rarr;{{ else }}RADAR TERMİNALİNİ AÇ &rarr;{{ end }}</span>
+  </a>
+</aside>
+{{- end }}
+
 <div class="post-feed-divider">
   <div class="divider-line"></div>
   <div class="divider-stamp stamp-dystopian-banner">

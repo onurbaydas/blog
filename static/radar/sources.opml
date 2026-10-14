@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+    <head>
+        <title>Onur Baydaş - Sistem, Altyapı ve Güvenlik Radarı Beslemeleri</title>
+        <dateCreated>2026-10-14T15:00:00Z</dateCreated>
+        <ownerName>Onur Baydaş</ownerName>
+        <ownerEmail>contact@onurbaydas.online</ownerEmail>
+    </head>
+    <body>
+        <outline text="Güvenlik ve Tehdit İstihbaratı" title="Güvenlik ve Tehdit İstihbaratı">
+            <outline type="rss" text="BleepingComputer" title="BleepingComputer" xmlUrl="https://www.bleepingcomputer.com/feed/" htmlUrl="https://www.bleepingcomputer.com/"/>
+            <outline type="rss" text="Krebs on Security" title="Krebs on Security" xmlUrl="https://krebsonsecurity.com/feed/" htmlUrl="https://krebsonsecurity.com"/>
+            <outline type="rss" text="The Hacker News" title="The Hacker News" xmlUrl="https://thehackernews.com/feeds/posts/default" htmlUrl="https://thehackernews.com"/>
+            <outline type="rss" text="Darknet Security" title="Darknet Security" xmlUrl="https://www.darknet.org.uk/feed/" htmlUrl="https://www.darknet.org.uk"/>
+            <outline type="rss" text="All InfoSec News" title="All InfoSec News" xmlUrl="https://allinfosecnews.com/feed/" htmlUrl="https://allinfosecnews.com/"/>
+        </outline>
+        <outline text="Linux, Çekirdek ve Altyapı" title="Linux, Çekirdek ve Altyapı">
+            <outline type="rss" text="Phoronix" title="Phoronix" xmlUrl="https://www.phoronix.com/rss.php" htmlUrl="https://www.phoronix.com/"/>
+            <outline type="rss" text="ServeTheHome" title="ServeTheHome" xmlUrl="https://www.servethehome.com/feed/" htmlUrl="https://www.servethehome.com/"/>
+            <outline type="rss" text="Yellow Bricks" title="Yellow Bricks" xmlUrl="https://www.yellow-bricks.com/feed/" htmlUrl="https://www.yellow-bricks.com/"/>
+            <outline type="rss" text="InfoQ" title="InfoQ" xmlUrl="https://www.infoq.com/rss/rss.action" htmlUrl="https://www.infoq.com"/>
+            <outline type="rss" text="SoylentNews" title="SoylentNews" xmlUrl="https://soylentnews.org/index.rss" htmlUrl="https://soylentnews.org/"/>
+            <outline type="rss" text="Slashdot" title="Slashdot" xmlUrl="https://rss.slashdot.org/Slashdot/slashdot" htmlUrl="https://slashdot.org/"/>
+        </outline>
+        <outline text="Yapay Zeka, GPU ve Veri" title="Yapay Zeka, GPU ve Veri">
+            <outline type="rss" text="The Rundown AI" title="The Rundown AI" xmlUrl="https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml" htmlUrl="https://www.therundown.ai/"/>
+            <outline type="rss" text="TLDR AI" title="TLDR AI" xmlUrl="https://tldr.tech/api/rss/ai" htmlUrl="https://tldr.tech"/>
+            <outline type="rss" text="KDnuggets" title="KDnuggets" xmlUrl="https://www.kdnuggets.com/feed" htmlUrl="https://www.kdnuggets.com"/>
+            <outline type="rss" text="ScienceDaily AI" title="ScienceDaily AI" xmlUrl="https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml" htmlUrl="https://www.sciencedaily.com/news/computers_math/artificial_intelligence/"/>
+            <outline type="rss" text="r/LocalLLaMA" title="r/LocalLLaMA" xmlUrl="https://www.reddit.com/r/LocalLLaMA/.rss" htmlUrl="https://www.reddit.com/r/LocalLLaMA"/>
+        </outline>
+        <outline text="Mühendislik Toplulukları ve Küresel Akış" title="Mühendislik Toplulukları ve Küresel Akış">
+            <outline type="rss" text="Hacker News: Best" title="Hacker News: Best" xmlUrl="https://hnrss.org/best" htmlUrl="https://news.ycombinator.com/best"/>
+            <outline type="rss" text="Lobsters" title="Lobsters" xmlUrl="https://lobste.rs/rss" htmlUrl="https://lobste.rs/"/>
+            <outline type="rss" text="Ars Technica (IT)" title="Ars Technica (IT)" xmlUrl="https://feeds.arstechnica.com/arstechnica/technology-lab" htmlUrl="https://arstechnica.com/information-technology/"/>
+            <outline type="rss" text="Techmeme" title="Techmeme" xmlUrl="https://www.techmeme.com/feed.xml" htmlUrl="https://www.techmeme.com/"/>
+            <outline type="rss" text="DEV Community" title="DEV Community" xmlUrl="https://dev.to/feed/" htmlUrl="https://dev.to"/>
+            <outline type="rss" text="r/SysAdmin+Net+Sec" title="r/SysAdmin+Net+Sec" xmlUrl="https://www.reddit.com/r/sysadmin+cybersecurity+networking/top/.rss?t=day" htmlUrl="https://www.reddit.com/r/sysadmin+cybersecurity+networking/"/>
+        </outline>
+    </body>
+</opml>
