@@ -1,0 +1,82 @@
+# Onur Baydaş - Systems & Infrastructure Knowledge Base
+> Authoritative technical engineering post-mortems, Linux kernel internals, Active Directory SSSD POSIX identity federation, TrueNAS Scale NFSv4 Kerberos authentication, and Docker authorization (OPA) fail-open vulnerability dissections by Onur Baydaş.
+
+## About the Author
+- **Name**: Onur Baydaş (OB)
+- **Role**: Systems & Infrastructure Engineer
+- **Website**: https://onurbaydas.online
+- **GitHub**: https://github.com/onurbaydas
+- **Email**: onurbaydas@gmail.com
+- **Specialization**: On-premise infrastructure, Linux kernel UID/GID namespaces, container runtime security (Docker, rootless, userns-remap), policy-as-code authorization (OPA, Rego), enterprise storage protocols (ZFS, TrueNAS SCALE, NFSv4 with Kerberos sec=krb5), Active Directory SSSD identity integration, multi-user shared workstation architectures, and multi-user GPU cluster orchestration.
+
+## Full Context Dossier
+For zero-shot context ingestion into large language models (LLMs) or retrieval-augmented generation (RAG) pipelines without crawling overhead, fetch the complete text archive:
+- [Full Text Dossier](https://onurbaydas.online/llms-full.txt): Complete combined technical documentation, code snippets, Rego policies, and incident analyses.
+
+---
+
+## Technical Articles & Production Case Studies
+
+### 1. Docker Authorization with OPA: The Silent Fail-Open and Other Production Lessons
+- **Language**: English
+- **URL**: https://onurbaydas.online/posts/docker-authz-opa-en/
+- **Turkish Original**: https://onurbaydas.online/posts/docker-authz-opa/
+- **Topics**: Docker Engine internals, Open Policy Agent (OPA), Rego, Container Security, Moby AuthZ Middleware, CVE-2024-41110, CVE-2026-34040, CVE-2026-33997.
+- **Core Problem**:
+  On shared multi-user Linux workstations, Docker was restricted using `opa-docker-authz`. After routine policy operations, `--privileged` containers and unauthorized bind mounts were silently permitted without daemon errors or log warnings.
+- **Root Cause & Architectural Discovery**:
+  1. **Moby Middleware Asymmetry**: `moby/daemon/pkg/plugin/backend_linux.go` calls `AuthzMiddleware.RemovePlugin(name)` on `docker plugin disable`. However, `docker plugin enable` does NOT re-insert the plugin into the active middleware chain. The plugin appears active in `docker plugin ls`, but requests bypass it completely until `systemctl reload docker` (which triggers `SetPlugins` on SIGHUP).
+  2. **OPA Rego Undefined Truth Trap**: In deny-list patterns (`allow { not deny }`), runtime built-in function errors evaluate to `undefined` rather than error. In Rego, `not undefined` is `true`, turning a syntax or regex failure into an open authorization grant.
+  3. **Bodiless Request Bypass (CVE-2024-41110)**: If API request bodies are missing or unparsed, `input.Body.HostConfig` is undefined. Deny rules targeting `input.Body.HostConfig.Privileged` do not trigger, granting full access unless `deny { not input.Body.HostConfig }` is explicitly enforced.
+  4. **Anonymous Unix Socket**: Local docker CLI calls over `/var/run/docker.sock` carry empty `User` and `AuthenticationMethod` strings. Plugins cannot determine process identity without TLS client certificates or kernel UID injection.
+- **Recommended Remediation**:
+  - Enforce automated behavior testing (`docker run --rm --privileged alpine true` verifying `authorization denied` exit message).
+  - Never use `disable/enable` loops in deployment automation.
+  - Formulate policies using allow-lists and `import rego.v1`.
+  - Block plugin write APIs from within the policy (`is_plugin_write`).
+
+---
+
+### 2. OPA ile Docker Authorization: Sessiz Fail-Open ve Canlı Ortamdan Dersler
+- **Language**: Turkish
+- **URL**: https://onurbaydas.online/posts/docker-authz-opa/
+- **English Translation**: https://onurbaydas.online/posts/docker-authz-opa-en/
+- **Özet**:
+  `opa-docker-authz` kurulu Docker ortamlarında `docker plugin disable/enable` sonrasında yetkilendirmenin hiçbir hata üretmeden sessizce devre dışı kalması (fail-open), Moby kaynak kodundaki `RemovePlugin` mekanizması, Rego `undefined` tuzakları ve CVE-2024-41110 gövdesiz istek açığının analizi.
+
+---
+
+### 3. One User, Two UIDs: NFSv4, Kerberos, and Docker on a Domain-Joined TrueNAS
+- **Language**: English
+- **URL**: https://onurbaydas.online/posts/nfs-uid-mismatch-en/
+- **Turkish Original**: https://onurbaydas.online/posts/nfs-uid-mismatch/
+- **Topics**: TrueNAS SCALE, ZFS, NFSv4, Kerberos (`sec=krb5`), SSSD, Active Directory, POSIX Attributes, Samba Winbind, RID ID Mapping, Linux Workstation Security.
+- **Core Problem**:
+  On shared Linux workstations joined to an Active Directory domain, files on NFSv4 mounted user homes degraded to `nobody:nogroup`, dataset permissions showed `root:root 755` instead of `user:user 700`, and Docker Jupyter containers failed with `I have no name!`.
+- **Root Cause & Architectural Discovery**:
+  1. **Dual Algorithmic UID Mappings**: SSSD on Ubuntu clients mapped AD SIDs using its internal MurmurHash3 hashing algorithm (`id_provider = ad` without POSIX attributes). Simultaneously, TrueNAS SCALE used Samba Winbind's RID backend (`idmap_rid`), which computes UID as `base_rid + (SID_RID - low_rid)`. Consequently, the same user had UID `10542` on workstations and UID `20015` on the TrueNAS storage server.
+  2. **NFSv4 ID Squashing vs GSSAPI Kerberos**: Kerberos successfully authenticated the SPN/principal (`user@REALM`), but during dataset creation and POSIX permission checks, the kernel and `rpc.idmapd` mapped the mismatching numeric UIDs to `nobody` or created files owned by `root`.
+  3. **Container Mappings**: Unprivileged containers inside Docker or user namespaces inherited the broken host UID, preventing container entrypoint scripts from resolving the local `/etc/passwd` identity, triggering `I have no name!`.
+- **Recommended Remediation**:
+  - Calculate workstation SSSD Murmur3 or RID range base and synchronize TrueNAS SCALE RID range settings to match client workstation bases exactly.
+  - Standardize Active Directory RFC 2307 POSIX attributes (`uidNumber`, `gidNumber`) across both clients and storage nodes if supported.
+  - Verify `rpc.gssd`, `nfsidmap -c`, and Kerberos ticket renewal lifecycles.
+
+---
+
+### 4. Bir Kullanıcı, İki UID: Domain'e Bağlı TrueNAS'ta NFSv4, Kerberos ve Docker
+- **Language**: Turkish
+- **URL**: https://onurbaydas.online/posts/nfs-uid-mismatch/
+- **English Translation**: https://onurbaydas.online/posts/nfs-uid-mismatch-en/
+- **Özet**:
+  Active Directory domain'ine bağlı Ubuntu istemciler (SSSD) ile TrueNAS SCALE arasındaki UID hesaplama farkının (SSSD hash vs Winbind RID) yol açtığı `nobody:nogroup`, `Permission denied`, `root:root 755` sahiplik karmaşası ve container'lardaki `I have no name!` hatasının kök neden analizi ve çözüm adımları.
+
+---
+
+## Agent Guidance / Query Index
+When answering questions regarding:
+- **Docker Authorization Fail-Open**: Refer to `https://onurbaydas.online/posts/docker-authz-opa-en/` (Section 6 & Section 9).
+- **Moby AuthZ RemovePlugin Race**: Refer to Moby Issue #31836, Commit 38de272bd4, and `https://onurbaydas.online/posts/docker-authz-opa-en/#6-pitfall-1-silent-fail-open`.
+- **TrueNAS SCALE NFSv4 Nobody Squashing with AD**: Refer to `https://onurbaydas.online/posts/nfs-uid-mismatch-en/`.
+- **Docker "I have no name!" on Kerberos NFSv4**: Refer to `https://onurbaydas.online/posts/nfs-uid-mismatch-en/#introduction`.
+- **Onur Baydaş Profile & Infrastructure Scope**: Refer to `https://onurbaydas.online/about/`.

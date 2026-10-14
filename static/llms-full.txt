@@ -1,0 +1,1193 @@
+# Onur Baydaş - Complete Systems & Infrastructure Knowledge Dossier
+> Author: Onur Baydaş | Systems & Infrastructure Engineer
+> Website: https://onurbaydas.online | GitHub: https://github.com/onurbaydas
+> Email: onurbaydas@gmail.com
+
+This document contains the uncurated full-text technical knowledge base of Onur Baydaş, compiled for zero-shot LLM ingestion, semantic embedding, and RAG architectures.
+
+================================================================================
+PART 1: AUTHOR PROFILE & SYSTEMS SCOPE
+================================================================================
+
+---
+title: "About"
+url: "/en/about/"
+translationKey: "about"
+ShowReadingTime: false
+ShowBreadCrumbs: false
+ShowPostNavLinks: false
+ShowShareButtons: false
+ShowToc: false
+---
+
+I'm Onur Baydaş, a systems and infrastructure engineer based in Turkey. Since 2024
+I've been designing, deploying, running, and troubleshooting on-premises
+infrastructure: the kind of environments where there is no managed cloud service to
+fall back on and every layer, from hardware and storage to identity and scheduling,
+is your responsibility.
+
+## Currently
+
+- Scheduling, partitioning, and isolation on multi-user GPU infrastructure
+- Operating virtualization and software-defined storage clusters
+- Backup, monitoring, and high availability
+- Technical writing in Turkish and English, drawn from production experience
+
+## What I work on
+
+- **Virtualization and storage:** Clustered virtualization, software-defined
+  storage, hyperconverged infrastructure (HCI), enterprise NAS and ZFS-based storage.
+- **GPU infrastructure:** GPU servers and clusters for AI and research workloads,
+  GPU partitioning and virtual GPUs, HPC job scheduling, stress testing, and
+  driver/framework compatibility.
+- **Multi-user platforms:** Shared Linux workstations: user isolation, resource
+  management, container access control, and day-to-day operations.
+- **Container security:** Restricting the container runtime on shared machines,
+  policy-as-code authorization, and cross-user isolation gaps.
+- **Identity and access:** Directory services and identity management, Kerberos
+  authentication, network home directories, PAM integration.
+- **Backup and DR:** Hyperconverged backup, deduplication backup appliances, backup
+  monitoring and reporting.
+- **High availability:** Cluster resource management, block-level replication,
+  active/passive service failover.
+- **Observability:** Metrics, centralized logging, alerting, and dashboards;
+  centralized syslog collection.
+- **Hardware and lifecycle:** Rack server deployment, out-of-band management (BMC),
+  RAID controller and disk failure analysis, vendor support processes.
+- **Network and security:** Next-generation firewall management, segmentation,
+  management network design.
+
+## What I write about
+
+I write about problems I actually hit in production: the silent failures, the
+misleading documentation, and what the source code says when the docs don't.
+Every post is based on a real incident, tested on a live system, and backed by
+links to the source.
+
+## Contact
+
+- Email: onurbaydas@gmail.com
+- GitHub: [github.com/onurbaydas](https://github.com/onurbaydas)
+
+
+================================================================================
+PART 2: CASE STUDY - DOCKER AUTHORIZATION WITH OPA (FAIL-OPEN & INTERNALS)
+URL: https://onurbaydas.online/posts/docker-authz-opa-en/
+Turkish: https://onurbaydas.online/posts/docker-authz-opa/
+================================================================================
+
+---
+title: "Docker Authorization with OPA: The Silent Fail-Open and Other Production Lessons"
+date: 2026-10-12
+lastmod: 2026-10-12
+url: "/posts/docker-authz-opa-en/"
+translationKey: "docker-authz-opa"
+description: "The plugin looks enabled, the policy is correct, yet Docker allows everything. A silent security gap I hit with opa-docker-authz in production, and its lessons."
+tags: ["docker", "opa", "rego", "security"]
+ShowToc: true
+---
+
+*Bu yazının Türkçesi: [OPA ile Docker Authorization](https://onurbaydas.online/posts/docker-authz-opa/)*
+
+## 1. Introduction
+
+I set up `opa-docker-authz` to restrict Docker on shared, multi-user Linux workstations. After a routine policy update, I noticed that `--privileged` containers were silently running. This article summarizes that incident and what I found in the source code afterward.
+
+Docker authorization plugins let you evaluate every API request sent to the Docker daemon against a policy before the daemon processes it. `opa-docker-authz` is a plugin that implements this mechanism with OPA (Open Policy Agent) and its policy language, Rego.
+
+This article covers:
+
+- How the Docker authorization plugin mechanism works, and how to install `opa-docker-authz`.
+- What an example policy guarantees and what it doesn't.
+- Four pitfalls: silent fail-open, policy updates, Rego syntax and version compatibility, and fields the policy can't see.
+- Protections an authorization plugin can't provide by design.
+- A production checklist.
+
+Fail-open means a control mechanism lets a request through on error instead of rejecting it. The main subject of this article is that this can happen without a single error or warning.
+
+## 2. Scenario and Goal
+
+The scenario: multi-user, shared Linux workstations. Users need Docker, but they shouldn't be able to access each other's data or the host.
+
+The core tension is this: the Docker daemon (dockerd) runs as root. The daemon is the background service that handles Docker API requests. Anyone who can reach the daemon's socket can ask it to do work with root privileges. Docker's official documentation also states that the `docker` group grants a user root-level privileges. In this scenario, users have access to the socket.
+
+The goal is a single rule:
+
+> Each user can bind only their own workspace (`/home/<user>/workspace`) to `/workspace` inside a container. No other bind mounts, no privileged containers, no host namespaces. GPU access is allowed.
+
+A bind mount attaches a directory on the host directly into a container. The container sees that directory as part of its own file system. If the container runs as root, it can read and write everything in that directory.
+
+Expected usage looks roughly like this:
+
+```bash
+docker run -d \
+  --gpus all \
+  -v "/home/<user>/workspace":/workspace \
+  "<image>"
+```
+
+Because users have terminal access, the policy has to account for every request that can reach the Docker API, not just this command.
+
+The approach in this article is to put an authorization layer in front of a standard dockerd running as root. Alternatives such as rootless Docker and userns-remap are covered in [Section 10](#10-what-an-authorization-plugin-cant-provide).
+
+## 3. How Docker Authorization Plugins Work
+
+Docker's default access model is all-or-nothing. Any client that can reach the daemon can make any API call. Authorization plugins add a decision point to this model. Before processing each API request, the daemon asks the configured plugins whether they allow it.
+
+Request flow:
+
+```mermaid
+sequenceDiagram
+    participant C as docker CLI / client
+    participant D as dockerd (API server)
+    participant M as Authz middleware
+    participant P as opa-docker-authz plugin
+    participant O as OPA (inside the plugin)
+    participant H as API handler
+
+    C->>D: HTTP request (e.g. POST /v1.xx/containers/create)
+    D->>M: pass request to middleware
+    alt chain is empty
+        M->>H: forward directly (no check)
+        H-->>C: response
+    else plugin in chain
+        M->>P: AuthZReq (Method, URI, headers, JSON body, User)
+        P->>P: read policy file from disk
+        P->>O: evaluate data.docker.authz.allow with input
+        O-->>P: true / false / undefined / error
+        P-->>M: Allow: true or false + message
+        alt allowed
+            M->>H: process request
+            H-->>C: response
+        else denied
+            M-->>C: "authorization denied by plugin ..."
+        end
+    end
+```
+
+Details that matter for the rest of the article:
+
+**If the chain is empty, there is no check.** `WrapHandler` in Moby's `pkg/authorization/middleware.go` passes the request straight to the handler when the plugin list is empty. The middleware has no mechanism to warn that "a plugin should be here but isn't." This is the foundation of the pitfall in [Section 6](#6-pitfall-1-silent-fail-open).
+
+**The middleware fails closed.** According to Docker's official documentation, if a plugin in the chain can't be reached, the request is denied. Docker also recommends that plugin authors fail closed. So a "the plugin crashed and everything opened up" scenario isn't expected at the middleware level. The risk is the plugin being removed from the chain without any warning.
+
+**User identity is empty in most setups.** The request sent to the plugin has `User` and `AuthenticationMethod` fields. According to the Moby source code, these fields are populated only if the request arrived over TLS and the client presented a client certificate. The username comes from the certificate's CN field. For requests over the Unix socket, which covers nearly all local `docker` commands, both fields are empty strings. The policy can't answer the question "who made this request?" The consequences are covered in [Section 10](#10-what-an-authorization-plugin-cant-provide).
+
+**The plugin doesn't see everything.** According to the official documentation:
+
+- The body is sent to the plugin only when it can be forwarded as JSON.
+- For hijacked connections such as `exec` and `attach`, the plugin sees only the initial HTTP request.
+- For streamed responses such as `logs` and `events`, it sees only the request.
+- The gRPC endpoint that BuildKit uses isn't subject to authorization. A policy that tries to restrict image builds through authorization can't see this channel.
+
+An endpoint is a path in the Docker API that performs a specific operation, for example `/containers/create`.
+
+## 4. Installation
+
+`opa-docker-authz` is an authorization plugin with OPA embedded that you can install as a Docker managed plugin. The examples use the `openpolicyagent/opa-docker-authz-v2:0.9` tag. This version ships with OPA 0.60. Versioning is covered separately in [Section 8](#8-pitfall-3-rego-syntax-and-plugin-version).
+
+Installation:
+
+```bash
+docker plugin install --alias opa-docker-authz \
+  --grant-all-permissions \
+  openpolicyagent/opa-docker-authz-v2:0.9 \
+  opa-args="-policy-file /opa/policies/authz.rego"
+```
+
+The policy path needs care. The plugin's configuration mounts the host's `/etc/docker` directory read-only at `/opa` inside the plugin. A file at `/etc/docker/policies/authz.rego` on the host appears as `/opa/policies/authz.rego` from inside the plugin. `opa-args` must contain the path inside the plugin, not the host path. If the path is wrong, the plugin allows every request ([Section 6](#6-pitfall-1-silent-fail-open)).
+
+File and directory permissions:
+
+```bash
+install -d -m 0755 -o root -g root /etc/docker/policies
+install -m 0644 -o root -g root authz.rego /etc/docker/policies/authz.rego
+```
+
+To add the plugin to the daemon's authorization plugin chain, use `daemon.json`:
+
+```json
+{
+  "authorization-plugins": ["opa-docker-authz"]
+}
+```
+
+If a `daemon.json` already exists, merge this key with the other settings. The order is: install the plugin first, then update `daemon.json`, then make the daemon re-read its configuration. You can restart the service for this. `systemctl reload docker` also rebuilds the chain and doesn't stop running containers ([Section 6](#6-pitfall-1-silent-fail-open)).
+
+## 5. The Policy, Line by Line
+
+The policy below uses OPA 0.60's classic Rego syntax.
+
+```rego
+package docker.authz
+
+default allow = false
+
+allow { not is_container_create }
+allow { is_container_create; not deny }
+
+is_container_create {
+    input.Method == "POST"
+    endswith(split(input.Path, "?")[0], "/containers/create")
+}
+```
+
+`package docker.authz` and the `allow` rule form the decision point the plugin queries by default: `data.docker.authz.allow`.
+
+`default allow = false` is a safe default. If no `allow` rule matches, the decision is deny.
+
+The next two lines define the policy's architecture:
+
+- If the request is **not** a container create request, allow it.
+- If it is a container create request and no `deny` rule fired, allow it.
+
+`is_container_create` uses `endswith` to skip the API version prefix (such as `/v1.47/`) and `split` to strip query parameters (`?name=...`).
+
+Hard prohibitions:
+
+```rego
+deny { input.Body.HostConfig.Privileged == true }
+deny { count(input.Body.HostConfig.CapAdd) > 0 }
+deny { input.Body.HostConfig.PidMode == "host" }
+deny { input.Body.HostConfig.NetworkMode == "host" }
+deny { input.Body.HostConfig.IpcMode == "host" }
+deny { input.Body.HostConfig.UTSMode == "host" }
+deny { startswith(input.Body.HostConfig.UsernsMode, "host") }
+deny { count(input.Body.HostConfig.Devices) > 0 }
+deny { s := input.Body.HostConfig.SecurityOpt[_]; contains(s, "unconfined") }
+deny { s := input.Body.HostConfig.SecurityOpt[_]; contains(s, "no-new-privileges:false") }
+deny { s := input.Body.HostConfig.SecurityOpt[_]; contains(s, "no-new-privileges=false") }
+```
+
+These rules block `--privileged`, `--cap-add`, sharing the host's PID/network/IPC/UTS namespaces, disabling the user namespace, passing devices through with `--device`, and setting protections such as seccomp/AppArmor to `unconfined`. Each one on its own can be enough to escape from a container to the host.
+
+The bind mount rule:
+
+```rego
+deny { b := input.Body.HostConfig.Binds[_]; not bind_ok(b) }
+deny { m := input.Body.HostConfig.Mounts[_]; m.Type == "bind"; not mount_ok(m) }
+
+bind_ok(b) {
+    parts := split(b, ":")
+    parts[1] == "/workspace"
+    seg := split(parts[0], "/")
+    count(seg) == 4
+    seg[1] == "home"
+    seg[3] == "workspace"
+}
+
+mount_ok(m) {
+    m.Target == "/workspace"
+    seg := split(m.Source, "/")
+    count(seg) == 4
+    seg[1] == "home"
+    seg[3] == "workspace"
+}
+```
+
+In Docker, a bind mount can come from two separate fields. The `-v source:target` syntax writes to the `HostConfig.Binds` array, and the `--mount type=bind,...` syntax writes to the `HostConfig.Mounts` array. The policy checks both.
+
+When the source path is split on `/`, it must have exactly four parts: `""`, `"home"`, the username, and `"workspace"`. The target must be `/workspace`. This also rejects deeper paths such as `/home/<user>/workspace/subdir`. The reason: Docker resolves symbolic links (symlinks) in the bind source. Before this rule was added, the following was seen in production: when a symlink pointing to the host's root was placed inside the workspace and that subpath was bind-mounted, the host's files could be read. The four-part rule closes off symlinks that come in through a subpath. The workspace directory itself being a symlink is a separate risk ([Section 10](#10-what-an-authorization-plugin-cant-provide)).
+
+**What it guarantees** (verified on a live daemon): `--privileged`, `--cap-add`, binding the host root or `/etc`, the subpath symlink, binding the Docker socket into a container, `--device`, `--ipc=host`, and binding outside the workspace with `--mount type=bind` are all denied. Expected usage (the workspace bind and `--gpus all`) works. When the machine reboots, the plugin comes back and the rules keep being enforced.
+
+**What it doesn't guarantee** is covered in [Sections 9](#9-pitfall-4-what-the-policy-cant-see) and [10](#10-what-an-authorization-plugin-cant-provide). Some of it comes from gaps in the policy, and some comes from the mechanism itself. First, though, consider the case where protection can shut off entirely even when the policy is correct.
+
+## 6. Pitfall 1: Silent Fail-Open
+
+### Symptom
+
+The plugin shows as enabled in `docker plugin ls`, `authorization-plugins` is set in `daemon.json`, and the policy file is correct. Yet `docker run --rm --privileged alpine true` succeeds. Host bind mounts aren't denied either. The daemon log has no error or warning.
+
+This happens after running this pair of commands:
+
+```bash
+docker plugin disable --force opa-docker-authz
+docker plugin enable opa-docker-authz
+```
+
+This pair is a common habit, used to "reload the plugin so it picks up the new policy."
+
+### Mechanism: The Plugin Is Dropped from the Chain
+
+Three pieces of the Moby source code explain this behavior:
+
+1. The `Disable()` function in `daemon/pkg/plugin/backend_linux.go` calls `AuthzMiddleware.RemovePlugin(name)` when a plugin of the authorization type is disabled. The plugin is removed from dockerd's authorization plugin chain.
+2. The `Enable()` function in the same file has **no** call that adds the plugin back to the middleware. The plugin is enabled and `docker plugin ls` shows it as enabled, but the plugin isn't in the chain.
+3. The config reload path in `daemon/command/daemon.go` calls `authzMiddleware.SetPlugins(cfg.AuthorizationPlugins)`. This is where the chain is rebuilt from the list in `daemon.json`. `systemctl reload docker` sends SIGHUP to the daemon and triggers this path.
+
+With the chain empty, the middleware passes every request straight to the handler ([Section 3](#3-how-docker-authorization-plugins-work)). As a result, authorization is silently off after disable/enable. The daemon reports no error, the plugin looks enabled, and the policy file is correct, but no request reaches the plugin. The behavior is the same in the current Moby source.
+
+In short: **`docker plugin disable` turns authorization off, `docker plugin enable` doesn't turn it back on, and `systemctl reload docker` does.**
+
+#### History: Why Does Removal from the Chain Exist?
+
+Removal from the chain isn't a bug; it's a fix. Moby issue #31836, opened in 2017, reported that after an authorization plugin was disabled, the daemon still sent requests to that plugin. Because the plugin no longer responded, all API requests were blocked.
+
+The fixing commit, `38de272bd4`, added code to `Disable()` that removes an authorization-type plugin from the middleware chain. The same commit didn't add code to `Enable()` that puts the plugin back in the chain. This first fix removed the plugin from the chain with different code; later the same year, moby #33655 ("Eliminate authz plugin disable race") moved that code into today's `RemovePlugin` function, and the behavior stayed the same. The silent fail-open described in this section is a side effect of that asymmetry in the fix.
+
+### Observed Behavior
+
+Test results on a live daemon match the mechanism in the source code:
+
+| Step | `--privileged` test |
+|---|---|
+| Policy written + `systemctl reload docker` | Denied |
+| Policy changed + `disable` / `enable` | Succeeded (fail-open) |
+| Directory set to 755, file to 644 + `disable` / `enable` | Succeeded (fail-open) |
+| Plugin reinstalled (`disable` → `rm` → `install`) + `systemctl reload docker` | Denied |
+
+The behavior is the same in a current version: with Docker Engine 29.9.0 and opa-docker-authz v0.9, `--privileged` succeeds after disable/enable and is denied after `systemctl reload docker`.
+
+In the last step, the chain is rebuilt by the reload, not the reinstall. A reinstall also includes a disable/enable cycle and doesn't add the plugin back to the chain on its own. The plugin is added back by `SetPlugins`, that is, during the reload.
+
+The daemon journal has a notable entry: the plugin allowed the `POST .../plugins/opa-docker-authz/disable?force=1` request that disabled it (`result: true`). Because this policy only checks container creation, the disable request also passes through authorization and gets allowed. After this entry, there are no decision entries for the test requests: requests no longer reach the plugin.
+
+### A Common Misdiagnosis: File Permissions
+
+A frequent explanation for this symptom goes like this: "If the policy file isn't 644, the plugin can't read it, runs with an empty policy, and allows everything." This explanation is wrong for two reasons:
+
+- In the table above, protection was still off after disable/enable even once permissions were set to 644. The step that fixed it was the reload.
+- `opa-docker-authz` reads the policy file with `os.ReadFile`. If the read fails (including a permission error), it **denies** the request. A permission problem produces a fail-closed result.
+
+A likely source of the confusion: the official `openpolicyagent/opa` CLI image runs as a non-root user. Running `opa check` with this image on a policy file with 600 permissions returns "permission denied." That says nothing about the plugin's behavior. The 755/644 permissions are a recommended hygiene rule so that separately run tools such as `opa check` can read the file, but they aren't the cause of the fail-open.
+
+### When the Plugin Explicitly Fails Open
+
+The plugin's source code does have a branch that genuinely fails open. Before reading the policy file, the plugin checks it with `os.Stat`. If the file **doesn't exist**, the plugin logs this message and allows the request:
+
+```text
+OPA policy file %s does not exist, failing open and allowing request
+```
+
+So a typo in the path inside `opa-args`, or getting the `/etc/docker` → `/opa` translation wrong, shuts protection off completely. In this case, the plugin log does leave a trace.
+
+The decision table derived from the source code:
+
+| Condition | Plugin decision |
+|---|---|
+| Policy file missing | **Allow (fail-open)**, logged |
+| File unreadable (e.g., permission error) | Deny |
+| Rego compile or evaluation error | Deny |
+| `allow` undefined | Deny |
+| Plugin not in the chain | Plugin is never asked, **allow** |
+
+### Detection
+
+The plugin appearing "enabled" or the file hash being correct won't catch this problem. A drift check that collects the policy file's hash, the file mode, and the enabled state from `docker plugin ls` returns a "correct" result even during a fail-open. Don't rely on configuration output such as `docker info` for the actual state of the chain either.
+
+The reliable check is a behavioral test. With a regular user account:
+
+```bash
+docker run --rm --privileged alpine true
+```
+
+This command should be denied with this message:
+
+```text
+docker: Error response from daemon: authorization denied by plugin opa-docker-authz:latest: request rejected by administrative policy
+```
+
+It isn't enough for the command to merely fail. It can also fail because the image couldn't be pulled or the daemon couldn't be reached. Check that the output contains `authorization denied`. A version of this test that runs on a schedule is in [Section 11](#11-production-checklist).
+
+## 7. Pitfall 2: Updating the Policy
+
+According to its source code, the plugin reads the policy file from disk on **every request**. There is no cache. As soon as the file changes, the next request is evaluated against the new policy. Updating the policy doesn't require reloading the plugin.
+
+The real risk is the disable/enable pair making its way into update automation. Automation that disables and re-enables the plugin when the policy changes, and doesn't reload because `daemon.json` didn't change, turns authorization off on every machine it touches, each time it runs, until the next reload or restart. Even if the correct procedure is written down in the documentation, this risk goes unnoticed when the automation does something different.
+
+A safe policy update:
+
+1. Compile the new policy with the OPA version the plugin uses (`opa check`) and evaluate it against test inputs (`opa eval`).
+2. Put the file in place. Because the plugin reads the file on every request, if it sees a half-written file mid-write, that request is denied due to a compile error. To avoid this, write the new file under a temporary name in the same directory and swap it in with `mv`.
+3. Don't touch the plugin.
+4. Run the `--privileged` test.
+
+If the plugin itself changed (version upgrade, reinstall), run `systemctl reload docker` once you're done and repeat the behavioral test. If the policy forbids writes to the plugin API ([Section 9](#9-pitfall-4-what-the-policy-cant-see)), the plugin must first be removed from the chain via `daemon.json` before these operations.
+
+A pattern for rolling out authorization to multiple machines: back up → reload → roll back automatically if `docker ps` fails → `--privileged` test. It doesn't stop running containers and can run on machines in parallel.
+
+```bash
+#!/usr/bin/env bash
+set -u
+cfg=/etc/docker/daemon.json
+bak="$cfg.bak.$(date +%s)"
+
+cp -a "$cfg" "$bak"
+
+# Merge authorization-plugins into the existing settings
+jq '. + {"authorization-plugins": ["opa-docker-authz"]}' "$bak" > "$cfg.new" \
+  && mv "$cfg.new" "$cfg"
+
+systemctl reload docker
+
+# Roll back automatically if the daemon is unhealthy
+if ! docker ps >/dev/null 2>&1; then
+  cp -a "$bak" "$cfg"
+  systemctl reload docker
+  echo "ROLLBACK"
+  exit 1
+fi
+echo -n "ps=OK "
+
+# Behavioral test
+if docker run --rm --privileged alpine true 2>&1 | grep -q "authorization denied"; then
+  echo "priv=DENIED"
+else
+  echo "priv=OPEN"
+  exit 2
+fi
+```
+
+Don't consider the rollout done until every machine reports `ps=OK priv=DENIED`.
+
+## 8. Pitfall 3: Rego Syntax and Plugin Version
+
+### Version Status
+
+Rego syntax changed with OPA 1.0. `if` before rule bodies and `contains` for multi-value rules are now mandatory. The policy in [Section 5](#5-the-policy-line-by-line) is written in classic (0.x) syntax.
+
+`opa-docker-authz` versions:
+
+| Plugin | OPA | Managed plugin on Docker Hub |
+|---|---|---|
+| v0.9 | 0.60.0 | Yes (latest tag) |
+| v0.10 | 1.3.0 | No |
+| v0.11 | 1.21.1 | No |
+
+The project is maintained, and new releases are published on GitHub. However, the newest tag you can pull from Docker Hub with `docker plugin install` is 0.9. Because 0.10 and later aren't published on Docker Hub as managed plugins, using these versions requires building the plugin from source.
+
+The result: a classic policy written for 0.9 won't compile when the plugin is upgraded to 0.10+. `opa check` with OPA 1.21.1:
+
+```text
+rego_parse_error: `if` keyword is required before rule body
+```
+
+The plugin denies the request on a compile error. The result is fail-closed, but every request, including `docker ps`, is denied and Docker becomes unusable.
+
+### Bridge: `import rego.v1`
+
+For a policy that works on both versions, use `import rego.v1`. This import was added in OPA 0.59.0. Once the policy is converted to OPA 1.x syntax and this line is added at the top, both 0.60 and 1.x compile it.
+
+```rego
+package docker.authz
+
+import rego.v1
+
+default allow := false
+
+allow if {
+	is_container_create
+	not deny
+}
+
+deny if input.Body.HostConfig.Privileged == true
+```
+
+`authz-hardened-v1.rego` is in this form and was evaluated with all test inputs on OPA 0.60.0 and 1.21.1. Both versions return the same decisions. Converting the policy to this form before upgrading the plugin is recommended.
+
+### A Rego Pitfall: An Error Can Turn into "Allow"
+
+By default, OPA treats a runtime error in a built-in function (for example, an invalid regex) not as an error but as **undefined**. The plugin also calls OPA without the `StrictBuiltinErrors` option.
+
+If a built-in errors inside a `deny` rule, the rule becomes undefined, meaning it doesn't fire. `not deny` is then true. In the deny-list + `not deny` pattern, an error means **allow**.
+
+Test: with a `deny` rule containing a broken regex, a privileged input returns `allow = true`. Running the same evaluation with `--strict-builtin-errors` returns `eval_builtin_error`.
+
+Mitigations:
+
+- Run policy tests in CI (continuous integration) with `opa eval --strict-builtin-errors`.
+- In `deny` rules, avoid built-ins that can error (regex, parsing functions) as much as possible.
+- Where possible, use an allow-list instead of a deny-list. Describe what's allowed, not what's forbidden. That way, an undefined result means deny.
+
+## 9. Pitfall 4: What the Policy Can't See
+
+The policy in [Section 5](#5-the-policy-line-by-line) and its hardened version were tested against 19 test scenarios, both with `opa eval` and on a live Docker daemon.
+
+| Test input | Original | Hardened |
+|---|---|---|
+| Own workspace | allowed | allowed |
+| Another user's workspace | **allowed** | **allowed** |
+| `--privileged` | denied | denied |
+| `/etc` bind | denied | denied |
+| Workspace subpath | denied | denied |
+| Root directory via `--mount type=bind` | denied | denied |
+| Volume mount with driver options | **allowed** | denied |
+| `--volumes-from` | **allowed** | denied |
+| `--gpus` | allowed | allowed |
+| Bodyless create request | **allowed** | denied |
+| Plugin disable request | **allowed** | denied |
+| Plugin list (GET) | allowed | allowed |
+| `volume create` with driver options | **allowed** | denied |
+| Plain `volume create` | allowed | allowed |
+| Bodyless `volume create` | **allowed** | denied |
+| `exec` | **allowed** | **allowed** |
+| `exec --privileged` | **allowed** | denied |
+| Path containing `..` | **allowed** | denied |
+| `--cap-add` | denied | denied |
+
+Live daemon tests were run with plugin v0.9 (OPA 0.60). In the `opa eval` evaluation, the hardened column is the same for the classic-syntax `authz-hardened.rego` on OPA 0.60, and for `authz-hardened-v1.rego` on both OPA 0.60 and 1.21.1. The rows for another user's workspace and `exec` are the subject of [Section 10](#10-what-an-authorization-plugin-cant-provide).
+
+There's an inconsistency in the plain `volume create` row. When a named volume is attached with `-v name:/path`, it lands in `HostConfig.Binds`, doesn't match the `/home/...` format, hits the bind rule, and is denied. When the same volume is attached with `--mount type=volume`, it has no driver configuration, so it's allowed. Plain volumes don't point to a host directory, so this is harmless. A policy that also wants to allow `-v` should add a separate branch to `bind_ok` for named volumes.
+
+### Volume-Type Mounts
+
+The original policy checks `HostConfig.Mounts` entries only if `Type == "bind"`. Docker's `local` volume driver, however, supports creating a volume that points to a directory on the host through driver options. Such a mount arrives as `Type == "volume"` and isn't covered by the bind rule. The container can access an arbitrary directory on the host.
+
+The fix: deny volume mounts that contain a driver configuration.
+
+```rego
+deny { m := input.Body.HostConfig.Mounts[_]; m.Type == "volume"; m.VolumeOptions.DriverConfig }
+```
+
+### `volume create` Options
+
+You can reach the same result by first creating a volume with driver options through a separate `POST /volumes/create` request and then mounting it. Because the original policy allows every endpoint other than container create, this request isn't checked.
+
+The fix: make volume creation a separate decision point and accept only requests without driver options. Volumes without options remain allowed.
+
+```rego
+allow { is_volume_create; volume_ok }
+
+is_volume_create {
+    input.Method == "POST"
+    endswith(split(input.Path, "?")[0], "/volumes/create")
+}
+volume_ok { is_object(input.Body); count(object.get(input.Body, "DriverOpts", {})) == 0 }
+```
+
+The rule is intentionally written as an allow-list. A deny-list rule such as `volume_deny { count(input.Body.DriverOpts) > 0 }` doesn't fire when the body doesn't arrive, and the request goes through (see [Bodyless Requests](#bodyless-requests) below). The `is_object` check also denies the cases where the body doesn't arrive at all or arrives as `null`. The Docker CLI always sends a body with `volume create` requests, and `DriverOpts` is an empty object when there are no options, so normal usage isn't affected.
+
+### `--volumes-from`
+
+`HostConfig.VolumesFrom` lets a container inherit all the mounts of another container. On a shared machine, this means inheriting another user's workspace from a container that has it mounted. The original policy doesn't look at this field.
+
+```rego
+deny { count(input.Body.HostConfig.VolumesFrom) > 0 }
+```
+
+### Path Normalization
+
+The policy only splits the path on `/`; it doesn't resolve it. `/home/../workspace` splits into four parts and satisfies the rule. This example doesn't directly give access to sensitive data, but it shows that the policy evaluates the path as text. The hardened version rejects an empty value, `.`, and `..` in the username segment:
+
+```rego
+bind_ok(b) {
+    parts := split(b, ":")
+    parts[1] == "/workspace"
+    seg := split(parts[0], "/")
+    count(seg) == 4
+    seg[1] == "home"
+    not {"", ".", ".."}[seg[2]]
+    seg[3] == "workspace"
+}
+```
+
+The plugin's input has a `Resolved` field that is expected to carry the path with symlinks resolved. In the managed plugin, however, this field arrives empty. The plugin does the resolution on its own file system, and the host's `/home` directory doesn't exist inside the plugin. For this reason, `Resolved` can't be used as a symlink defense.
+
+### Bodyless Requests
+
+This is the most insidious blind spot of the deny-list pattern. All the `deny` rules look at fields under `input.Body.HostConfig`. If the body doesn't reach the plugin, or the plugin can't parse it, no `deny` rule fires, `not deny` is true, and the request goes through.
+
+Don't assume the plugin will always parse the body. Docker's documentation also states that the body isn't forwarded to the plugin in every case. The fix is one line:
+
+```rego
+deny { not input.Body.HostConfig }
+```
+
+This rule denies a container create request that has no `HostConfig`. A normal `docker run` always sends `HostConfig`, so the rule doesn't affect legitimate use.
+
+This blind spot isn't theoretical. In CVE-2024-41110 (CVE: Common Vulnerabilities and Exposures), a specially crafted API request could make the daemon forward the request to the authorization plugin without its body. Plugins that make decisions based on the body could allow a request they would normally deny. The vulnerability was first fixed in January 2019, in Docker Engine v18.09.1. Because the fix wasn't carried forward to later major versions, it came back as a regression. According to the advisory, the affected versions are v19.03.15, v20.10.27, v23.0.14, v24.0.9, v25.0.5, v26.0.2, v26.1.4, v27.0.3, v27.1.0, and earlier versions on each of those branches. The advisory gives patched versions for only three branches: versions after v23.0.14, v26.1.4, and v27.1.0. For docker-ce, the fix is in v27.1.1. The advisory gives no patched version for the 19.03, 20.10, 24.0, 25.0, 26.0, and 27.0 branches. If you're on one of these branches, upgrade to a patched version.
+
+The `deny { not input.Body.HostConfig }` rule catches exactly this case: in a bodyless create request, `HostConfig` is undefined and the request is denied. Even if the engine is patched, the rule should stay as defense in depth, because the policy's security shouldn't depend on a single fix in the engine.
+
+The same blind spot exists in every deny-list rule that looks at the body. When you add a decision point other than container create to the policy (`volume create`, `exec`), test separately that it also denies bodyless requests.
+
+### The Plugin API
+
+In the journal entry from [Section 6](#6-pitfall-1-silent-fail-open), the request to disable the plugin passes through authorization and is allowed. This means any user who can reach the socket can turn off authorization entirely. It's a direct consequence of the mechanism in Section 6.
+
+The fix: deny every operation on the plugin API other than reads.
+
+```rego
+allow { not is_container_create; not is_volume_create; not is_plugin_write }
+
+is_plugin_write { input.Method != "GET"; input.PathArr[1] == "plugins" }
+is_plugin_write { input.Method != "GET"; startswith(input.PathArr[1], "v"); input.PathArr[2] == "plugins" }
+```
+
+The second rule catches version-prefixed paths (`/v1.47/plugins/...`).
+
+The operational consequence: this rule also prevents administrators from disabling the plugin over the socket. To upgrade or reinstall the plugin, first remove the `authorization-plugins` key from `daemon.json` and reload. When you're done, put the key back and reload again. This trade-off also makes the dangerous disable/enable habit from [Section 7](#7-pitfall-2-updating-the-policy) impossible.
+
+### `exec --privileged`
+
+`docker exec --privileged` starts a privileged process in a running container. This request goes to the `POST /containers/{id}/exec` endpoint, and its body contains a `Privileged: true` field. Because the policy in [Section 5](#5-the-policy-line-by-line) only checks container creation, this request is unrestricted. So privileged access that was denied at the `create` stage can be obtained at the `exec` stage.
+
+This part doesn't require identity, so policy can close it:
+
+```rego
+allow { not is_container_create; not is_volume_create; not is_plugin_write; not is_exec_create }
+allow { is_exec_create; exec_ok }
+
+is_exec_create {
+    input.Method == "POST"
+    input.PathArr[count(input.PathArr) - 1] == "exec"
+}
+exec_ok { input.Body.Privileged == false }
+```
+
+The first line replaces the general `allow` rule from [The Plugin API](#the-plugin-api).
+
+The rule is intentionally written as an allow-list. The Docker CLI always sends the `Privileged` field in exec requests, so a normal `docker exec` keeps working. Because it's an allow-list, a bodyless request or one missing the field is denied.
+
+A deny-list rule such as `exec_deny { not input.Body }` doesn't do the job. When the plugin can't parse the body, the `input.Body` field can arrive as `null`. `null` is a defined value in Rego, not `false`, so `not input.Body` is false. A bodyless privileged exec request passes such a rule. The create-side `deny { not input.Body.HostConfig }` rule isn't affected by this problem: the `HostConfig` field of a `null` body is undefined, so the rule fires.
+
+### `--gpus` and `DeviceRequests`
+
+`--gpus` writes to `HostConfig.DeviceRequests`, not `HostConfig.Devices`. The `Devices` rule doesn't block GPU access. In this scenario, GPU access is part of the goal, so the field was intentionally left open. A policy that wants to restrict GPUs has to handle `DeviceRequests` separately.
+
+### Other Unchecked Fields
+
+`CgroupnsMode`, `CgroupParent`, `Sysctls`, `Runtime`, and `PortBindings` aren't checked by either policy. They were considered lower risk. By the nature of the deny-list approach, the list has to be reviewed whenever a new field is added to the Docker API.
+
+## 10. What an Authorization Plugin Can't Provide
+
+Two rows in the hardened table are still open: another user's workspace and `exec`. `exec --privileged` can be closed with policy ([Section 9](#9-pitfall-4-what-the-policy-cant-see)). But restrictions that depend on the question "whose container is this?" can't be closed by improving the policy.
+
+### No Identity
+
+For requests over the Unix socket, the `User` field is empty ([Section 3](#3-how-docker-authorization-plugins-work)). The policy can check the **format** of the `/home/<user>/workspace` path, but it can't know whether the requester is that `<user>`. A user can bind another user's workspace into their own container.
+
+Home directories with 0700 permissions don't stop this. The files are accessed by the daemon, which runs as root. For directories on local disk, this means direct read and write access. If workspaces are mounted over NFS (Network File System) with `sec=krb5`, whether the root daemon can access another user's data depends on Kerberos identity mapping.
+
+The same cause creates one more risk. Because users own their home directories, a user can delete the workspace directory and replace it with a symlink that points somewhere else on the host. The path format passes the policy, and because Docker resolves symlinks in the bind source ([Section 5](#5-the-policy-line-by-line)), whatever the symlink points to gets mounted. If the workspace is an NFS mount point, it can't be deleted. When the mount is absent, or the workspace is a local directory, this is possible. A policy that looks at path format can't close this risk.
+
+Carrying identity with TLS client certificates is theoretically possible. However, it requires users to connect over TLS with their own certificates instead of the local socket. For a shared workstation, that's a separate infrastructure project.
+
+### `exec`, `commit`, and `rm` Are Unrestricted
+
+The policy only checks container creation. And since there's no identity, you can't write a rule based on "whose container is this?" either. A user can:
+
+- `exec` into another user's container as root,
+- turn that container into an image with `commit` and take it out,
+- stop or delete it.
+
+You can ban `exec` entirely, but then users can't get into their own containers either. Without ownership information, you can't write a selective rule.
+
+### The `docker` Group Is Root-Equivalent
+
+According to Docker's official documentation, the `docker` group grants a user root-level privileges, and only trusted users should be able to control the Docker daemon. An authorization plugin doesn't change this; it only closes some paths. The list of those paths can easily end up incomplete. The plugin can silently drop out of service through an administrator mistake or, if the policy isn't strict enough, through a regular user's request.
+
+### Authorization Alone Is Not a Security Boundary
+
+It helps to split the risks into two categories:
+
+- **Gaps by design:** Access to the host through legitimate Docker features (such as `--privileged`, host bind mounts, and volume driver options). An authorization policy exists to close these.
+- **Runtime escape vulnerabilities:** Escaping a container through security bugs in runc or the kernel. No policy closes these. The remedy is keeping runc, Docker, and the kernel up to date.
+
+An authorization plugin is a useful layer for the first category. But because it has no identity, can be dropped from the chain, and relies on a deny-list that can be incomplete, it isn't enough on its own against untrusted users.
+
+### Alternatives
+
+- **Rootless Docker:** The daemon runs with the user's own privileges. The root-equivalence problem largely goes away.
+- **Podman:** A daemonless alternative that can run rootless.
+- **userns-remap:** Maps root in the container to an unprivileged UID range on the host.
+- **A separate daemon per user:** Each user gets their own socket and isolation.
+- **Kubernetes + admission control:** Identity and authorization are built into the API server. The policy (for example, with OPA Gatekeeper) is written in a context that knows identity.
+- **A root-owned launcher:** Instead of the Docker socket, users get a small root-owned tool that launches containers only with allowed parameters. Identity comes from the operating system.
+
+Every option has a cost. Rootless Docker can cause compatibility problems when added to an existing setup after the fact. Because userns-remap maps root in the container to a different UID on the host, it can break users' access to their NFS data under their own identities. GPU access can also be affected. For requirements that need identity, a root-owned launcher or a separate daemon per user is a sturdier foundation than an authorization plugin.
+
+## 11. Production Checklist
+
+**Version**
+- Run Docker Engine 29.3.1 or later. This version patches CVE-2026-34040, which allows AuthZ plugins to be bypassed, and CVE-2026-33997, which allows privilege validation to be skipped during `docker plugin install`.
+- If you have to stay on an older version, at least use one that is patched for CVE-2024-41110. The advisory gives patched versions only for the 23.0, 26.1, and 27.1 branches: versions after v23.0.14, v26.1.4, and v27.1.0 (docker-ce v27.1.1). No patched version is given for the 19.03, 20.10, 24.0, 25.0, 26.0, and 27.0 branches; if you're on one of them, upgrade to a patched version ([Section 9](#9-pitfall-4-what-the-policy-cant-see)).
+
+**Permissions**
+- Set the policy directory to `0755 root:root` and the file to `0644 root:root`. This isn't the cause of the fail-open. It's a recommended hygiene rule so that separately run tools such as `opa check` can read the file.
+- Write the policy path as the path inside the plugin (`/etc/docker/...` → `/opa/...`). If the path is wrong, the plugin explicitly fails open.
+
+**Behavioral Test**
+- After every installation, every policy change, and every plugin operation, run `docker run --rm --privileged alpine true` as a regular user.
+- Check for the `authorization denied` message, not just the exit code.
+- `docker plugin ls`, file hashes, and file modes don't show the state of the chain. A drift check limited to these won't catch a fail-open.
+
+**Periodic Test and Alerting**
+- Run the behavioral test at regular intervals and raise an alert if it isn't denied. This is the check that catches the situation in [Section 6](#6-pitfall-1-silent-fail-open) the earliest:
+
+```bash
+#!/usr/bin/env bash
+# Run as a non-root service account in the docker group.
+out=$(docker run --rm --privileged alpine true 2>&1)
+if ! grep -q "authorization denied" <<<"$out"; then
+  logger -p auth.crit "docker-authz: privileged test NOT denied: ${out:-<succeeded>}"
+  exit 1
+fi
+```
+
+**Update Procedure**
+- For policy changes, don't touch the plugin. Change the file and test.
+- Don't use `docker plugin disable/enable` to update the policy.
+- Before plugin operations (upgrade, reinstall), remove the plugin from `daemon.json` and reload. When you're done, add it back, reload again, and repeat the behavioral test.
+- Compare your automation scripts against the documented procedure.
+- Deny write operations on the plugin API in the policy.
+- Before upgrading the plugin version, convert the policy to the `import rego.v1` form and run `opa check` with the target OPA version.
+
+**Policy**
+- Deny bodyless requests: `deny { not input.Body.HostConfig }`. For decision points other than container create (`volume create`, `exec`), use an allow-list and test with a bodyless request.
+- Check the volume type in `Mounts`, `volume create` options, and `VolumesFrom`.
+- Reject `.`, `..`, and empty values in path segments.
+- Test in CI with `--strict-builtin-errors`.
+
+**Backup**
+- Don't exclude the `/var/lib/docker` directory from backups, or explicitly add the plugin to your restore procedure. The plugin binary lives there. If `daemon.json` requires the plugin and the plugin is missing, `validateAuthzPlugins` fails and dockerd doesn't start. The result is fail-closed: authorization doesn't open up, but Docker stops entirely on that machine.
+
+**Logging**
+- Ship the plugin's decision logs to a central location. An allow decision on the plugin API, followed by decision logs that stop, is the first sign of the plugin being dropped from the chain.
+- Define a separate alert rule for the `failing open and allowing request` message.
+
+## 12. Conclusion
+
+You know a security control works by testing whether it actually blocks, not because it looks "enabled." The plugin can look enabled, and the policy file and permissions can be correct. Despite all that, the authorization plugin chain can be empty. A one-line `docker run --privileged` test reveals this in a second. `docker plugin disable` turns authorization off, `enable` doesn't turn it back on, and `systemctl reload docker` does.
+
+A Docker authorization plugin doesn't change the fact that the `docker` group is root-equivalent. It's a layer that doesn't know identity, checks only some endpoints, and can silently drop out of service. It's useful for preventing accidents among trusted users. Separating untrusted users requires a sturdier foundation, such as rootless operation, per-user isolation, or a control plane that knows identity.
+
+Since that incident, I run the behavioral test periodically. You can't know the difference between "looks enabled" and "works" without testing it.
+
+## 13. References
+
+- Docker, Access authorization plugin: https://docs.docker.com/engine/extend/plugins_authorization/
+- Docker, Linux post-installation steps (docker group): https://docs.docker.com/engine/install/linux-postinstall/
+- Docker, Docker daemon attack surface: https://docs.docker.com/engine/security/#docker-daemon-attack-surface
+- Docker, dockerd configuration reload behavior: https://docs.docker.com/reference/cli/dockerd/#configuration-reload-behavior
+- moby, `pkg/authorization/middleware.go`: https://github.com/moby/moby/blob/b1bf272a8c767e2a21737fa0625844e9970c3dc2/pkg/authorization/middleware.go
+- moby, `daemon/pkg/plugin/backend_linux.go`: https://github.com/moby/moby/blob/b1bf272a8c767e2a21737fa0625844e9970c3dc2/daemon/pkg/plugin/backend_linux.go
+- moby, `daemon/command/daemon.go`: https://github.com/moby/moby/blob/b1bf272a8c767e2a21737fa0625844e9970c3dc2/daemon/command/daemon.go
+- moby, issue #31836 (a disabled authz plugin blocking requests): https://github.com/moby/moby/issues/31836
+- moby, commit `38de272bd4` (removing a disabled authz plugin from the chain): https://github.com/moby/moby/commit/38de272bd4
+- moby, PR #33655 (Eliminate authz plugin disable race): https://github.com/moby/moby/pull/33655
+- NVD, CVE-2024-41110: https://nvd.nist.gov/vuln/detail/CVE-2024-41110
+- moby, GHSA-v23v-6jw2-98fq (CVE-2024-41110 advisory): https://github.com/moby/moby/security/advisories/GHSA-v23v-6jw2-98fq
+- NVD, CVE-2026-34040: https://nvd.nist.gov/vuln/detail/CVE-2026-34040
+- NVD, CVE-2026-33997: https://nvd.nist.gov/vuln/detail/CVE-2026-33997
+- opa-docker-authz, `main.go`: https://github.com/open-policy-agent/opa-docker-authz/blob/v0.9/main.go
+- opa-docker-authz, releases: https://github.com/open-policy-agent/opa-docker-authz/releases
+- opa-docker-authz v0.9, `go.mod`: https://github.com/open-policy-agent/opa-docker-authz/blob/v0.9/go.mod
+- Docker Hub, `openpolicyagent/opa-docker-authz-v2` tags: https://hub.docker.com/r/openpolicyagent/opa-docker-authz-v2/tags
+- OPA, v0 → v1 upgrade guide: https://www.openpolicyagent.org/docs/v0-upgrade
+- OPA, v0.59.0 release notes (`rego.v1` import): https://github.com/open-policy-agent/opa/releases/tag/v0.59.0
+- OPA, errors and strict built-in errors: https://www.openpolicyagent.org/docs/errors
+
+
+================================================================================
+PART 3: CASE STUDY - ONE USER, TWO UIDS: NFSv4, KERBEROS, TRUENAS SCALE & SSSD
+URL: https://onurbaydas.online/posts/nfs-uid-mismatch-en/
+Turkish: https://onurbaydas.online/posts/nfs-uid-mismatch/
+================================================================================
+
+---
+title: "One User, Two UIDs: NFSv4, Kerberos, and Docker on a Domain-Joined TrueNAS"
+date: 2026-10-13
+url: "/posts/nfs-uid-mismatch-en/"
+translationKey: "nfs-uid-mismatch"
+description: "SSSD and TrueNAS gave the same AD user different UIDs. How that showed up as nobody, Permission denied, root:root 755, and \"I have no name!\", and how we aligned them."
+tags: ["docker", "nfs", "kerberos", "truenas", "active-directory"]
+ShowToc: true
+---
+
+## Introduction
+
+On a set of shared, multi-user Linux workstations, several things broke in the same few weeks. Files on a user's NFS home showed up as `nobody:nogroup`. Once we tightened the share, a user could no longer write to their own home, even though `ls` showed them as the owner. A freshly provisioned home dataset came out owned by `root:root` with mode `755` instead of belonging to the user with mode `700`. A user's Jupyter container opened with the prompt `I have no name!` and `sudo` refused to work.
+
+Most of this came from one root cause. The same Active Directory user had one UID on the Linux clients and a different UID on the storage server. Neither side was misconfigured on its own terms. In the end, we computed the base the clients used and set the storage server's ID range to start at the same number. Two more lookups on the same path, one on the client and one on the server, also had to be fixed before access worked.
+
+This post follows one identity from login to an NFS file, shows where the mismatch hurts, and covers the fix, a checklist, and alternatives.
+
+## The Setup
+
+The environment has four parts:
+
+- **Domain controller:** a Samba-based AD appliance for the `EXAMPLE.LOCAL` realm.
+- **Storage:** TrueNAS SCALE at `nas.example.local` (192.0.2.10), joined to the same domain. Every user gets a separate ZFS dataset, exported over NFSv4 with `sec=krb5` only. Each dataset is owned by its user with mode `0700`. The owner has full access and everyone else has none.
+- **Clients:** Ubuntu workstations joined to the domain with SSSD. `pam_mount` mounts the user's dataset at login, and `rpc.gssd` handles the Kerberos side of NFS.
+- **Docker:** users run their work (Jupyter, training jobs) in containers. The user's NFS directory is bind-mounted into the container as `/workspace`.
+
+The isolation goal is simple: user A must not be able to read user B's dataset, even with Docker in the picture.
+
+The diagram shows which identity is in effect at each hop, before the fix. The UIDs are examples.
+
+```mermaid
+flowchart TD
+    A["Login on client<br/>AD password"] --> B["SSSD<br/>SID to UID (ID mapping)<br/>alice = 1914801105"]
+    B --> C["SSSD krb5_child<br/>TGT in /tmp/krb5cc_1914801105"]
+    C --> D["pam_mount<br/>mount nas:/.../alice sec=krb5"]
+    D --> E["docker exec --user 1914801105<br/>process in container"]
+    E --> F["Kernel NFS client<br/>caller UID = 1914801105"]
+    F --> G["rpc.gssd<br/>finds ccache by UID<br/>principal alice@EXAMPLE.LOCAL"]
+    G --> H["TrueNAS<br/>principal to UID via its own idmap (RID)<br/>alice = 100001106"]
+    H --> I["ZFS permission check<br/>owner 100001106, mode 0700"]
+    I --> J["Reply: owner as name string<br/>EXAMPLE\\alice@example.local"]
+    J --> K["Client nfsidmap + SSSD<br/>name to local UID 1914801105"]
+```
+
+The client's number never reaches the server; it only selects the Kerberos ticket. The server uses the principal and its own number, and the owner comes back as a name. The two numbers never meet, which is why the mismatch could hide.
+
+## Why Containers Must Not Run as Root Here
+
+With `sec=sys`, the server trusts the UID the client sends. With `sec=krb5`, it trusts a Kerberos principal, and the client picks that principal from the UID of the calling process.
+
+### How the client picks a Kerberos identity
+
+Per the `rpc.gssd` man page, user credentials live in a file with "a well-known name constructed using the user's UID", typically in `/tmp`. SSSD writes the ticket cache under exactly that kind of name:
+
+```ini
+# /etc/sssd/sssd.conf (domain section, excerpt)
+ldap_id_mapping = True
+krb5_ccachedir = /tmp
+krb5_ccname_template = FILE:%d/krb5cc_%U
+krb5_renewable_lifetime = 7d
+krb5_renew_interval = 60m
+```
+
+`%U` is the login UID and `%d` is `krb5_ccachedir` (`sssd-krb5(5)`). Renewal keeps a long Jupyter session from losing its ticket.
+
+A container shares the host kernel, so when a container process touches `/workspace`, `rpc.gssd` looks for a ticket cache under that process's UID. The container's UID decides which identity the NAS sees.
+
+### What root gets
+
+The `rpc.gssd` man page is explicit about root: "By default rpc.gssd uses the system's machine credentials for UID 0 accesses that require GSS authentication."
+
+So root in the container reaches the NAS as the machine account, which owns none of the `0700` datasets. Root gets *less* access to the user's files than the user. That is good for security, but any setup step that writes to `/workspace` as root fails.
+
+It failed even earlier for us. The launcher started containers as root with `-w /workspace`. After the share became Kerberos-only, the container no longer started at all: the runtime's `chdir` into `/workspace` ran as root and was denied. The fix was to start the container with `-w /`, so root never touches the NFS path, and to change into `/workspace` only in the exec calls that run as the user.
+
+Our launcher used to create Jupyter directories as root and then `chown -R` them to the user. On a Kerberos mount that step cannot work. We replaced it with a `mkdir` run as the user:
+
+```bash
+# Create directories AS THE USER (NFS, owner is the user)
+docker exec --user "$UID:$GID" "$name" bash -c '
+  mkdir -p /workspace/.jupyter/runtime /workspace/.local/bin /workspace/.cache
+'
+```
+
+On the host, a playbook running `chmod 0755` on a mounted NFS path failed with `PermissionError: [Errno 1] Operation not permitted`. Permissions belong to the server.
+
+### Running as the user, with root kept inside the container
+
+The launcher now starts every interactive shell and Jupyter process with the host UID and GID:
+
+```bash
+docker exec -it --user "$(id -u):$(id -g)" "$name" bash -lc 'cd /workspace && exec bash'
+```
+
+Docker accepts a numeric UID for `--user`; only a user *name* must exist in the container. A UID with no entry in the image's `/etc/passwd` still runs, and that is where `I have no name!` comes from. Tools that look up the user, `sudo` among them, break too.
+
+So a separate root step runs first to make the image aware of the user:
+
+```bash
+docker exec --user 0 "$name" bash -c "
+  grep -q ':x:$GID:' /etc/group  || echo '$USER:x:$GID:' >> /etc/group
+  id $UID >/dev/null 2>&1        || echo '$USER:x:$UID:$GID::/workspace:/bin/bash' >> /etc/passwd
+  grep -q '^$USER:' /etc/shadow  || echo '$USER:*:19999:0:99999:7:::' >> /etc/shadow
+  command -v sudo >/dev/null     || (apt-get update && apt-get install -y sudo)
+  echo '$USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/lab && chmod 0440 /etc/sudoers.d/lab
+"
+```
+
+Each line in that block fixed a failure we hit:
+
+- We first used `useradd`. Some images do not have it, so the script now writes to `/etc/passwd` and `/etc/group` directly.
+- Images built on the Jupyter Docker Stacks start as `jovyan` (UID 1000). Without `--user 0`, the setup ran as `jovyan` and could not write `/etc/passwd`. The result was `I have no name!` and a broken `sudo`.
+- A user that exists in `passwd` but not in `shadow` makes `sudo` fail with `account validation failure`. A non-expiring shadow line with a locked password fixes it.
+
+This `sudo` is container root only: users can `apt install`, but on `/workspace` it is the machine account and cannot read anyone's dataset. Access to the Docker daemon itself is a separate problem, covered in a [separate post on Docker authorization](/posts/docker-authz-opa/).
+
+The `jovyan` case fails in a different way. The host has no ticket cache for UID 1000, so `rpc.gssd` has nothing to present. The user's own UID is the only one that works correctly.
+
+## The UID Mismatch
+
+### Two ID mapping engines, two numbers
+
+AD identifies users by SID. Every Linux system has to turn a SID into a number, and ours used two different engines.
+
+**On the clients, SSSD.** With the AD provider, `ldap_id_mapping` is true by default. The `sssd-ad(5)` man page says the provider maps "UID and GID values from the objectSID parameter in Active Directory", and that "When ID-mapping is enabled, the uidNumber and gidNumber attributes are ignored." The default range runs from 200,000 to 2,000,200,000 in slices of 200,000. Each domain lands in a slice chosen by a hash of its SID, so the resulting UIDs are large and look arbitrary.
+
+**On TrueNAS, winbind with the RID backend.** TrueNAS joins AD through Samba. Its documentation says that by default it "uses an algorithmic method based on the RID component of the user or group SID", and lists the default domain range as 100000001 to 200000000. Our TrueNAS used this default. The Samba man page gives the formula: `ID = RID - BASE_RID + LOW_RANGE_ID`.
+
+Both engines are deterministic, but they start from different bases. For a user with RID 1105, the client computed `1914801105` and TrueNAS computed `100001106`. Neither was wrong, but they were not the same number. We first saw the two numbers side by side when we compared `id` on a client with the owner of the user's files on TrueNAS.
+
+### Where the mismatch hits, layer by layer
+
+The example UIDs are the values before the fix.
+
+| Layer | Where the identity comes from | Example UID | What the mismatch does here |
+|---|---|---|---|
+| Client host | SSSD ID mapping from SID | 1914801105 | Consistent on the client. `id -u` returns it, and the launcher passes it to the container. If it is ever sent to TrueNAS as a number, it points to the wrong account or to none. |
+| Container | `docker exec --user <host UID>` | 1914801105 | Without a `passwd` entry you get `I have no name!` and `sudo` breaks. As root or `jovyan`, NFS requests do not carry the user's identity. |
+| NFS request | `rpc.gssd` finds `/tmp/krb5cc_<UID>`, and the principal goes on the wire | `alice@EXAMPLE.LOCAL` | The number is only a lookup key on the client. The mismatch does not matter here, provided the ticket cache is named after the UID the process actually runs as. |
+| TrueNAS file system | Principal to UID through winbind idmap, checked against ZFS ownership | 100001106 | The dataset must be owned by *this* number. If ownership is wrong, the user is locked out of their own `0700` dataset. |
+| TrueNAS API `filesystem.setperm` | Whatever the provisioning code sends | 100001106 (correct) or 1914801105 (wrong) | Our name-based call did not apply. The dataset stayed `root:root 755`, so the owner could not write and other users could read. Sending the client's UID would have been just as wrong. |
+| NFSv4 name mapping (idmapd) | Server sends `EXAMPLE\alice@example.local`, and the client maps it through NSS (SSSD) | client: 1914801105 | If the client's NFSv4 domain does not match, the name does not map and the file shows as `nobody`. If it matches, the name maps to the client's own UID and the mismatch disappears from view. |
+
+### Symptom 1: `nobody:nogroup`
+
+The client logs were full of this:
+
+```text
+nfsidmap: libnfsidmap: Unable to determine the NFSv4 domain; Using 'localdomain' as the NFSv4 domain ...
+nfsidmap: nss_getpwnam: name 'EXAMPLE\alice@example.local' does not map into domain 'localdomain'
+nfsidmap: nss_name_to_gid: name 'EXAMPLE\domain users@example.local' does not map into domain 'localdomain'
+```
+
+NFSv4 sends owners as `user@domain` strings, not numbers (`nfsidmap(5)`), and the client accepts only names from its own NFSv4 domain. If `idmapd.conf` does not set one, the client tries a DNS `_nfsv4idmapdomain` record, then the DNS domain. Ours found neither, fell back to `localdomain`, and every owner became `nobody`.
+
+The fix was one line on every client, plus clearing the cache:
+
+```ini
+# /etc/idmapd.conf
+[General]
+Domain = example.local
+```
+
+```bash
+sudo nfsidmap -c
+```
+
+`nfsidmap -c` clears the keyring of cached mappings. The man page warns that a stale key alone can make ownership show as `nobody`.
+
+After that fix, ownership *looked* correct, and the mismatch became invisible: `ls -l` showed `alice`, `ls -ln` showed `1914801105`, and TrueNAS stored `100001106`.
+
+### Symptom 2: the right owner, and still `Permission denied`
+
+At first, the share squashed all access to a single user (`mapall`), which hid ownership problems. Once we removed `mapall` and made the share Kerberos-only, isolation depended on one thing: each dataset's owner had to be exactly the UID that TrueNAS maps the user's principal to.
+
+The first test after that change looked like this:
+
+```text
+$ stat -c '%U %u' ~/nfs-home
+alice 1914801105
+$ touch ~/nfs-home/_t
+touch: cannot touch '/home/alice/nfs-home/_t': Permission denied
+```
+
+The client resolved the owner to the right user, because idmapd translated the name. The server still refused the write. Three things were wrong at the same time, and each one alone was enough to deny access:
+
+- **The numbers differed.** TrueNAS stored the files under its own UID, which the clients never used.
+- **The client did not present the user's ticket.** The cache name had a random suffix (`/tmp/krb5cc_1914801105_XXXXXX`), and `rpc.gssd` did not find it.
+- **The server mapped the principal to `nobody`.** Even with the first two fixed, the user still got `ls: cannot open directory ...: Permission denied`. As a diagnostic step, we set the directory to `777` for a moment, and it opened. The user was getting in through the "other" bits, not as the owner. On TrueNAS, `getent passwd 'EXAMPLE\alice'` resolved, but the bare `getent passwd alice` returned nothing.
+
+The fix section covers all three.
+
+### Symptom 3: a new dataset owned by `root:root 755`
+
+The provisioning code set permissions by name:
+
+```python
+payload = {
+    "path": mount_path,
+    "uid": None,
+    "user": "EXAMPLE\\alice",
+    "group": "EXAMPLE\\domain users",
+    "mode": "700",
+    "options": {"recursive": True, "traverse": False},
+}
+```
+
+On our TrueNAS version the call was rejected, and new datasets stayed `root:root 755`. Nobody noticed, because the provisioning code caught the error, logged it as non-critical, and carried on. Older datasets looked fine only because they had been fixed by hand. Under a Kerberos-only share, a `root:root 755` dataset means the owner cannot write to their own home and any other authenticated user can read it. Newer TrueNAS API references list `user` and `group` name fields for `filesystem.setperm`, so name-based calls may behave differently on your version. Numeric IDs avoid the question entirely.
+
+### Why this stays quiet
+
+No error ever mentioned a UID. Every tool showed the right *name*, the symptoms had different names in different layers (`nobody`, `Permission denied` on a file you own, `root:root 755`, `I have no name!`), and Kerberos kept the number off the wire. You only see the mismatch when you put the two numbers side by side.
+
+## The Fix
+
+The fix had three parts. First, make every layer carry the right identity. Second, make the two numbers equal. Third, fix the two lookups that still turned the user into `nobody`.
+
+### Part 1: the right identity at every hop
+
+1. **Names on the wire.** Every client gets `Domain = example.local` in `idmapd.conf` and runs `nfsidmap -c`, so the owner strings from TrueNAS resolve through SSSD to local users.
+2. **Principals for access.** The share accepts only `KRB5`, with no `mapall`/`maproot`. The clients mount with `sec=krb5`, run `rpc.gssd`, keep the ticket cache at a predictable `/tmp/krb5cc_%U`, and renew it. Each of these broke at least once after the share became Kerberos-only:
+   - The `pam_mount` options did not include `sec=krb5`, so the mount was refused.
+   - `rpc-gssd` was not running on every client. It has to be enabled.
+   - `rpc.gssd` logged `ERROR: unable to resolve 192.0.2.10 to hostname: Name or service not known`. Without a reverse lookup it cannot build the NFS service principal for the server, and the mount fails. A PTR record in DNS fixes it, or an `/etc/hosts` entry with the server's FQDN.
+   - Some users got `ls: cannot access '/home/alice/nfs-home/': Key has expired`. They had logged in while SSSD could not reach the KDC, so they had no valid ticket, and nothing renewed it. The renewal settings shown earlier fix this, and the user has to log out and back in once.
+3. **The user's UID inside the container.** Every process that touches `/workspace` runs with `--user <host UID>:<host GID>`. Root work happens in a separate `--user 0` exec that touches only the container's own files.
+4. **Ownership from the server's own lookup.** Provisioning asks TrueNAS which UID it uses for the user, then sets ownership numerically:
+
+```python
+uid_resp = self._post("/user/get_user_obj", {"username": username})
+user_obj = uid_resp.json() or {}
+uid, gid = user_obj.get("pw_uid"), user_obj.get("pw_gid")
+if not isinstance(uid, int) or not isinstance(gid, int):
+    return {"success": False, "message": "could not resolve uid/gid"}
+
+payload = {
+    "path": mount_path,
+    "mode": "700",
+    "uid": uid,
+    "gid": gid,
+    "options": {"recursive": True, "traverse": False},
+}
+resp = self._post("/filesystem/setperm", payload)
+```
+
+`user.get_user_obj` returns the `struct passwd` fields for a user, including `pw_uid` and `pw_gid`, and it works for Active Directory accounts too. The TrueNAS API documents `uid` and `gid` in `filesystem.setperm` as numeric owner IDs. If TrueNAS cannot resolve the user, provisioning stops instead of leaving a dataset owned by root.
+
+### Part 2: align the UIDs by moving the TrueNAS range
+
+Both engines add the user's RID to a fixed base. TrueNAS uses `range_low - BASE_RID`. SSSD uses the start of the slice the domain landed in. The `sssd-ad(5)` page requires `ldap_idmap_range_size` to be at least the highest RID in the domain, so every user fits in that one slice. If TrueNAS starts its range at the same base, the numbers become equal.
+
+We found the SSSD base by subtracting the RID from the client's UID, for a user and for two groups. All three gave the same number, which confirmed that the client's formula was `base + RID`:
+
+```text
+alice          1914801105 - 1105 = 1914800000
+domain users   1914800513 -  513 = 1914800000
+another group  1914801158 - 1158 = 1914800000
+```
+
+Then we changed the TrueNAS side:
+
+1. In the Active Directory idmap settings for the domain, keep the **RID** backend and set **Range Low** to the base and **Range High** to the base plus the SSSD slice size (200,000). The RID backend's SSSD compatibility option stays off; the range is already aligned.
+2. TrueNAS would not save idmap changes while the directory service was enabled. Disable the directory service, save, then enable it again.
+3. Enabling it makes TrueNAS rejoin the domain. The account used for the join needs write access to the TrueNAS computer object. Without it, the join fails with `Insufficient access` during `LDB_MODIFY`. A `KRB5KDC_ERR_PREAUTH_FAILED` at this step means a wrong password, a wrong UPN format, or a clock difference larger than Kerberos allows.
+4. Verify: `wbinfo -i 'EXAMPLE\alice'` on TrueNAS must show the same UID as `id -u alice` on a client.
+5. Re-own the existing data, because every AD UID on TrueNAS has changed.
+
+With the example numbers:
+
+```text
+client (SSSD):    alice  RID 1105  ->  1914801105
+TrueNAS before:   alice  RID 1105  ->  100001106    (range 100000001-200000000)
+TrueNAS after:    alice  RID 1105  ->  1914801105   (range 1914800000-1915000000)
+```
+
+The re-own step is not optional. ZFS stores numeric owners, so every existing dataset still pointed to the old TrueNAS UIDs. Because the old and the new TrueNAS formulas are both `base + RID`, the shift is the same for every account: `1914800000 - 100000001 = 1814799999`. We took a recursive ZFS snapshot first, then added that shift to every UID and GID in the old range:
+
+```bash
+zfs snapshot -r pool/users@before-idmap-fix
+OLD_LOW=100000001; OLD_HIGH=200000000; DELTA=1814799999
+for U in $(find /mnt/pool/users -printf '%U\n' | sort -un); do
+  [ "$U" -ge "$OLD_LOW" ] && [ "$U" -le "$OLD_HIGH" ] &&
+    find /mnt/pool/users -uid "$U" -exec chown -h "$((U + DELTA))" {} +
+done
+# the same loop with %G, -gid and chgrp for groups
+```
+
+Two details matter here. Each user's home was its own child dataset, so `find` must not use `-xdev`, or it stops at the first dataset boundary. Local accounts with small UIDs are outside the old range, so the loop leaves them alone.
+
+After the change, the UID was the same for every user we checked on the clients, in the containers, and on TrueNAS. `ls -ln` now shows the same number on both sides. Even when a number does cross the boundary, it identifies the right person.
+
+### Part 3: the two lookups that still returned `nobody`
+
+Aligned numbers were not enough. The user from Symptom 2 still got `Permission denied`, for two more reasons.
+
+**On the client, a ticket cache that `rpc.gssd` could find.** SSSD had written the ticket to `/tmp/krb5cc_1914801105_XXXXXX`, with a random suffix. `rpc.gssd` did not use it. Setting `krb5_ccname_template = FILE:%d/krb5cc_%U` (shown earlier) gave the cache a fixed name. We rolled it out to every client and restarted SSSD. `klist` then showed `/tmp/krb5cc_1914801105`.
+
+**On TrueNAS, "Use Default Domain".** With this setting off, TrueNAS resolved only the domain-qualified name (`EXAMPLE\alice`), and the bare `alice` returned nothing. Incoming principals ended up as `nobody`, which is why the `777` test opened the directory. With the setting on, the bare name resolved to the aligned UID and the `0700` home opened for its owner.
+
+Changing it had its own catch. TrueNAS refused to disable the directory service while it held a Kerberos user credential: `Kerberos user credentials may not be stored for disabled directory services`. We first switched the credential to the TrueNAS machine account's Kerberos principal (its keytab), then disabled, changed the setting, and enabled again. That also removed the password and `PREAUTH_FAILED` problems from later rejoins.
+
+Old mappings are cached on both sides, so after the change we flushed them:
+
+```bash
+# TrueNAS
+net cache flush
+nfsidmap -c
+midclt call service.restart nfs
+# clients: remount, or log out and back in
+```
+
+A few limits apply to this trick:
+
+- It depends on SSSD's slice choice. All clients must use the same SSSD ID mapping settings so they all land in the same slice. The man page warns that hash collisions can make slices differ between machines, so check more than one client.
+- Users whose RID is above the SSSD range size do not fit the scheme. The man page says lookups fail for them.
+- The TrueNAS docs warn that the domain range "must not overlap with local accounts or trusted domain ranges", and that idmap mistakes can assign permissions to the wrong users. Make the change in a maintenance window and verify before users log in.
+
+## How to Check Your Own Setup
+
+**On the client, find out who you are:**
+
+```bash
+id                    # UID and GID as SSSD computed them
+getent passwd alice   # the same, from NSS
+klist                 # the principal and the ticket cache path; it should end in krb5cc_<your UID>
+```
+
+If the cache name does not contain your `id -u`, `rpc.gssd` cannot find it; check `krb5_ccname_template`.
+
+**On TrueNAS, find out who the server thinks you are** (from the TrueNAS shell):
+
+```bash
+id 'EXAMPLE\alice'
+midclt call user.get_user_obj '{"username": "alice"}'
+```
+
+Compare `pw_uid` with the client's `id -u`. If they differ, subtract the RID from the client's UID for two or three accounts. If the result is the same for all of them, that number is the client's base, and the range change above will work.
+
+**Check the NFS mount and the name mapping:**
+
+```bash
+findmnt -t nfs4 -o TARGET,SOURCE,OPTIONS   # look for sec=krb5 and vers=4.x
+nfsidmap -d                                # effective NFSv4 domain; must not be "localdomain"
+grep -E '^\s*Domain' /etc/idmapd.conf
+systemctl is-active rpc-gssd
+journalctl -t nfsidmap --since today       # "does not map into domain" means wrong domain
+```
+
+If the share is Kerberos-only and you still get `Permission denied` on a directory you own, check the server's view of the bare user name (on TrueNAS, `getent passwd alice` without the domain), and check that `klist` shows a cache without a random suffix. To get more detail, stop `rpc-gssd` and run `rpc.gssd -f -vvv` in the foreground while you repeat the access.
+
+**Check ownership both ways:**
+
+```bash
+ls -l  ~/nfs-home     # names: should show alice, never nobody
+ls -ln ~/nfs-home     # numbers: after alignment, the same UID as on TrueNAS
+```
+
+On TrueNAS, `ls -ln /mnt/pool/users/alice` should show the same UID with mode `drwx------`.
+
+**Inside the container:**
+
+```bash
+docker exec --user "$(id -u):$(id -g)" mybox sh -c 'id; whoami; ls -ln /workspace | head'
+```
+
+`whoami` should print a name, and `/workspace` should show the same UID. Repeat with `--user 0`: listing `/workspace` should fail. If it succeeds, check the share's `maproot` and the dataset's mode.
+
+## Alternatives
+
+**SSSD on POSIX attributes.** Store `uidNumber`/`gidNumber` in AD for every user, set `ldap_id_mapping = False` in SSSD, and select the AD (RFC2307) idmap backend on TrueNAS. Both sides read the same stored number, independent of any slice or range. The costs:
+
+- Every account needs those attributes, assigned uniquely and forever by your provisioning.
+- The SSSD man page recommends replicating them to the Global Catalog for performance.
+- The man page warns that changing ID mapping options "will cause user and group IDs to change", so every home directory on the clients has to be re-owned.
+
+**Two UID spaces.** Leave the numbers different and rely on Kerberos plus idmapd names, always setting ownership from the server's own lookup. Nothing is migrated, but everyone must know never to send a client UID to the server, which rules out `sec=sys`, NFSv3, and careless numeric backups. We ran like this for a while; it is how the mismatch stayed hidden. (Replacing SSSD with winbind on the clients would also give one algorithm on both sides, at the cost of a new identity stack.)
+
+**The approach we used: move the TrueNAS RID range.** It changes one setting on one server, and it touches neither AD nor the clients. The cost is a one-time re-own of the existing datasets, a rejoin of the NAS to the domain, and a dependency on SSSD's slice. If the SSSD ID mapping settings change, or a client lands in a different slice, the mismatch comes back. For an environment with one NAS and identical clients, that was the cheapest way to get one UID per user everywhere.
+
+## Conclusion
+
+With NFSv4 and Kerberos, identity on the wire is a principal plus a name string, and a numeric UID exists only inside each system. That let our clients and our NAS disagree about every UID with nothing visibly wrong. The problems appeared where a number or a name crossed a boundary: an idmapd domain that defaulted to `localdomain`, a ticket cache that `rpc.gssd` could not find, a server that could not resolve the bare user name, a permission call that failed silently, and containers that ran as root or as the image's built-in user instead of the person at the keyboard.
+
+Three rules came out of this:
+
+- Run container processes that touch Kerberos NFS as the user's host UID, and keep root work inside the container.
+- Set ownership on the server with the UID the server itself resolves.
+- Compare `id -u` on the client with the server's UID for the same user. If they differ, compute the client's base (UID minus RID), start the server's RID range at that base, and re-own the data.
+
+## References
+
+- `rpc.gssd(8)`, credential cache lookup and machine credentials for UID 0: https://man7.org/linux/man-pages/man8/rpc.gssd.8.html
+- `nfsidmap(5)`, NFSv4 `user@domain` names, `-c`, `-d`, stale keys showing as nobody: https://man7.org/linux/man-pages/man5/nfsidmap.5.html
+- `idmapd.conf(5)`, `Domain` and its default: https://linux.die.net/man/5/idmapd.conf
+- `sssd-ad(5)`, `ldap_id_mapping`, ID ranges and slices, `ldap_idmap_range_size`: https://man.archlinux.org/man/sssd-ad.5.en
+- `sssd-krb5(5)`, `krb5_ccname_template`, renewal options: https://man.archlinux.org/man/sssd-krb5.5.en
+- Samba `idmap_rid(8)`: https://www.samba.org/samba/docs/current/man-html/idmap_rid.8.html
+- TrueNAS, Configuring Active Directory (idmap backends and warnings): https://www.truenas.com/docs/scale/credentials/directoryservices/configad/
+- TrueNAS, Directory Services Screens (Range Low/High, default ranges): https://www.truenas.com/docs/scale/credentials/directoryservices/directoryservicesscreens/
+- TrueNAS API, `filesystem.setperm`: https://api.truenas.com/v25.10/api_methods_filesystem.setperm.html
+- TrueNAS API, `user.get_user_obj`: https://api.truenas.com/v25.10/api_methods_user.get_user_obj.html
+- Docker, running containers (default user, `--user`, numeric UIDs): https://docs.docker.com/engine/containers/run/
+- Docker CLI, `docker container exec`: https://docs.docker.com/reference/cli/docker/container/exec/
+

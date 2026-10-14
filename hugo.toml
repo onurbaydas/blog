@@ -5,14 +5,27 @@ theme = 'PaperMod'
 defaultContentLanguage = 'tr'
 enableRobotsTXT = true
 
+[sitemap]
+  changefreq = 'weekly'
+  priority = 0.8
+  filename = 'sitemap.xml'
+
 [pagination]
   pagerSize = 10
 
 [languages]
   [languages.tr]
     languageName = 'Türkçe'
+    label = 'Türkçe'
     locale = 'tr-tr'
     weight = 1
+    title = 'Onur Baydaş'
+    [languages.tr.params]
+      description = 'Onur Baydaş - Sistem ve Altyapı Mühendisliği Blogu. Linux çekirdek iç mekanizmaları, UID/GID eşleme, TrueNAS Scale NFSv4 Kerberos entegrasyonu, Active Directory SSSD kimlik yönetimi, Docker daemon yetkilendirme (OPA) fail-open açıkları ve çok kullanıcılı GPU cluster mimarileri üzerine teknik analizler.'
+      keywords = ['Onur Baydaş', 'Sistem Mühendisliği', 'Linux Çekirdeği', 'UID GID Eşleme', 'TrueNAS SCALE', 'NFSv4 Kerberos', 'Active Directory SSSD', 'Docker Güvenliği', 'Open Policy Agent', 'OPA Docker Authz', 'Fail-Open', 'CVE-2024-41110', 'GPU Cluster', 'ZFS Depolama']
+      [languages.tr.params.homeInfoParams]
+        Title = 'OB'
+        Content = 'Sistem mimarisi, Linux çekirdeği ve altyapı mühendisliği.'
     [[languages.tr.menus.main]]
       name = 'Yazılar'
       pageRef = '/posts'
@@ -31,14 +44,16 @@ enableRobotsTXT = true
       weight = 40
   [languages.en]
     languageName = 'English'
+    label = 'English'
     locale = 'en-us'
     weight = 2
     title = 'Onur Baydaş'
     [languages.en.params]
-      description = 'Technical writing'
+      description = 'Onur Baydaş - Systems & Infrastructure Engineering Blog. Deep technical post-mortems and architecture breakdowns on Linux kernel internals, UID/GID mappings, TrueNAS Scale NFSv4 Kerberos integration, Active Directory SSSD identity federation, Docker authorization (OPA) fail-open vulnerabilities, and multi-user GPU cluster design.'
+      keywords = ['Onur Baydas', 'Systems Engineering', 'Linux Kernel Internals', 'UID GID Namespace', 'TrueNAS SCALE', 'NFSv4 Kerberos', 'Active Directory SSSD', 'Docker Security', 'Open Policy Agent', 'OPA Docker Authz', 'Silent Fail-Open', 'CVE-2024-41110', 'GPU Cluster Scheduling', 'Enterprise Storage Architecture']
       [languages.en.params.homeInfoParams]
         Title = 'OB'
-        Content = 'Technical writing.'
+        Content = 'Systems architecture, Linux kernel mechanics, and infrastructure engineering.'
     [[languages.en.menus.main]]
       name = 'Posts'
       pageRef = '/posts'
@@ -57,8 +72,10 @@ enableRobotsTXT = true
       weight = 40
 
 [params]
+  env = 'production'
   author = 'Onur Baydaş'
-  description = 'Teknik yazılar'
+  description = 'Onur Baydaş - Sistem ve Altyapı Mühendisliği Blogu. Linux çekirdek mekanizmaları, TrueNAS Scale NFSv4 Kerberos, Active Directory SSSD kimlik entegrasyonu, Docker yetkilendirme (OPA) fail-open açıkları ve çok kullanıcılı GPU altyapıları.'
+  keywords = ['Onur Baydaş', 'Onur Baydas', 'Sistem Mühendisi', 'Linux Kernel', 'Docker Security', 'OPA Docker Authz', 'TrueNAS SCALE', 'NFSv4 Kerberos', 'SSSD Active Directory', 'CVE-2024-41110', 'GPU Cluster']
   defaultTheme = 'dark'
   ShowReadingTime = true
   ShowPostNavLinks = true
@@ -68,6 +85,9 @@ enableRobotsTXT = true
   TocOpen = false
   ShowShareButtons = true
   ShareButtons = ['linkedin', 'x']
+  [params.schema]
+    publisherType = 'Person'
+    sameAs = ['https://github.com/onurbaydas']
   [params.assets]
     favicon = "/favicon.ico"
     favicon16x16 = "/favicon-16x16.png"
@@ -75,7 +95,7 @@ enableRobotsTXT = true
     apple_touch_icon = "/apple-touch-icon.png"
   [params.homeInfoParams]
     Title = 'OB'
-    Content = 'Teknik yazılar.'
+    Content = 'Sistem mimarisi, Linux çekirdeği ve altyapı mühendisliği.'
   [[params.socialIcons]]
     name = 'github'
     url = 'https://github.com/onurbaydas'

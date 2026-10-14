@@ -1,0 +1,278 @@
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+{{- /* ===================================================================== */ -}}
+{{- /* ADVANCED ROBOTS & AI CRAWLER DIRECTIVES                               */ -}}
+{{- /* ===================================================================== */ -}}
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+{{- /* ===================================================================== */ -}}
+{{- /* TITLE                                                                 */ -}}
+{{- /* ===================================================================== */ -}}
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ if .Title }}{{ .Title }} | {{ end }}{{ site.Title }}{{ end }}</title>
+
+{{- /* ===================================================================== */ -}}
+{{- /* METADATA: DESCRIPTION, KEYWORDS, AUTHOR                               */ -}}
+{{- /* ===================================================================== */ -}}
+<meta name="description" content="{{- with .Description }}{{ . | plainify }}{{- else }}{{- if or .IsPage .IsSection }}{{ .Summary | default site.Params.description | plainify }}{{- else }}{{ site.Params.description | plainify }}{{- end }}{{- end -}}">
+<meta name="author" content="Onur Baydaş">
+<meta name="keywords" content="{{- if .Params.keywords }}{{ delimit .Params.keywords ", " }}{{ else if .Params.tags }}{{ delimit .Params.tags ", " }}{{ else if site.Params.keywords }}{{ delimit site.Params.keywords ", " }}{{ end -}}">
+
+{{- /* ===================================================================== */ -}}
+{{- /* CANONICAL & MULTI-LINGUAL ALTERNATES (HREFLANG)                       */ -}}
+{{- /* ===================================================================== */ -}}
+<link rel="canonical" href="{{ if .Params.canonicalURL }}{{ trim .Params.canonicalURL " " }}{{ else }}{{ .Permalink }}{{ end }}">
+{{- range .AllTranslations }}
+<link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}">
+{{- end }}
+{{- with .AllTranslations }}
+{{- range . }}
+{{- if eq .Lang "tr" }}
+<link rel="alternate" hreflang="x-default" href="{{ .Permalink }}">
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- /* ===================================================================== */ -}}
+{{- /* AI & MACHINE-READABLE AGENT SPECIFICATIONS (LLMS.TXT)                 */ -}}
+{{- /* ===================================================================== */ -}}
+<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Agent Knowledge Summary">
+<link rel="alternate" type="text/plain" href="/llms-full.txt" title="Full LLM Knowledge Dossier">
+
+{{- /* ===================================================================== */ -}}
+{{- /* STYLESHEETS (PaperMod bundled core + extended)                        */ -}}
+{{- /* ===================================================================== */ -}}
+{{- $includes := slice }}
+{{- $includes = $includes | append (" " | resources.FromString "assets/css/includes-blank.css") }}
+{{- $includes_all := $includes | resources.Concat "assets/css/includes.css" }}
+{{- $theme_vars := (resources.Get "css/core/theme-vars.css") }}
+{{- $reset := (resources.Get "css/core/reset.css") }}
+{{- $media := (resources.Get "css/core/zmedia.css") }}
+{{- $license_css := (resources.Get "css/core/license.css") }}
+{{- $common := (resources.Match "css/common/*.css") | resources.Concat "assets/css/common.css" }}
+{{- $chroma_styles := (resources.Get "css/includes/chroma-styles.css") }}
+{{- $chroma_mod := (resources.Get "css/includes/chroma-mod.css") }}
+{{- $core := (slice $theme_vars $reset $common $chroma_styles $chroma_mod $includes_all $media) | resources.Concat "assets/css/core.css" | resources.Minify }}
+{{- $extended := (resources.Match "css/extended/*.css") | resources.Concat "assets/css/extended.css" | resources.Minify }}
+{{- $stylesheet := (slice $license_css $core $extended) | resources.Concat "assets/css/stylesheet.css" }}
+{{- if not site.Params.assets.disableFingerprinting }}
+{{- $stylesheet := $stylesheet | fingerprint }}
+<link crossorigin="anonymous" href="{{ $stylesheet.RelPermalink }}" integrity="{{ $stylesheet.Data.Integrity }}" rel="preload stylesheet" as="style">
+{{- else }}
+<link crossorigin="anonymous" href="{{ $stylesheet.RelPermalink }}" rel="preload stylesheet" as="style">
+{{- end }}
+
+{{- /* ===================================================================== */ -}}
+{{- /* SEARCH                                                                */ -}}
+{{- /* ===================================================================== */ -}}
+{{- if (eq .Layout `search`) }}
+<link crossorigin="anonymous" rel="preload" as="fetch" href="../index.json">
+{{- $fastsearch := resources.Get "js/fastsearch.js" | js.Build (dict "params" (dict "fuseOpts" site.Params.fuseOpts)) | resources.Minify }}
+{{- $fusejs := resources.Get "js/fuse.basic.min.js" }}
+{{- $license_js := resources.Get "js/license.js" }}
+{{- if not site.Params.assets.disableFingerprinting }}
+{{- $search := (slice $fusejs $license_js $fastsearch ) | resources.Concat "assets/js/search.js" | fingerprint }}
+<script defer crossorigin="anonymous" src="{{ $search.RelPermalink }}" integrity="{{ $search.Data.Integrity }}"></script>
+{{- else }}
+{{- $search := (slice $fusejs $fastsearch ) | resources.Concat "assets/js/search.js" }}
+<script defer crossorigin="anonymous" src="{{ $search.RelPermalink }}"></script>
+{{- end }}
+{{- end }}
+
+{{- /* ===================================================================== */ -}}
+{{- /* FAVICONS & DEVICE ICONS                                               */ -}}
+{{- /* ===================================================================== */ -}}
+<link rel="icon" href="{{ site.Params.assets.favicon | default "favicon.ico" | absURL }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ site.Params.assets.favicon16x16 | default "favicon-16x16.png" | absURL }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ site.Params.assets.favicon32x32 | default "favicon-32x32.png" | absURL }}">
+<link rel="apple-touch-icon" href="{{ site.Params.assets.apple_touch_icon | default "apple-touch-icon.png" | absURL }}">
+<link rel="mask-icon" href="{{ site.Params.assets.safari_pinned_tab | default "safari-pinned-tab.svg" | absURL }}">
+<meta name="theme-color" content="{{ site.Params.assets.theme_color | default "#141517" }}">
+<meta name="msapplication-TileColor" content="{{ site.Params.assets.msapplication_TileColor | default "#141517" }}">
+
+{{- /* ===================================================================== */ -}}
+{{- /* RSS FEEDS                                                             */ -}}
+{{- /* ===================================================================== */ -}}
+{{ range .AlternativeOutputFormats -}}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type | html }}" href="{{ .Permalink | safeURL }}" title="{{ .Name }}">
+{{ end -}}
+
+{{- /* ===================================================================== */ -}}
+{{- /* THEME SCRIPTS & NOSCRIPT                                              */ -}}
+{{- /* ===================================================================== */ -}}
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.querySelector("html").dataset.theme = 'light';
+    } else {
+        document.querySelector("html").dataset.theme = 'dark';
+    }
+</script>
+
+{{- /* ===================================================================== */ -}}
+{{- /* EXTEND HEAD (Custom Fonts, Mermaid)                                   */ -}}
+{{- /* ===================================================================== */ -}}
+{{- partial "extend_head.html" . -}}
+
+{{- /* ===================================================================== */ -}}
+{{- /* OPEN GRAPH & SOCIAL METADATA                                          */ -}}
+{{- /* ===================================================================== */ -}}
+<meta property="og:site_name" content="Onur Baydaş">
+<meta property="og:title" content="{{ if .IsHome }}Onur Baydaş{{ else }}{{ .Title }}{{ end }}">
+<meta property="og:description" content="{{ with .Description }}{{ . | plainify }}{{ else }}{{ site.Params.description | plainify }}{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:locale" content="{{ if eq site.Language.Lang "tr" }}tr_TR{{ else }}en_US{{ end }}">
+{{- if eq site.Language.Lang "tr" }}
+<meta property="og:locale:alternate" content="en_US">
+{{- else }}
+<meta property="og:locale:alternate" content="tr_TR">
+{{- end }}
+<meta property="og:image" content="{{ "apple-touch-icon.png" | absURL }}">
+<meta property="og:image:alt" content="Onur Baydaş - Systems & Infrastructure Engineering">
+{{- if .IsPage }}
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+<meta property="article:author" content="Onur Baydaş">
+<meta property="article:section" content="Systems Engineering">
+{{- range .Params.tags }}
+<meta property="article:tag" content="{{ . }}">
+{{- end }}
+{{- else }}
+<meta property="og:type" content="website">
+{{- end }}
+
+{{- /* ===================================================================== */ -}}
+{{- /* TWITTER CARDS                                                         */ -}}
+{{- /* ===================================================================== */ -}}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ if .IsHome }}Onur Baydaş{{ else }}{{ .Title }}{{ end }}">
+<meta name="twitter:description" content="{{ with .Description }}{{ . | plainify }}{{ else }}{{ site.Params.description | plainify }}{{ end }}">
+<meta name="twitter:image" content="{{ "apple-touch-icon.png" | absURL }}">
+<meta name="twitter:creator" content="@onurbaydas">
+
+{{- /* ===================================================================== */ -}}
+{{- /* SCHEMA.ORG JSON-LD KNOWLEDGE GRAPH (GEO & AI AGENT OPTIMIZATION)       */ -}}
+{{- /* ===================================================================== */ -}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://onurbaydas.online/#person",
+      "name": "Onur Baydaş",
+      "alternateName": ["Onur Baydas", "OB"],
+      "jobTitle": "Systems & Infrastructure Engineer",
+      "url": "https://onurbaydas.online/",
+      "image": "{{ "apple-touch-icon.png" | absURL }}",
+      "sameAs": [
+        "https://github.com/onurbaydas"
+      ],
+      "knowsAbout": [
+        "Linux Systems Engineering",
+        "Linux Kernel UID/GID Mapping",
+        "Container Security",
+        "Docker Authorization Plugins",
+        "Open Policy Agent (OPA)",
+        "Rego Policy Language",
+        "Active Directory SSSD Integration",
+        "Kerberos NFSv4 Architecture",
+        "TrueNAS SCALE",
+        "ZFS Storage Systems",
+        "Multi-user GPU Clusters",
+        "CVE-2024-41110"
+      ],
+      "description": "Systems engineer specializing in on-premise infrastructure, Linux kernel namespaces, container runtime security, enterprise storage protocols, and high-performance computing clusters."
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://onurbaydas.online/#website",
+      "name": "Onur Baydaş",
+      "url": "https://onurbaydas.online/",
+      "description": "Technical systems engineering analyses on Linux kernel internals, storage architectures, identity federation, and container security.",
+      "inLanguage": ["tr-TR", "en-US"],
+      "publisher": {
+        "@id": "https://onurbaydas.online/#person"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://onurbaydas.online/search/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    {{- if .IsPage -}}
+    ,
+    {
+      "@type": "TechArticle",
+      "@id": "{{ .Permalink }}#article",
+      "isPartOf": {
+        "@id": "https://onurbaydas.online/#website"
+      },
+      "headline": {{ .Title | plainify }},
+      "name": {{ .Title | plainify }},
+      "description": {{ with .Description | plainify }}{{ . }}{{ else }}{{ .Summary | plainify }}{{ end }},
+      "inLanguage": {{ .Language.Locale | default "tr-TR" }},
+      "mainEntityOfPage": "{{ .Permalink }}",
+      "datePublished": "{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}",
+      "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}",
+      "author": {
+        "@id": "https://onurbaydas.online/#person"
+      },
+      "publisher": {
+        "@id": "https://onurbaydas.online/#person"
+      },
+      "image": "{{ "apple-touch-icon.png" | absURL }}",
+      "proficiencyLevel": "Expert",
+      "articleSection": "Systems Engineering",
+      "keywords": [
+        {{- range $i, $e := .Params.tags -}}
+        {{- if $i }}, {{ end }}{{ $e }}
+        {{- end -}}
+      ]
+    }
+    {{- end -}}
+    {{- if not .IsHome -}}
+    ,
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{ .Permalink }}#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ site.Home.Permalink }}"
+        }
+        {{- if and .Parent (not .Parent.IsHome) -}}
+        ,
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ .Parent.Title | plainify }},
+          "item": "{{ .Parent.Permalink }}"
+        }
+        {{- end -}}
+        ,
+        {
+          "@type": "ListItem",
+          "position": {{ if and .Parent (not .Parent.IsHome) }}3{{ else }}2{{ end }},
+          "name": {{ .Title | plainify }},
+          "item": "{{ .Permalink }}"
+        }
+      ]
+    }
+    {{- end -}}
+  ]
+}
+</script>
