@@ -108,9 +108,20 @@ Available system commands:
   canary            Inspect current warrant canary declaration
   pgp               Print PGP public key fingerprint
   cat &lt;file&gt;        Read file (/etc/motd, /proc/cpuinfo, /security.txt)
-  cve &lt;id&gt;          Query known vulnerability details (e.g. CVE-2024-41110)
-  ping &lt;host&gt;       Simulate ICMP round-trip latency
+  cve <id>          Query known vulnerability details (e.g. CVE-2024-41110)
+  ping <host>       Simulate ICMP round-trip latency
   dmesg             Dump simulated kernel ring buffer telemetry
+  defcon            Open DEFCON-1 Crisis & Catastrophe Console
+  siren             Sound civil-defense air-raid emergency siren
+  nuke              Simulate nuclear detonation & radiation flash
+  quake             Trigger seismic tectonic earthquake shockwave
+  clown             Summon demonic laughing clown phantom
+  panic             Trigger simulated Linux 6.12 Kernel Panic
+  captcha           Challenge yourself with Sysadmin CAPTCHA from Hell
+  delta             Spin 15,000 RPM 1U server Delta jet fan
+  thermal           Trigger CPU 104°C thermal junction meltdown
+  daemon            Spawn evil sysadmin ASCII assistant
+  selinux           Trigger SELinux AVC EPERM denial dialog
   clear             Clear terminal screen
   exit              Close terminal session
 `,
@@ -180,6 +191,50 @@ Emergency Production Runbooks (SOP):
     clear: () => {
       outputLines.innerHTML = '';
       return null;
+    },
+    siren: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerSiren();
+      return '[CIVIL_DEFENSE] Air-raid emergency siren sounded across sector.';
+    },
+    nuke: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerNuke();
+      return '[GROUND_ZERO] Nuclear detonation sequence initialized. Thermal shockwave active.';
+    },
+    quake: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerQuake();
+      return '[SEISMIC_ALERT] Tectonic tremor triggered. Magnitude 7.8 viewport shake.';
+    },
+    clown: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerClown();
+      return '[DEMONIC_JOKER] Runtime jester phantom summoned. Check your unmounted volumes.';
+    },
+    panic: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerPanic();
+      return '[KERNEL_PANIC] CPU halted. Call trace dumped to screen.';
+    },
+    captcha: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerCaptcha();
+      return '[VERIFICATION] Senior sysadmin chmod / iptables challenge issued.';
+    },
+    delta: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerDeltaFan();
+      return '[DELTA_FAN] 15,000 RPM dual-rotor turbine spun to maximum throttle.';
+    },
+    thermal: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerThermal();
+      return '[THERMAL_MELTDOWN] CPU die temp reached 104°C. Silicon degradation warning.';
+    },
+    daemon: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerDaemon();
+      return '[EVIL_DAEMON] ASCII assistant spawned in bottom-right corner.';
+    },
+    selinux: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerSelinuxAlert();
+      return '[SELINUX_AVC] Access denied by kernel security policy.';
+    },
+    defcon: () => {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.openDefconModal();
+      return '[DEFCON_SWITCHBOARD] Crisis & Catastrophe Console opened.';
     },
     exit: () => {
       toggleTerminal();
@@ -325,7 +380,7 @@ Visit ${isEn ? '/en/radar/' : '/radar/'} for live grep filtering.
     } else if (e.key === 'Tab') {
       e.preventDefault();
       const current = cliInput.value.toLowerCase().trim();
-      const known = ['help', 'uname', 'uname -a', 'whoami', 'uptime', 'posts', 'radar', 'tools', 'lab', 'runbooks', 'canary', 'pgp', 'cat', 'cve', 'ping', 'dmesg', 'clear', 'exit'];
+      const known = ['help', 'uname', 'uname -a', 'whoami', 'uptime', 'posts', 'radar', 'tools', 'lab', 'runbooks', 'canary', 'pgp', 'cat', 'cve', 'ping', 'dmesg', 'defcon', 'siren', 'nuke', 'quake', 'clown', 'panic', 'captcha', 'delta', 'thermal', 'daemon', 'selinux', 'clear', 'exit'];
       const match = known.find(k => k.startsWith(current));
       if (match) cliInput.value = match;
     }

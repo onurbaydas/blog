@@ -1,0 +1,217 @@
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<div id="brutal-cmd-palette" class="cmd-palette-modal" style="display: none;" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="cmd-palette-chassis">
+    <div class="cmd-palette-search-strip">
+      <span class="cmd-icon">⌘</span>
+      <input type="text" id="cmd-palette-input" class="cmd-palette-input" placeholder="{{ if $is_en }}Type a command, page, or runbook (Esc to close)...{{ else }}Komut, sayfa veya runbook ara (Kapatmak için Esc)...{{ end }}" autocomplete="off" spellcheck="false" />
+      <span class="cmd-key-hint">[ESC]</span>
+    </div>
+
+    <div class="cmd-palette-results" id="cmd-palette-results">
+      {{- /* Items rendered by JS dynamically */ -}}
+    </div>
+
+    <div class="cmd-palette-footer">
+      <div class="cmd-footer-keys">
+        <span><kbd>↑</kbd><kbd>↓</kbd> {{ if $is_en }}Navigate{{ else }}Gezin{{ end }}</span>
+        <span><kbd>↵</kbd> {{ if $is_en }}Select{{ else }}Seç{{ end }}</span>
+        <span><kbd>esc</kbd> {{ if $is_en }}Exit{{ else }}Çık{{ end }}</span>
+      </div>
+      <div class="cmd-footer-spec">
+        <span>OB-SYS-PALETTE // v2.0</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const modal = document.getElementById('brutal-cmd-palette');
+  const input = document.getElementById('cmd-palette-input');
+  const resultsBox = document.getElementById('cmd-palette-results');
+  if (!modal || !input) return;
+
+  const isEn = document.documentElement.lang === 'en';
+
+  const items = [
+    // Pages
+    { title: isEn ? 'Posts // Technical Analyses' : 'Yazılar // Teknik Analizler', url: isEn ? '/en/posts/' : '/posts/', cat: 'PAGE', tag: '#01' },
+    { title: isEn ? 'Systems & Security Radar' : 'Sistem ve Güvenlik Radarı', url: isEn ? '/en/radar/' : '/radar/', cat: 'PAGE', tag: '#02' },
+    { title: isEn ? 'Interactive Systems Engineering Tools' : 'İnteraktif Sistem Mühendisliği Araçları', url: isEn ? '/en/tools/' : '/tools/', cat: 'PAGE', tag: '#03' },
+    { title: isEn ? 'Infrastructure & Lab Topology Blueprint' : 'Laboratuvar & Altyapı Mimarisi', url: isEn ? '/en/lab/' : '/lab/', cat: 'PAGE', tag: '#04' },
+    { title: isEn ? 'Emergency Production Runbooks' : 'Acil Durum Üretim Runbookları', url: isEn ? '/en/runbooks/' : '/runbooks/', cat: 'PAGE', tag: '#05' },
+    { title: isEn ? 'Incident Post-Mortems // Root Cause Analysis' : 'Olay İncelemeleri // Kök Neden Analizleri', url: isEn ? '/en/incidents/' : '/incidents/', cat: 'PAGE', tag: '#06' },
+    { title: isEn ? 'Technology Radar & Production Stack' : 'Teknoloji Radarı & Üretim Mimarisi', url: isEn ? '/en/stack/' : '/stack/', cat: 'PAGE', tag: '#07' },
+    { title: isEn ? 'About // Operator Dossier' : 'Hakkımda // Operatör Dosyası', url: isEn ? '/en/about/' : '/about/', cat: 'PAGE', tag: '#08' },
+    { title: isEn ? 'Warrant Canary // Cryptographic Declaration' : 'Warrant Canary // Güvence Beyanı', url: isEn ? '/en/canary/' : '/canary/', cat: 'SECURITY', tag: 'CANARY' },
+    { title: isEn ? 'PGP Public Key // Fingerprint' : 'PGP Açık Anahtar // Parmak İzi', url: isEn ? '/en/pgp/' : '/pgp/', cat: 'SECURITY', tag: 'PGP' },
+
+    // Runbooks
+    { title: 'SOP-SEC-01: Docker OPA Authz Bypass (CVE-2024-41110)', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-sec-01', cat: 'RUNBOOK', tag: 'P0' },
+    { title: 'SOP-STOR-02: NFSv4.2 Stale Handle & Kerberos Expiry', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-stor-02', cat: 'RUNBOOK', tag: 'P1' },
+    { title: 'SOP-AUTH-03: SSSD / Active Directory Cache Invalidation', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-auth-03', cat: 'RUNBOOK', tag: 'P1' },
+    { title: 'SOP-ZFS-04: ZFS Corrupted Pool Read-Only Rescue Import', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-zfs-04', cat: 'RUNBOOK', tag: 'P0' },
+    { title: 'SOP-EBPF-05: Production eBPF Kernel Tracing One-Liners', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-ebpf-05', cat: 'RUNBOOK', tag: 'P2' },
+    { title: 'SOP-GPU-06: NVIDIA GPU Hang & PCIe Secondary Bus Reset', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-gpu-06', cat: 'RUNBOOK', tag: 'P1' },
+
+    // Actions & Crisis Drills
+    { title: isEn ? 'Action: Open Interactive VT100 Terminal (~)' : 'Eylem: İnteraktif VT100 Terminalini Aç (~)', action: 'open_term', cat: 'ACTION', tag: 'TTY' },
+    { title: isEn ? 'Action: Toggle 60Hz Reactor & Geiger Audio' : 'Eylem: 60Hz Reaktör & Geiger Sesini Aç/Kapat', action: 'toggle_audio', cat: 'ACTION', tag: 'AUDIO' },
+    { title: isEn ? 'Action: Toggle Decay Engine / Glitch Mode' : 'Eylem: Mekanik Parçalanma / Glitch Modu', action: 'toggle_glitch', cat: 'ACTION', tag: 'CHAOS' },
+    { title: isEn ? 'Action: Print Classified Whitepaper Dossier (Ctrl+P)' : 'Eylem: Gizli Teknik Raporu Yazdır (Ctrl+P)', action: 'print_dossier', cat: 'ACTION', tag: 'PRINT' },
+    { title: isEn ? 'Action: Switch Language' : 'Eylem: Dil Değiştir (TR/EN)', action: 'toggle_lang', cat: 'ACTION', tag: 'LANG' },
+    { title: isEn ? 'Catastrophe: Trigger Air-Raid Siren' : 'Felaket: Hava Taarruz Sirenini Çal', action: 'crisis_siren', cat: 'DRILL', tag: 'SIREN' },
+    { title: isEn ? 'Catastrophe: Nuclear Detonation & Fallout' : 'Felaket: Nükleer Patlama ve Radyasyon Şoku', action: 'crisis_nuke', cat: 'DRILL', tag: 'NUKE' },
+    { title: isEn ? 'Catastrophe: Tectonic Earthquake Vibration' : 'Felaket: Şiddetli Tektonik Deprem Titreşimi', action: 'crisis_quake', cat: 'DRILL', tag: 'QUAKE' },
+    { title: isEn ? 'Catastrophe: Demonic Clown Laughter & Phantom' : 'Muziplik: Korkunç Palyaço Gülüşü & Hayaleti', action: 'crisis_clown', cat: 'DRILL', tag: 'JOKER' },
+    { title: isEn ? 'Catastrophe: Simulate Linux Kernel Panic' : 'Kriz: Linux Çekirdek Kilitlenmesi (Kernel Panic)', action: 'crisis_panic', cat: 'DRILL', tag: 'PANIC' },
+    { title: isEn ? 'Challenge: Senior Sysadmin CAPTCHA from Hell' : 'Muziplik: Cehennemden Çıkma Sysadmin CAPTCHA', action: 'crisis_captcha', cat: 'DRILL', tag: 'CAPTCHA' },
+    { title: isEn ? 'Catastrophe: 15,000 RPM 1U Delta Fan Whine' : 'Akustik: 15.000 RPM Delta Sunucu Fanı Çığlığı', action: 'crisis_delta', cat: 'DRILL', tag: 'DELTA' },
+    { title: isEn ? 'Catastrophe: CPU 104°C Thermal Meltdown' : 'Kriz: Aşırı Isınma & Termal Erime (104°C)', action: 'crisis_thermal', cat: 'DRILL', tag: 'THERMAL' },
+    { title: isEn ? 'Catastrophe: Summon Evil Sysadmin Daemon' : 'Muziplik: Kötü Ruhlu Sysadmin Asistanını Çağır', action: 'crisis_daemon', cat: 'DRILL', tag: 'DAEMON' },
+    { title: isEn ? 'Catastrophe: Open DEFCON-1 Emergency Switchboard' : 'Kontrol: DEFCON-1 Acil Durum Santralini Aç', action: 'crisis_defcon', cat: 'DRILL', tag: 'DEFCON' }
+  ];
+
+  let activeIdx = 0;
+  let filteredItems = [...items];
+
+  function openPalette() {
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    input.value = '';
+    renderResults('');
+    input.focus();
+  }
+
+  function closePalette() {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  function renderResults(q) {
+    const query = q.toLowerCase().trim();
+    filteredItems = items.filter(it => {
+      return !query || it.title.toLowerCase().includes(query) || it.cat.toLowerCase().includes(query) || (it.tag && it.tag.toLowerCase().includes(query));
+    });
+
+    activeIdx = 0;
+    if (filteredItems.length === 0) {
+      resultsBox.innerHTML = `<div class="cmd-empty">${isEn ? 'NO MATCHING SYSTEM DIRECTIVES' : 'EŞLEŞEN SİSTEM YÖNERGESİ BULUNAMADI'}</div>`;
+      return;
+    }
+
+    resultsBox.innerHTML = filteredItems.map((it, idx) => `
+      <div class="cmd-item ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
+        <span class="cmd-tag">[${it.tag}]</span>
+        <span class="cmd-name">${it.title}</span>
+        <span class="cmd-cat">${it.cat}</span>
+      </div>
+    `).join('');
+
+    resultsBox.querySelectorAll('.cmd-item').forEach(el => {
+      el.addEventListener('click', () => {
+        executeIndex(parseInt(el.dataset.idx, 10));
+      });
+    });
+  }
+
+  function executeIndex(idx) {
+    const it = filteredItems[idx];
+    if (!it) return;
+
+    closePalette();
+
+    if (it.url) {
+      window.location.href = it.url;
+    } else if (it.action === 'open_term') {
+      const termBtn = document.getElementById('terminal-trigger-btn');
+      if (termBtn) termBtn.click();
+    } else if (it.action === 'toggle_audio') {
+      const audioBtn = document.getElementById('audio-btn');
+      if (audioBtn) audioBtn.click();
+    } else if (it.action === 'toggle_glitch') {
+      const chaosBtn = document.getElementById('chaos-btn');
+      if (chaosBtn) chaosBtn.click();
+    } else if (it.action === 'print_dossier') {
+      window.print();
+    } else if (it.action === 'toggle_lang') {
+      const targetUrl = isEn ? '/' : '/en/';
+      window.location.href = targetUrl;
+    } else if (it.action === 'crisis_siren') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerSiren();
+    } else if (it.action === 'crisis_nuke') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerNuke();
+    } else if (it.action === 'crisis_quake') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerQuake();
+    } else if (it.action === 'crisis_clown') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerClown();
+    } else if (it.action === 'crisis_panic') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerPanic();
+    } else if (it.action === 'crisis_captcha') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerCaptcha();
+    } else if (it.action === 'crisis_delta') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerDeltaFan();
+    } else if (it.action === 'crisis_thermal') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerThermal();
+    } else if (it.action === 'crisis_daemon') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerDaemon();
+    } else if (it.action === 'crisis_defcon') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.openDefconModal();
+    }
+  }
+
+  // Key listener: Ctrl+K or Cmd+K
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      if (modal.style.display === 'none') {
+        openPalette();
+      } else {
+        closePalette();
+      }
+    } else if (e.key === 'Escape' && modal.style.display !== 'none') {
+      e.preventDefault();
+      closePalette();
+    }
+  });
+
+  input.addEventListener('input', () => {
+    renderResults(input.value);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const itemEls = resultsBox.querySelectorAll('.cmd-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (activeIdx < filteredItems.length - 1) {
+        activeIdx++;
+        updateActiveItem(itemEls);
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (activeIdx > 0) {
+        activeIdx--;
+        updateActiveItem(itemEls);
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      executeIndex(activeIdx);
+    }
+  });
+
+  function updateActiveItem(els) {
+    els.forEach((el, i) => {
+      el.classList.toggle('active', i === activeIdx);
+      if (i === activeIdx) {
+        el.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }
+
+  // Modal backdrop click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closePalette();
+  });
+})();
+</script>

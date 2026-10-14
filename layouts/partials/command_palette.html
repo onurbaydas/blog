@@ -55,12 +55,22 @@
     { title: 'SOP-EBPF-05: Production eBPF Kernel Tracing One-Liners', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-ebpf-05', cat: 'RUNBOOK', tag: 'P2' },
     { title: 'SOP-GPU-06: NVIDIA GPU Hang & PCIe Secondary Bus Reset', url: (isEn ? '/en/runbooks/' : '/runbooks/') + '#sop-gpu-06', cat: 'RUNBOOK', tag: 'P1' },
 
-    // Actions
+    // Actions & Crisis Drills
     { title: isEn ? 'Action: Open Interactive VT100 Terminal (~)' : 'Eylem: İnteraktif VT100 Terminalini Aç (~)', action: 'open_term', cat: 'ACTION', tag: 'TTY' },
     { title: isEn ? 'Action: Toggle 60Hz Reactor & Geiger Audio' : 'Eylem: 60Hz Reaktör & Geiger Sesini Aç/Kapat', action: 'toggle_audio', cat: 'ACTION', tag: 'AUDIO' },
     { title: isEn ? 'Action: Toggle Decay Engine / Glitch Mode' : 'Eylem: Mekanik Parçalanma / Glitch Modu', action: 'toggle_glitch', cat: 'ACTION', tag: 'CHAOS' },
     { title: isEn ? 'Action: Print Classified Whitepaper Dossier (Ctrl+P)' : 'Eylem: Gizli Teknik Raporu Yazdır (Ctrl+P)', action: 'print_dossier', cat: 'ACTION', tag: 'PRINT' },
-    { title: isEn ? 'Action: Switch Language to [TR]' : 'Eylem: Dili [EN] olarak değiştir', action: 'toggle_lang', cat: 'ACTION', tag: 'LANG' }
+    { title: isEn ? 'Action: Switch Language' : 'Eylem: Dil Değiştir (TR/EN)', action: 'toggle_lang', cat: 'ACTION', tag: 'LANG' },
+    { title: isEn ? 'Catastrophe: Trigger Air-Raid Siren' : 'Felaket: Hava Taarruz Sirenini Çal', action: 'crisis_siren', cat: 'DRILL', tag: 'SIREN' },
+    { title: isEn ? 'Catastrophe: Nuclear Detonation & Fallout' : 'Felaket: Nükleer Patlama ve Radyasyon Şoku', action: 'crisis_nuke', cat: 'DRILL', tag: 'NUKE' },
+    { title: isEn ? 'Catastrophe: Tectonic Earthquake Vibration' : 'Felaket: Şiddetli Tektonik Deprem Titreşimi', action: 'crisis_quake', cat: 'DRILL', tag: 'QUAKE' },
+    { title: isEn ? 'Catastrophe: Demonic Clown Laughter & Phantom' : 'Muziplik: Korkunç Palyaço Gülüşü & Hayaleti', action: 'crisis_clown', cat: 'DRILL', tag: 'JOKER' },
+    { title: isEn ? 'Catastrophe: Simulate Linux Kernel Panic' : 'Kriz: Linux Çekirdek Kilitlenmesi (Kernel Panic)', action: 'crisis_panic', cat: 'DRILL', tag: 'PANIC' },
+    { title: isEn ? 'Challenge: Senior Sysadmin CAPTCHA from Hell' : 'Muziplik: Cehennemden Çıkma Sysadmin CAPTCHA', action: 'crisis_captcha', cat: 'DRILL', tag: 'CAPTCHA' },
+    { title: isEn ? 'Catastrophe: 15,000 RPM 1U Delta Fan Whine' : 'Akustik: 15.000 RPM Delta Sunucu Fanı Çığlığı', action: 'crisis_delta', cat: 'DRILL', tag: 'DELTA' },
+    { title: isEn ? 'Catastrophe: CPU 104°C Thermal Meltdown' : 'Kriz: Aşırı Isınma & Termal Erime (104°C)', action: 'crisis_thermal', cat: 'DRILL', tag: 'THERMAL' },
+    { title: isEn ? 'Catastrophe: Summon Evil Sysadmin Daemon' : 'Muziplik: Kötü Ruhlu Sysadmin Asistanını Çağır', action: 'crisis_daemon', cat: 'DRILL', tag: 'DAEMON' },
+    { title: isEn ? 'Catastrophe: Open DEFCON-1 Emergency Switchboard' : 'Kontrol: DEFCON-1 Acil Durum Santralini Aç', action: 'crisis_defcon', cat: 'DRILL', tag: 'DEFCON' }
   ];
 
   let activeIdx = 0;
@@ -128,6 +138,26 @@
     } else if (it.action === 'toggle_lang') {
       const targetUrl = isEn ? '/' : '/en/';
       window.location.href = targetUrl;
+    } else if (it.action === 'crisis_siren') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerSiren();
+    } else if (it.action === 'crisis_nuke') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerNuke();
+    } else if (it.action === 'crisis_quake') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerQuake();
+    } else if (it.action === 'crisis_clown') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerClown();
+    } else if (it.action === 'crisis_panic') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerPanic();
+    } else if (it.action === 'crisis_captcha') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerCaptcha();
+    } else if (it.action === 'crisis_delta') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerDeltaFan();
+    } else if (it.action === 'crisis_thermal') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerThermal();
+    } else if (it.action === 'crisis_daemon') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.triggerDaemon();
+    } else if (it.action === 'crisis_defcon') {
+      if (window.ObCrisisEngine) window.ObCrisisEngine.openDefconModal();
     }
   }
 

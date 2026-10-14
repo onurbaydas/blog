@@ -1737,3 +1737,742 @@
   font-size: 0.8rem;
   color: #10b981;
 }
+
+/* ==========================================================================
+   8. DEFCON-1 CRISIS & PSYCHOLOGICAL WARFARE ENGINE STYLING
+   ========================================================================== */
+
+/* Header Trigger Button */
+.crisis-trigger-btn {
+  background: #1c1917;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.crisis-trigger-btn:hover {
+  background: #ef4444;
+  color: #000;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.crisis-warn {
+  animation: pulse-terminal-led 1s infinite;
+}
+
+/* DEFCON Modal Switchboard */
+.defcon-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.defcon-chassis {
+  width: 100%;
+  max-width: 980px;
+  background: #09090b;
+  border: 3px solid #dc2626;
+  box-shadow: 12px 12px 0px #000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.defcon-titlebar {
+  background: #1c1917;
+  border-bottom: 2px solid #dc2626;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.defcon-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.defcon-warning-badge {
+  background: #dc2626;
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  letter-spacing: 0.05em;
+  animation: pulse-terminal-led 1.2s infinite;
+}
+
+.defcon-title {
+  color: #f4f4f5;
+  font-weight: 900;
+  font-size: 0.95rem;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.defcon-close {
+  background: #000;
+  border: 1px solid #3f3f46;
+  color: #d4d4d8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.defcon-close:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.defcon-desc {
+  padding: 16px 20px;
+  font-size: 0.82rem;
+  color: #a1a1aa;
+  border-bottom: 1px solid #27272a;
+  line-height: 1.5;
+  background: #0f0f11;
+}
+
+.defcon-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .defcon-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.defcon-btn {
+  background: #141416;
+  border: 2px solid #27272a;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.15s ease;
+  box-shadow: 3px 3px 0px #000;
+}
+
+.defcon-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #000;
+  border-color: #ef4444;
+  background: #1f1f23;
+}
+
+.defcon-code {
+  font-size: 0.72rem;
+  color: #dc2626;
+  font-weight: 900;
+}
+
+.defcon-label {
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.defcon-hint {
+  font-size: 0.74rem;
+  color: #71717a;
+}
+
+.defcon-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #27272a;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #71717a;
+}
+
+/* Air-Raid Siren Flashing State */
+body.siren-flashing {
+  animation: siren-flash-bg 1.3s infinite ease-in-out;
+}
+
+@keyframes siren-flash-bg {
+  0%, 100% { box-shadow: inset 0 0 120px rgba(220, 38, 38, 0.45); }
+  50% { box-shadow: inset 0 0 160px rgba(59, 130, 246, 0.45); }
+}
+
+/* Nuclear Detonation Flash Overlay */
+.nuke-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: nuke-blast-seq 4s forwards cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+.nuke-flashbang {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  animation: nuke-flash-anim 3.8s forwards;
+}
+
+@keyframes nuke-flash-anim {
+  0% { background: #ffffff; opacity: 1; }
+  12% { background: #ff4500; opacity: 0.95; }
+  45% { background: #7f1d1d; opacity: 0.75; }
+  100% { background: transparent; opacity: 0; }
+}
+
+.nuke-content-box {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+  color: #fff;
+  text-shadow: 0 0 20px #ff0000;
+  animation: nuke-text-rise 3.5s forwards;
+}
+
+@keyframes nuke-text-rise {
+  0% { opacity: 0; transform: scale(0.8); }
+  15% { opacity: 1; transform: scale(1.05); }
+  75% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+.nuke-hazard-symbol {
+  font-size: 5rem;
+  color: #facc15;
+  animation: pulse-terminal-led 0.6s infinite;
+}
+
+.nuke-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #fff;
+}
+
+.nuke-sub {
+  font-size: 0.95rem;
+  color: #f87171;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 8px;
+}
+
+/* Tectonic Earthquake Screen Shake */
+@keyframes violent-quake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-14px, 10px) rotate(-1.4deg); }
+  20% { transform: translate(12px, -12px) rotate(1.2deg); }
+  30% { transform: translate(-10px, -8px) rotate(-1deg); }
+  40% { transform: translate(14px, 12px) rotate(1.4deg); }
+  50% { transform: translate(-14px, 8px) rotate(-1.2deg); }
+  60% { transform: translate(12px, -10px) rotate(1deg); }
+  70% { transform: translate(-8px, 6px) rotate(-0.8deg); }
+  80% { transform: translate(6px, -4px) rotate(0.6deg); }
+  90% { transform: translate(-3px, 2px) rotate(-0.3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+body.earthquake-active {
+  animation: violent-quake 0.11s infinite ease-in-out;
+  box-shadow: inset 0 0 100px rgba(239, 68, 68, 0.45);
+}
+
+/* Creepy Clown Phantom */
+.clown-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.94);
+  z-index: 10006;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: clown-glitch-jump 0.18s steps(2) infinite;
+}
+
+@keyframes clown-glitch-jump {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(4px, -3px); }
+  100% { transform: translate(-3px, 4px); }
+}
+
+.clown-box {
+  text-align: center;
+  max-width: 540px;
+  padding: 24px;
+}
+
+.clown-svg-wrap {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 16px auto;
+  filter: drop-shadow(0 0 30px #dc2626);
+}
+
+.clown-pupil-glow {
+  animation: pulse-terminal-led 0.4s infinite;
+}
+
+.clown-text-alert {
+  font-family: 'Rubik Glitch', 'Syne', sans-serif;
+  font-size: 1.4rem;
+  color: #ef4444;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.clown-meta-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #71717a;
+}
+
+/* Linux Kernel Panic Fullscreen Modal */
+.kernel-panic-modal {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  color: #d4d4d8;
+  z-index: 10007;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow: auto;
+}
+
+.panic-terminal-screen {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.panic-code-dump {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #a1a1aa;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.panic-highlight {
+  color: #ef4444;
+  font-weight: 900;
+  background: #3f0f0f;
+  padding: 2px 6px;
+}
+
+.panic-alert {
+  color: #f59e0b;
+  font-weight: 800;
+}
+
+.panic-action-row {
+  margin-top: 24px;
+  border-top: 1px solid #3f3f46;
+  padding-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.panic-cursor-blink {
+  color: #ef4444;
+  font-size: 0.85rem;
+  animation: pulse-terminal-led 0.8s infinite;
+}
+
+.panic-btn {
+  background: #18181b;
+  border: 2px solid #ef4444;
+  color: #ef4444;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 900;
+  padding: 8px 16px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.panic-btn:hover {
+  background: #ef4444;
+  color: #000;
+}
+
+/* Sysadmin CAPTCHA from Hell */
+.captcha-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(5px);
+  z-index: 10003;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.captcha-box {
+  width: 100%;
+  max-width: 580px;
+  background: #09090b;
+  border: 3px solid #f59e0b;
+  box-shadow: 10px 10px 0px #000;
+  padding: 24px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.captcha-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.captcha-badge {
+  background: #f59e0b;
+  color: #000;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 3px 6px;
+}
+
+.captcha-timer {
+  color: #ef4444;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.captcha-timer-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: #27272a;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.captcha-timer-bar {
+  height: 100%;
+  width: 100%;
+  background: #ef4444;
+  transition: width 0.05s linear;
+}
+
+.captcha-q {
+  font-size: 0.95rem;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.captcha-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.captcha-opt-btn {
+  background: #141416;
+  border: 1px solid #3f3f46;
+  color: #d4d4d8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.captcha-opt-btn:hover {
+  background: #27272a;
+  border-color: #f59e0b;
+  color: #fff;
+}
+
+.captcha-feedback {
+  margin-top: 14px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  min-height: 20px;
+}
+
+/* SELinux Denial Modal */
+.selinux-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  z-index: 10004;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.selinux-box {
+  width: 100%;
+  max-width: 620px;
+  background: #09090b;
+  border: 3px solid #dc2626;
+  box-shadow: 10px 10px 0px #000;
+  padding: 24px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.selinux-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #dc2626;
+  padding-bottom: 10px;
+}
+
+.selinux-seal {
+  color: #ef4444;
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.selinux-close {
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.selinux-content p {
+  color: #f4f4f5;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.selinux-dmesg {
+  background: #000;
+  border: 1px solid #3f3f46;
+  color: #ef4444;
+  padding: 12px;
+  font-size: 0.74rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 14px;
+}
+
+.selinux-remedy {
+  font-size: 0.78rem;
+  color: #71717a;
+}
+
+/* Evil Sysadmin Daemon Assistant */
+.evil-daemon-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9997;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.daemon-bubble {
+  width: 320px;
+  background: #09090b;
+  border: 2px solid #dc2626;
+  box-shadow: 6px 6px 0px #000;
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.daemon-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-weight: 900;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #27272a;
+  padding-bottom: 4px;
+}
+
+.daemon-x {
+  background: transparent;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.daemon-speech {
+  font-size: 0.78rem;
+  color: #f4f4f5;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.daemon-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.daemon-btn-yes,
+.daemon-btn-no {
+  flex: 1;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  color: #d4d4d8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.daemon-btn-yes:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.daemon-btn-no:hover {
+  background: #27272a;
+  color: #fff;
+}
+
+.daemon-ascii-avatar pre {
+  margin: 0;
+  background: #000;
+  border: 2px solid #dc2626;
+  color: #ef4444;
+  padding: 6px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  box-shadow: 4px 4px 0px #000;
+}
+
+/* Evasive Sudo Button */
+.evasive-sudo-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 180px;
+  z-index: 9996;
+  background: #1c1917;
+  border: 2px solid #ef4444;
+  color: #ef4444;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 4px 4px 0px #000;
+  transition: transform 0.12s ease-out;
+}
+
+.evasive-sudo-btn:hover {
+  background: #ef4444;
+  color: #000;
+}
+
+/* Thermal Meltdown */
+body.thermal-meltdown {
+  box-shadow: inset 0 0 140px rgba(239, 68, 68, 0.55) !important;
+  filter: drop-shadow(0px 8px 12px rgba(255, 69, 0, 0.35));
+}
+
+/* Security Audit Log Toast Stack */
+.security-toast-stack {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9995;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 440px;
+  width: calc(100vw - 40px);
+}
+
+.security-toast-card {
+  background: #09090b;
+  border: 2px solid #dc2626;
+  color: #f4f4f5;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  padding: 10px 14px;
+  box-shadow: 6px 6px 0px #000;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.security-toast-card.toast-show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #ef4444;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.toast-sym {
+  animation: pulse-terminal-led 0.8s infinite;
+}
+
+.toast-msg {
+  color: #d4d4d8;
+  line-height: 1.4;
+  font-weight: 600;
+}
+

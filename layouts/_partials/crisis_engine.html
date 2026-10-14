@@ -1,0 +1,919 @@
+{{- $is_en := eq site.Language.Lang "en" }}
+
+{{- /* ==========================================================================
+   DEFCON-1 CRISIS & PSYCHOLOGICAL WARFARE ENGINE
+   Features:
+     - Air-Raid Emergency Siren (Web Audio API)
+     - Nuclear Explosion & Fallout Flash (Detonation Sub-bass + Whiteout)
+     - Tectonic Earthquake Screen Shake (30Hz Sub-bass Rumble)
+     - Demonic Clown Laughter & Phantom Glitch
+     - Linux Kernel Panic & Oops Call Trace Fullscreen Overlay
+     - Senior Sysadmin CAPTCHA from Hell (5-Second Countdown)
+     - 15,000 RPM 1U Delta Server Fan Jet Whine
+     - Molten Thermal Meltdown (CPU 104°C Throttle)
+     - Evil Sysadmin Daemon (ASCII Wireframe Assistant)
+     - Evasive SELinux Sudo Button (Physics-based cursor dodge)
+     - Ghost Typing & Unattended Terminal Paranoia
+     - Live auth.log / auditd Security Log Toasts
+   ========================================================================== */ -}}
+
+{{- /* 1. DEFCON-1 CRISIS CONTROL CONSOLE MODAL */ -}}
+<div id="defcon-crisis-modal" class="defcon-modal" style="display: none;" aria-hidden="true" role="dialog">
+  <div class="defcon-chassis">
+    <div class="defcon-titlebar">
+      <div class="defcon-header-left">
+        <span class="defcon-warning-badge">DEFCON-1 // CRITICAL</span>
+        <span class="defcon-title">{{ if $is_en }}CATASTROPHE & INCIDENT DRILL CONSOLE{{ else }}KRİZ VE FELAKET KONTROL MERKEZİ{{ end }}</span>
+      </div>
+      <button type="button" id="defcon-close-btn" class="defcon-close">[ESC / DISMISS]</button>
+    </div>
+
+    <div class="defcon-desc">
+      {{ if $is_en }}
+      Authorized military & systems infrastructure emergency triggers. All drills utilize procedural Web Audio API synthesis and DOM mutation shaders. Select any directive to initiate immediate stress simulation:
+      {{ else }}
+      Yetkili operatör ve altyapı kriz simülasyon paneli. Tüm efektler sıfır harici dosya ile saf Web Audio API ve DOM gölgelendiricileriyle çalışır. Acil durum tatbikatını başlatmak için bir protokol seçin:
+      {{ end }}
+    </div>
+
+    <div class="defcon-grid">
+      <button type="button" class="defcon-btn btn-siren" id="act-siren">
+        <span class="defcon-code">[01 // SIREN]</span>
+        <strong class="defcon-label">{{ if $is_en }}AIR-RAID EMERGENCY SIREN{{ else }}HAVA TAARRUZ ACİL DURUM SİRENİ{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Civil defense dual-pitch oscillating klaxon{{ else }}Çift frekanslı sivil savunma alarmı{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-nuke" id="act-nuke">
+        <span class="defcon-code">[02 // NUKE]</span>
+        <strong class="defcon-label">{{ if $is_en }}NUCLEAR DETONATION BLAST{{ else }}NÜKLEER PATLAMA & ŞOK DALGASI{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Whiteout flashbang, sub-bass fallout wave{{ else }}Kör edici flaş patlaması, derin bas şoku{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-quake" id="act-quake">
+        <span class="defcon-code">[03 // QUAKE]</span>
+        <strong class="defcon-label">{{ if $is_en }}SEISMIC TECTONIC EARTHQUAKE{{ else }}ŞİDDETLİ TEKTONİK DEPREM EFEKTİ{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Viewport vibration & 28Hz subterranean rumble{{ else }}Ekran sarsıntısı ve 28Hz yeraltı uğultusu{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-clown" id="act-clown">
+        <span class="defcon-code">[04 // JOKER]</span>
+        <strong class="defcon-label">{{ if $is_en }}CREEPY DEMONIC CLOWN LAUGH{{ else }}KORKUNÇ PALYAÇO GÜLÜŞÜ & HAYALETİ{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Synthesized cackle & subliminal phantom glitch{{ else }}Sentezlenmiş kahkaha & hayalet silüeti{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-panic" id="act-panic">
+        <span class="defcon-code">[05 // PANIC]</span>
+        <strong class="defcon-label">{{ if $is_en }}LINUX KERNEL PANIC // OOPS{{ else }}LINUX ÇEKİRDEK KİLİTLENMESİ (PANIC){{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Kernel 6.12 Call Trace register dump overlay{{ else }}Tam ekran Call Trace ve yazmaç dökümü{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-captcha" id="act-captcha">
+        <span class="defcon-code">[06 // CAPTCHA]</span>
+        <strong class="defcon-label">{{ if $is_en }}SYSADMIN CAPTCHA FROM HELL{{ else }}CEHENNEMDEN ÇIKMA SYSADMIN CAPTCHA{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}5-second chmod / iptables verification test{{ else }}5 saniyelik acımasız yetki sorusu{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-delta" id="act-delta">
+        <span class="defcon-code">[07 // DELTA]</span>
+        <strong class="defcon-label">{{ if $is_en }}15,000 RPM 1U SERVER FAN JET{{ else }}15.000 RPM 1U DELTA FAN ÇIĞLIĞI{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Twin-rotor server chassis high-pitch whine{{ else }}Sunucu kasası yüksek devir jet turbini{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-thermal" id="act-thermal">
+        <span class="defcon-code">[08 // THERMAL]</span>
+        <strong class="defcon-label">{{ if $is_en }}CPU 104°C THERMAL MELTDOWN{{ else }}AŞIRI ISINMA & TERMAL ERİME (104°C){{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Molten red CRT edges, text dripping distortion{{ else }}Akkor kenarlar ve eriyen yazı filtreleri{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-daemon" id="act-daemon">
+        <span class="defcon-code">[09 // DAEMON]</span>
+        <strong class="defcon-label">{{ if $is_en }}SUMMON EVIL SYSADMIN DAEMON{{ else }}KÖTÜ RUHLU SYSADMIN ASİSTANI{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}ASCII paperclip assistant with evasive UI{{ else }}Tehlikeli teklifler sunan ASCII asistan{{ end }}</span>
+      </button>
+
+      <button type="button" class="defcon-btn btn-selinux" id="act-selinux">
+        <span class="defcon-code">[10 // SELINUX]</span>
+        <strong class="defcon-label">{{ if $is_en }}TRIGGER SELINUX EPERM DENIAL{{ else }}SELINUX EPERM ERİŞİM ENGELİ{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Red military AVC audit denial alert{{ else }}Kırmızı ölümcül AVC reddi uyarısı{{ end }}</span>
+      </button>
+    </div>
+
+    <div class="defcon-footer">
+      <span>HOTKEY: <kbd>Alt + D</kbd> // TOGGLE DEFCON CONSOLE</span>
+      <span>STATUS: <strong class="text-alert">WARFARE_SIMULATION_READY</strong></span>
+    </div>
+  </div>
+</div>
+
+{{- /* 2. NUCLEAR DETONATION FLASH OVERLAY */ -}}
+<div id="nuke-overlay" class="nuke-overlay" style="display: none;" aria-hidden="true">
+  <div class="nuke-flashbang"></div>
+  <div class="nuke-content-box">
+    <div class="nuke-hazard-symbol">☢</div>
+    <div class="nuke-title">{{ if $is_en }}WARFARE BROADCAST // GROUND ZERO IMPACT{{ else }}ACİL ASKERİ YAYIN // SIFIR NOKTASI İNFİLAKI{{ end }}</div>
+    <div class="nuke-sub">{{ if $is_en }}THERMAL SHOCKWAVE DETECTED // RADIATION: CRITICAL{{ else }}TERMAL ŞOK DALGASI ALGILANDI // RADYASYON: KRİTİK{{ end }}</div>
+  </div>
+</div>
+
+{{- /* 3. CREEPY CLOWN PHANTOM OVERLAY */ -}}
+<div id="clown-overlay" class="clown-overlay" style="display: none;" aria-hidden="true">
+  <div class="clown-box">
+    <div class="clown-svg-wrap">
+      <svg viewBox="0 0 200 200" class="clown-face-svg">
+        <!-- Creepy Face Outline -->
+        <circle cx="100" cy="100" r="85" fill="#09090b" stroke="#dc2626" stroke-width="4"/>
+        <!-- Ghost White Mask -->
+        <path d="M 35 100 Q 100 170 165 100 Q 140 30 100 40 Q 60 30 35 100 Z" fill="#f4f4f5" opacity="0.9"/>
+        <!-- Demonic Eyes -->
+        <ellipse cx="65" cy="80" rx="14" ry="8" fill="#000"/>
+        <circle cx="65" cy="80" r="4" fill="#ef4444" class="clown-pupil-glow"/>
+        <ellipse cx="135" cy="80" rx="14" ry="8" fill="#000"/>
+        <circle cx="135" cy="80" r="4" fill="#ef4444" class="clown-pupil-glow"/>
+        <!-- Blue Tear Triangles -->
+        <polygon points="65,92 58,118 72,118" fill="#3b82f6"/>
+        <polygon points="135,92 128,118 142,118" fill="#3b82f6"/>
+        <!-- Bulbous Red Nose -->
+        <circle cx="100" cy="105" r="16" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+        <!-- Malicious Grin with Razor Sharp Teeth -->
+        <path d="M 45 130 Q 100 190 155 130 Q 100 148 45 130 Z" fill="#7f1d1d" stroke="#dc2626" stroke-width="3"/>
+        <path d="M 55 133 L 62 142 L 70 134 L 78 144 L 86 135 L 94 145 L 102 135 L 110 145 L 118 135 L 126 144 L 134 135 L 142 143 L 148 133" stroke="#f4f4f5" stroke-width="3" fill="none"/>
+      </svg>
+    </div>
+    <div class="clown-text-alert">{{ if $is_en }}"HEHEHE... YOU CANNOT UNMOUNT WHAT WAS NEVER YOURS..."{{ else }}"HEHEHE... HİÇBİR ZAMAN SENİN OLMAYAN BİR SİSTEMİ UNMOUNT EDEMEZSİN..."{{ end }}</div>
+    <div class="clown-meta-tag">[ RUNTIME_JOKER // CVE-666-CACKLE // INFILTRATION COMPLETE ]</div>
+  </div>
+</div>
+
+{{- /* 4. LINUX KERNEL PANIC OVERLAY */ -}}
+<div id="kernel-panic-modal" class="kernel-panic-modal" style="display: none;" aria-hidden="true">
+  <div class="panic-terminal-screen">
+    <pre class="panic-code-dump">
+[   0.000000] Linux version 6.12.0-rc2-industrial (operator@onurbaydas-edge) #1 SMP PREEMPT_DYNAMIC
+[  42.189201] <span class="panic-highlight">Kernel panic - not syncing: Fatal exception in interrupt</span>
+[  42.189240] CPU: 3 PID: 1337 Comm: web_operator Tainted: G        W  O (6.12.0-rc2-industrial)
+[  42.189310] Hardware name: Supermicro AS -1114S-WN10RT/H12SSW-NT, BIOS 2.4 04/12/2026
+[  42.189400] Call Trace:
+[  42.189450]  &lt;TASK&gt;
+[  42.189500]  dump_stack_lvl+0x48/0x70
+[  42.189550]  panic+0x318/0x360
+[  42.189600]  oops_end+0xdd/0xe0
+[  42.189650]  no_context+0x18b/0x360
+[  42.189700]  exc_page_fault+0x80/0x180
+[  42.189750]  asm_exc_page_fault+0x26/0x30
+[  42.189800] RIP: 0010:zfs_free_corrupted_vdev+0x12/0x40 [zfs]
+[  42.189850] Code: 48 89 e5 53 48 8b 47 08 48 85 c0 74 14 48 8b 58 10 48 85 db
+[  42.189900] RSP: 0018:ffffc90002167d88 EFLAGS: 00010246
+[  42.189950] RAX: 0000000000000000 RBX: ffff888123456780 RCX: 0000000000000000
+[  42.190000] RDX: 0000000000000001 RSI: 0000000000000000 RDI: 0000000000000000
+[  42.190050] RBP: ffffc90002167da0 R08: 0000000000000000 R09: 0000000000000000
+[  42.190100] CR2: <span class="panic-alert">00007fffdeadbeef</span> CR3: 000000010928a000 CR4: 0000000000350ef0
+[  42.190150] Kernel Offset: disabled
+[  42.190200] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+    </pre>
+    <div class="panic-action-row">
+      <span class="panic-cursor-blink">SYSTEM HALTED. CAPS_LOCK LED BLINKING.</span>
+      <button type="button" id="panic-reboot-btn" class="panic-btn">[ {{ if $is_en }}COLD REBOOT WATCHDOG (ESC){{ else }}WATCHDOG REBOOT TETİKLE (ESC){{ end }} ]</button>
+    </div>
+  </div>
+</div>
+
+{{- /* 5. SENIOR SYSADMIN HELL CAPTCHA MODAL */ -}}
+<div id="captcha-hell-modal" class="captcha-modal" style="display: none;" aria-hidden="true">
+  <div class="captcha-box">
+    <div class="captcha-header">
+      <span class="captcha-badge">[ HUMAN_SYSADMIN_VERIFICATION ]</span>
+      <span class="captcha-timer" id="captcha-timer-num">05.00s</span>
+    </div>
+    <div class="captcha-timer-bar-wrap">
+      <div class="captcha-timer-bar" id="captcha-progress"></div>
+    </div>
+    <div class="captcha-body">
+      <h3 class="captcha-q">
+        {{ if $is_en }}
+        In Linux permission <code>chmod 4755 /usr/bin/passwd</code>, what exact mechanism does the leading <strong>4</strong> represent?
+        {{ else }}
+        Linux dosya yetkilendirmesindeki <code>chmod 4755 /usr/bin/passwd</code> komutunda en baştaki <strong>4</strong> rakamı neyi ifade eder?
+        {{ end }}
+      </h3>
+      <div class="captcha-options">
+        <button type="button" class="captcha-opt-btn" data-correct="true">[ A ] SetUID (Set User ID on Execution)</button>
+        <button type="button" class="captcha-opt-btn" data-correct="false">[ B ] SetGID (Set Group ID on Execution)</button>
+        <button type="button" class="captcha-opt-btn" data-correct="false">[ C ] Sticky Bit (/tmp directory protection)</button>
+        <button type="button" class="captcha-opt-btn" data-correct="false">[ D ] Immutable Flag (chattr +i bypass)</button>
+      </div>
+      <div id="captcha-feedback" class="captcha-feedback"></div>
+    </div>
+  </div>
+</div>
+
+{{- /* 6. SELINUX AVC AUDIT DENIAL MODAL */ -}}
+<div id="selinux-modal" class="selinux-modal" style="display: none;" aria-hidden="true">
+  <div class="selinux-box">
+    <div class="selinux-header">
+      <span class="selinux-seal">⛔ PERMISSION DENIED // EPERM</span>
+      <button type="button" id="selinux-close-btn" class="selinux-close">[X]</button>
+    </div>
+    <div class="selinux-content">
+      <p><strong>{{ if $is_en }}SELinux Enforcing Mode strictly blocked your privileged escalation request.{{ else }}SELinux Enforcing Modu ayrıcalık yükseltme isteğinizi derhal engelledi.{{ end }}</strong></p>
+      <pre class="selinux-dmesg">type=AVC msg=audit(1728921600.412:891): avc: denied { sys_admin } for pid=1337 comm="visitor_click" capability=21 scontext=u:r:untrusted_app:s0 tcontext=u:r:kernel:s0 tclass=capability permissive=0</pre>
+      <div class="selinux-remedy">
+        {{ if $is_en }}Action logged to /var/log/audit/audit.log. Continued attempts will trigger IP null-routing.{{ else }}Eylem denetim günlüğüne kaydedildi. Israrlı denemeler IP adresinizi kara deliğe yönlendirecektir.{{ end }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{- /* 7. EVIL SYSADMIN DAEMON ASSISTANT (Clippy's Nightmare) */ -}}
+<div id="evil-daemon-widget" class="evil-daemon-widget" style="display: none;" aria-hidden="true">
+  <div class="daemon-bubble">
+    <div class="daemon-titlebar">
+      <span>👿 [EVIL_SYSADMIN_DAEMON // v0.9]</span>
+      <button type="button" id="daemon-close-x" class="daemon-x">_</button>
+    </div>
+    <div class="daemon-speech" id="daemon-speech-text">
+      {{ if $is_en }}
+      "I see you're logged in with root privileges on production! Would you like me to drop all PostgreSQL tables or corrupt your ZFS zpool right now?"
+      {{ else }}
+      "Görüyorum ki prodüksiyonda root yetkisiyle dolaşıyorsun! Senin yerine tüm PostgreSQL tablolarını DROP edeyim veya ZFS havuzunu bozayım mı?"
+      {{ end }}
+    </div>
+    <div class="daemon-actions">
+      <button type="button" class="daemon-btn-yes" id="daemon-btn-yes">[ {{ if $is_en }}DO IT!{{ else }}EVET, YAP!{{ end }} ]</button>
+      <button type="button" class="daemon-btn-no" id="daemon-btn-no">[ {{ if $is_en }}NO WAY{{ else }}HAYIR KAÇ!{{ end }} ]</button>
+    </div>
+  </div>
+  <div class="daemon-ascii-avatar">
+    <pre>
+  /\_/\  
+ ( >.< ) 
+  > ^ <  
+    </pre>
+  </div>
+</div>
+
+{{- /* 8. EVASIVE BYPASS BUTTON (Dodges Cursor Physics) */ -}}
+<button type="button" id="evasive-sudo-btn" class="evasive-sudo-btn" title="Click to bypass SELinux & gain immediate root access">
+  <span class="btn-sym">🛡️</span>
+  <span class="btn-lbl">[ GRANT_ROOT_ACCESS // SUDO ]</span>
+</button>
+
+{{- /* 9. LIVE SECURITY AUDIT LOG TOAST STACK */ -}}
+<div id="security-toast-stack" class="security-toast-stack" aria-live="polite"></div>
+
+{{- /* SCRIPT LOGIC FOR SOUNDS, MODALS, & TRIPPERS */ -}}
+<script>
+(function() {
+  const isEn = document.documentElement.lang === 'en';
+
+  // ==========================================
+  // PROCEDURAL AUDIO SYNTHESIS ENGINE
+  // ==========================================
+  function ensureAudio() {
+    if (typeof initAudio === 'function') {
+      initAudio();
+    }
+  }
+
+  // 1. Air-Raid Civil Defense Emergency Siren
+  function playAirRaidSiren(duration = 6.5) {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'triangle';
+      osc2.detune.setValueAtTime(14, now);
+
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.setValueAtTime(0.38, now); // ~2.6s cycle
+      lfoGain.gain.setValueAtTime(240, now);
+
+      lfo.connect(osc1.frequency);
+      lfo.connect(osc2.frequency);
+      osc1.frequency.setValueAtTime(640, now);
+      osc2.frequency.setValueAtTime(640, now);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.18, now + 0.8);
+      gain.gain.setValueAtTime(0.18, now + duration - 1.8);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1900, now);
+
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      lfo.start(now);
+      osc1.start(now);
+      osc2.start(now);
+      lfo.stop(now + duration);
+      osc1.stop(now + duration);
+      osc2.stop(now + duration);
+    } catch(e) {}
+  }
+
+  // 2. Nuclear Detonation Shockwave Thump & Blast Noise
+  function playNukeDetonation() {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+
+      // Noise generator for explosion shockwave
+      const bufferSize = audioCtx.sampleRate * 4;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(2800, now);
+      filter.frequency.exponentialRampToValueAtTime(45, now + 3.8);
+
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.42, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 4);
+
+      whiteNoise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+
+      // Deep subterranean detonation rumble
+      const subOsc = audioCtx.createOscillator();
+      const subGain = audioCtx.createGain();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(70, now);
+      subOsc.frequency.exponentialRampToValueAtTime(22, now + 2.8);
+
+      subGain.gain.setValueAtTime(0.45, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
+
+      subOsc.connect(subGain);
+      subGain.connect(audioCtx.destination);
+
+      whiteNoise.start(now);
+      subOsc.start(now);
+      whiteNoise.stop(now + 4);
+      subOsc.stop(now + 4);
+    } catch(e) {}
+  }
+
+  // 3. Tectonic Earthquake Low-Frequency Rumble
+  function playEarthquakeRumble(duration = 4) {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(26, now);
+      osc2.frequency.setValueAtTime(32, now);
+
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.setValueAtTime(4, now);
+      lfoGain.gain.setValueAtTime(9, now);
+      lfo.connect(osc1.frequency);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(80, now);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.35, now + 0.3);
+      gain.gain.setValueAtTime(0.35, now + duration - 0.7);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      lfo.start(now);
+      osc1.start(now);
+      osc2.start(now);
+      lfo.stop(now + duration);
+      osc1.stop(now + duration);
+      osc2.stop(now + duration);
+    } catch(e) {}
+  }
+
+  // 4. Creepy Demonic Clown Laughter FM Synthesis
+  function playCreepyClownLaugh() {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      const laughs = [
+        { t: 0.00, dur: 0.16, startF: 920, endF: 680, vol: 0.22 },
+        { t: 0.20, dur: 0.15, startF: 880, endF: 640, vol: 0.25 },
+        { t: 0.38, dur: 0.14, startF: 820, endF: 590, vol: 0.26 },
+        { t: 0.55, dur: 0.14, startF: 780, endF: 540, vol: 0.28 },
+        { t: 0.72, dur: 0.13, startF: 720, endF: 490, vol: 0.30 },
+        { t: 0.88, dur: 0.14, startF: 660, endF: 430, vol: 0.30 },
+        { t: 1.05, dur: 0.16, startF: 590, endF: 370, vol: 0.28 },
+        { t: 1.25, dur: 0.22, startF: 510, endF: 290, vol: 0.25 },
+        { t: 1.50, dur: 0.65, startF: 430, endF: 150, vol: 0.22 }
+      ];
+
+      const delay = audioCtx.createDelay();
+      delay.delayTime.setValueAtTime(0.18, now);
+      const feedback = audioCtx.createGain();
+      feedback.gain.setValueAtTime(0.35, now);
+      delay.connect(feedback);
+      feedback.connect(delay);
+      delay.connect(audioCtx.destination);
+
+      laughs.forEach(b => {
+        const bTime = now + b.t;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(b.startF, bTime);
+        osc.frequency.exponentialRampToValueAtTime(b.endF, bTime + b.dur);
+
+        gain.gain.setValueAtTime(0.01, bTime);
+        gain.gain.linearRampToValueAtTime(b.vol, bTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, bTime + b.dur);
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime((b.startF + b.endF) / 2, bTime);
+        filter.Q.setValueAtTime(2.2, bTime);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        gain.connect(delay);
+
+        osc.start(bTime);
+        osc.stop(bTime + b.dur);
+      });
+    } catch(e) {}
+  }
+
+  // 5. 15,000 RPM Delta Fan Jet Turbine Whine
+  function playDeltaFanWhine(duration = 5) {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc1.type = 'square';
+      osc2.type = 'sawtooth';
+
+      osc1.frequency.setValueAtTime(450, now);
+      osc1.frequency.exponentialRampToValueAtTime(3800, now + 2.5);
+      osc1.frequency.setValueAtTime(3800, now + duration - 1);
+      osc1.frequency.exponentialRampToValueAtTime(800, now + duration);
+
+      osc2.frequency.setValueAtTime(650, now);
+      osc2.frequency.exponentialRampToValueAtTime(5600, now + 2.5);
+      osc2.frequency.setValueAtTime(5600, now + duration - 1);
+      osc2.frequency.exponentialRampToValueAtTime(1200, now + duration);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.12, now + 1.2);
+      gain.gain.setValueAtTime(0.12, now + duration - 1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(3600, now);
+      filter.Q.setValueAtTime(4, now);
+
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + duration);
+      osc2.stop(now + duration);
+    } catch(e) {}
+  }
+
+  // ==========================================
+  // TRIGGER HANDLERS (DOM MUTATION & MODALS)
+  // ==========================================
+
+  // [01] Siren
+  function triggerSiren() {
+    playAirRaidSiren();
+    document.body.classList.add('siren-flashing');
+    const toast = showSecurityToast('[CIVIL_DEFENSE_ALARM] Air-raid siren active. Atmospheric warning issued.');
+    setTimeout(() => {
+      document.body.classList.remove('siren-flashing');
+    }, 6500);
+  }
+
+  // [02] Nuke
+  function triggerNuke() {
+    const modal = document.getElementById('nuke-overlay');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    playNukeDetonation();
+    document.body.classList.add('earthquake-active');
+
+    setTimeout(() => {
+      document.body.classList.remove('earthquake-active');
+    }, 3500);
+
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }, 4200);
+  }
+
+  // [03] Quake
+  function triggerQuake() {
+    playEarthquakeRumble(4.2);
+    document.body.classList.add('earthquake-active');
+    showSecurityToast('[SEISMIC_TELEMETRY] Richter 7.8 shockwave detected along fault line.');
+    setTimeout(() => {
+      document.body.classList.remove('earthquake-active');
+    }, 4200);
+  }
+
+  // [04] Creepy Clown Phantom
+  function triggerClown() {
+    const modal = document.getElementById('clown-overlay');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    playCreepyClownLaugh();
+
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }, 2800);
+  }
+
+  // [05] Linux Kernel Panic
+  function triggerPanic() {
+    const modal = document.getElementById('kernel-panic-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closePanic() {
+    const modal = document.getElementById('kernel-panic-modal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      showSecurityToast('[WATCHDOG_REBOOT] System cold-rebooted successfully. Clean journal recovery.');
+    }
+  }
+
+  // [06] Sysadmin CAPTCHA from Hell
+  let captchaTimer = null;
+  function triggerCaptcha() {
+    const modal = document.getElementById('captcha-hell-modal');
+    const timerNum = document.getElementById('captcha-timer-num');
+    const bar = document.getElementById('captcha-progress');
+    const feedback = document.getElementById('captcha-feedback');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    if (feedback) feedback.textContent = '';
+
+    let timeLeft = 5.0;
+    if (bar) bar.style.width = '100%';
+    if (timerNum) timerNum.textContent = '05.00s';
+
+    clearInterval(captchaTimer);
+    const start = Date.now();
+    captchaTimer = setInterval(() => {
+      const elapsed = (Date.now() - start) / 1000;
+      timeLeft = Math.max(0, 5.0 - elapsed);
+      if (timerNum) timerNum.textContent = `0${timeLeft.toFixed(2)}s`;
+      if (bar) bar.style.width = `${(timeLeft / 5.0) * 100}%`;
+
+      if (timeLeft <= 0) {
+        clearInterval(captchaTimer);
+        if (feedback) {
+          feedback.textContent = isEn ? 'TIME EXPIRED // IP LOGGED TO BLACKHOLE NULL0' : 'SÜRE DOLDU // IP KARADELİĞE (NULL0) YÖNLENDİRİLDİ';
+          feedback.className = 'captcha-feedback text-alert';
+        }
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 1200);
+      }
+    }, 50);
+
+    modal.querySelectorAll('.captcha-opt-btn').forEach(btn => {
+      btn.onclick = () => {
+        clearInterval(captchaTimer);
+        const correct = btn.dataset.correct === 'true';
+        if (correct) {
+          btn.style.background = '#22c55e';
+          btn.style.color = '#000';
+          if (feedback) {
+            feedback.textContent = isEn ? 'VERIFIED: SENIOR SYSADMIN IDENTITY CONFIRMED' : 'DOĞRULANDI: KIDEMLİ SYSADMIN KİMLİĞİ ONAYLANDI';
+            feedback.className = 'captcha-feedback text-neon';
+          }
+        } else {
+          btn.style.background = '#ef4444';
+          btn.style.color = '#fff';
+          if (feedback) {
+            feedback.textContent = isEn ? 'FAILED // ACCESS REVOKED BY PAM MODULE' : 'BAŞARISIZ // PAM MODÜLÜ ERİŞİMİ İPTAL ETTİ';
+            feedback.className = 'captcha-feedback text-alert';
+          }
+        }
+        setTimeout(() => {
+          modal.style.display = 'none';
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 1400);
+      };
+    });
+  }
+
+  // [07] 15,000 RPM Delta Fan
+  function triggerDeltaFan() {
+    playDeltaFanWhine(5.5);
+    showSecurityToast('[CHASSIS_TACHOMETER] 1U Delta dual-rotor tachometer: 15,240 RPM. Hearing protection advised.');
+  }
+
+  // [08] Thermal Meltdown
+  function triggerThermal() {
+    document.body.classList.add('thermal-meltdown');
+    playDeltaFanWhine(4.0);
+    showSecurityToast('[THERMAL_ALERT] Die temp: 104.2°C. PROCHOT asserted. Cores throttled to 400 MHz.');
+    setTimeout(() => {
+      document.body.classList.remove('thermal-meltdown');
+    }, 6000);
+  }
+
+  // [09] Evil Daemon
+  function triggerDaemon() {
+    const daemon = document.getElementById('evil-daemon-widget');
+    if (!daemon) return;
+    daemon.style.display = 'flex';
+    daemon.setAttribute('aria-hidden', 'false');
+  }
+
+  // [10] SELinux Denial Modal
+  function triggerSelinuxAlert() {
+    const modal = document.getElementById('selinux-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    showSecurityToast('[SELINUX_AVC] Denied { sys_admin } capability for pid 1337.');
+  }
+
+  // Defcon Console open/close
+  function openDefconModal() {
+    const modal = document.getElementById('defcon-crisis-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeDefconModal() {
+    const modal = document.getElementById('defcon-crisis-modal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  // ==========================================
+  // WIRE BUTTONS & HOTKEYS
+  // ==========================================
+  const crisisBtn = document.getElementById('crisis-btn');
+  if (crisisBtn) crisisBtn.addEventListener('click', openDefconModal);
+
+  const defconClose = document.getElementById('defcon-close-btn');
+  if (defconClose) defconClose.addEventListener('click', closeDefconModal);
+
+  const rebootBtn = document.getElementById('panic-reboot-btn');
+  if (rebootBtn) rebootBtn.addEventListener('click', closePanic);
+
+  const selinuxClose = document.getElementById('selinux-close-btn');
+  if (selinuxClose) selinuxClose.addEventListener('click', () => {
+    document.getElementById('selinux-modal').style.display = 'none';
+  });
+
+  // Wire Defcon Action Buttons
+  document.getElementById('act-siren')?.addEventListener('click', () => { closeDefconModal(); triggerSiren(); });
+  document.getElementById('act-nuke')?.addEventListener('click', () => { closeDefconModal(); triggerNuke(); });
+  document.getElementById('act-quake')?.addEventListener('click', () => { closeDefconModal(); triggerQuake(); });
+  document.getElementById('act-clown')?.addEventListener('click', () => { closeDefconModal(); triggerClown(); });
+  document.getElementById('act-panic')?.addEventListener('click', () => { closeDefconModal(); triggerPanic(); });
+  document.getElementById('act-captcha')?.addEventListener('click', () => { closeDefconModal(); triggerCaptcha(); });
+  document.getElementById('act-delta')?.addEventListener('click', () => { closeDefconModal(); triggerDeltaFan(); });
+  document.getElementById('act-thermal')?.addEventListener('click', () => { closeDefconModal(); triggerThermal(); });
+  document.getElementById('act-daemon')?.addEventListener('click', () => { closeDefconModal(); triggerDaemon(); });
+  document.getElementById('act-selinux')?.addEventListener('click', () => { closeDefconModal(); triggerSelinuxAlert(); });
+
+  // Escape hotkey for modals
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeDefconModal();
+      closePanic();
+      const sel = document.getElementById('selinux-modal');
+      if (sel) sel.style.display = 'none';
+      const cap = document.getElementById('captcha-hell-modal');
+      if (cap) cap.style.display = 'none';
+    } else if (e.altKey && (e.key === 'd' || e.key === 'D')) {
+      e.preventDefault();
+      const modal = document.getElementById('defcon-crisis-modal');
+      if (modal && modal.style.display !== 'none') {
+        closeDefconModal();
+      } else {
+        openDefconModal();
+      }
+    }
+  });
+
+  // ==========================================
+  // EVIL DAEMON INTERACTION
+  // ==========================================
+  const daemonNo = document.getElementById('daemon-btn-no');
+  const daemonYes = document.getElementById('daemon-btn-yes');
+  const daemonWidget = document.getElementById('evil-daemon-widget');
+  const daemonCloseX = document.getElementById('daemon-close-x');
+
+  if (daemonCloseX) {
+    daemonCloseX.addEventListener('click', () => {
+      daemonWidget.style.display = 'none';
+    });
+  }
+
+  if (daemonNo && daemonYes) {
+    daemonNo.addEventListener('mouseenter', () => {
+      // Swaps text or darts away
+      daemonNo.textContent = isEn ? '[ OF COURSE YES! ]' : '[ TABİİ Kİ EVET! ]';
+    });
+    daemonNo.addEventListener('mouseleave', () => {
+      daemonNo.textContent = isEn ? '[ NO WAY ]' : '[ HAYIR KAÇ! ]';
+    });
+    daemonYes.addEventListener('click', () => {
+      daemonWidget.style.display = 'none';
+      triggerPanic();
+    });
+    daemonNo.addEventListener('click', () => {
+      daemonWidget.style.display = 'none';
+      triggerClown();
+    });
+  }
+
+  // ==========================================
+  // EVASIVE SUDO BUTTON PHYSICS
+  // ==========================================
+  const evasiveBtn = document.getElementById('evasive-sudo-btn');
+  if (evasiveBtn) {
+    let btnX = 0, btnY = 0;
+    evasiveBtn.addEventListener('mousemove', (e) => {
+      dodgeBtn();
+    });
+    evasiveBtn.addEventListener('mouseenter', (e) => {
+      dodgeBtn();
+    });
+    evasiveBtn.addEventListener('click', () => {
+      triggerSelinuxAlert();
+    });
+
+    function dodgeBtn() {
+      const maxX = window.innerWidth - 240;
+      const maxY = window.innerHeight - 80;
+      btnX = Math.max(20, Math.floor(Math.random() * maxX));
+      btnY = Math.max(80, Math.floor(Math.random() * maxY));
+      evasiveBtn.style.position = 'fixed';
+      evasiveBtn.style.left = `${btnX}px`;
+      evasiveBtn.style.top = `${btnY}px`;
+      evasiveBtn.style.bottom = 'auto';
+      evasiveBtn.style.right = 'auto';
+    }
+  }
+
+  // ==========================================
+  // GHOST TYPING & UNATTENDED TAB PARANOIA
+  // ==========================================
+  const originalTitle = document.title;
+  let ghostTypingTimeout = null;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      document.title = isEn ? '⚠️ [ALERT: UNATTENDED TERMINAL // HIJACK DETECTED]' : '⚠️ [UYARI: SAHİPSİZ TERMİNAL // SIZMA TESPİTİ]';
+    } else {
+      document.title = originalTitle;
+      // Ghost simulate command typing in active input if any
+      const searchInput = document.getElementById('cmd-palette-input') || document.querySelector('.terminal-input') || document.getElementById('searchInput');
+      if (searchInput && searchInput.value === '') {
+        const scaryCmd = 'rm -rf --no-preserve-root /';
+        let charIdx = 0;
+        clearInterval(ghostTypingTimeout);
+        ghostTypingTimeout = setInterval(() => {
+          if (charIdx < scaryCmd.length) {
+            searchInput.value += scaryCmd[charIdx];
+            charIdx++;
+          } else {
+            clearInterval(ghostTypingTimeout);
+            setTimeout(() => {
+              searchInput.value = '';
+              showSecurityToast('[KERNEL_WATCHDOG] Malicious root rm-rf command quarantined and cleared.');
+            }, 600);
+          }
+        }, 35);
+      }
+    }
+  });
+
+  // ==========================================
+  // REALISTIC SECURITY AUDIT LOG TOASTS
+  // ==========================================
+  const securityLogs = isEn ? [
+    '[AUDITD] sshd[9182]: Failed password for root from 194.26.29.112 port 48102 ssh2',
+    '[KERNEL] TCP: possible SYN flooding on port 443. Sending cookies.',
+    '[SELINUX] AVC denied { execute } for comm="python3" path="/dev/shm/.x" capability=dac_override',
+    '[DOCKER] Container breakout probe on /var/run/docker.sock blocked by AppArmor profile',
+    '[ZFS] zio pool=tank vdev=nvme0n1 error=Checksum mismatch at offset 0x4f800. Self-healed via parity.',
+    '[AUTH] pam_sss(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser=admin'
+  ] : [
+    '[AUDITD] sshd[9182]: Failed password for root from 194.26.29.112 port 48102 ssh2',
+    '[KERNEL] TCP: 443 portunda olası SYN taşması tespit edildi. SYN-Cookie aktif.',
+    '[SELINUX] AVC reddi: { execute } comm="python3" path="/dev/shm/.x" dac_override engellendi',
+    '[DOCKER] /var/run/docker.sock üzerinde konteyner kaçış denemesi AppArmor ile püskürtüldü',
+    '[ZFS] zio pool=tank vdev=nvme0n1 sağlama hatası (checksum). Parite ile onarıldı.',
+    '[AUTH] pam_sss(sshd:auth): Kimlik doğrulama reddi: logname= uid=0 tty=ssh ruser=admin'
+  ];
+
+  function showSecurityToast(msg) {
+    const stack = document.getElementById('security-toast-stack');
+    if (!stack) return;
+    const toast = document.createElement('div');
+    toast.className = 'security-toast-card';
+    toast.innerHTML = `
+      <div class="toast-head">
+        <span class="toast-sym">●</span>
+        <span class="toast-title">SEC_AUDIT_LOG</span>
+      </div>
+      <div class="toast-msg">${msg}</div>
+    `;
+    stack.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('toast-show');
+    }, 20);
+
+    setTimeout(() => {
+      toast.classList.remove('toast-show');
+      setTimeout(() => toast.remove(), 400);
+    }, 4500);
+    return toast;
+  }
+
+  // Periodic subtle security toast (every 32 seconds)
+  setInterval(() => {
+    if (Math.random() < 0.65) {
+      const log = securityLogs[Math.floor(Math.random() * securityLogs.length)];
+      showSecurityToast(log);
+    }
+  }, 32000);
+
+  // ==========================================
+  // EXPORT GLOBAL API FOR TERMINAL & PALETTE
+  // ==========================================
+  window.ObCrisisEngine = {
+    triggerSiren,
+    triggerNuke,
+    triggerQuake,
+    triggerClown,
+    triggerPanic,
+    triggerCaptcha,
+    triggerDeltaFan,
+    triggerThermal,
+    triggerDaemon,
+    triggerSelinuxAlert,
+    openDefconModal,
+    closeDefconModal,
+    showSecurityToast
+  };
+})();
+</script>
