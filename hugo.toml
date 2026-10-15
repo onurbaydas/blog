@@ -27,14 +27,6 @@ enableRobotsTXT = true
         Title = 'OB'
         Content = 'Sistem mimarisi, Linux çekirdeği ve altyapı mühendisliği.'
     [[languages.tr.menus.main]]
-      name = 'Yazılar'
-      pageRef = '/posts'
-      weight = 10
-    [[languages.tr.menus.main]]
-      name = 'Radar'
-      pageRef = '/radar'
-      weight = 15
-    [[languages.tr.menus.main]]
       name = 'Araçlar'
       pageRef = '/tools'
       weight = 16
@@ -78,14 +70,6 @@ enableRobotsTXT = true
       [languages.en.params.homeInfoParams]
         Title = 'OB'
         Content = 'Systems architecture, Linux kernel mechanics, and infrastructure engineering.'
-    [[languages.en.menus.main]]
-      name = 'Posts'
-      pageRef = '/posts'
-      weight = 10
-    [[languages.en.menus.main]]
-      name = 'Radar'
-      pageRef = '/radar'
-      weight = 15
     [[languages.en.menus.main]]
       name = 'Tools'
       pageRef = '/tools'
