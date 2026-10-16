@@ -367,6 +367,81 @@
 {{- /* 11. SERVER ROOM PEST INFESTATION CONTAINER */ -}}
 <div id="pest-infestation-container" class="pest-infestation-container" aria-hidden="true"></div>
 
+{{- /* 12. EDGE-PEEKING BULLY CLOWN (ZORBA KENAR PALYAÇOSU) */ -}}
+<div id="edge-clown-apparatus" class="edge-clown-apparatus edge-clown-hidden" aria-hidden="true">
+  <div class="edge-clown-speech" id="edge-clown-speech">
+    <div class="clown-speech-badge">
+      <span class="clown-badge-dot">●</span>
+      <span class="clown-badge-title">MOCK_DAEMON // PID_666</span>
+    </div>
+    <div class="clown-speech-text" id="edge-clown-text">"HAHAHAHAHA! CİDDEN ORTAYA MI TIKLADIN?!"</div>
+    <div class="clown-speech-sub">[ TIKLA DA GÖREYİM SENİ // 0xDEADBEEF ]</div>
+  </div>
+  <div class="edge-clown-avatar" id="edge-clown-avatar" role="button" tabindex="0" title="HONK ME!">
+    <svg viewBox="0 0 220 220" class="edge-clown-svg">
+      <defs>
+        <radialGradient id="clownNoseGlow" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#ff6b6b"/>
+          <stop offset="60%" stop-color="#dc2626"/>
+          <stop offset="100%" stop-color="#7f1d1d"/>
+        </radialGradient>
+        <filter id="clownCrazyGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+      <!-- Wild Toxic Hair Tufts (Left) -->
+      <path d="M 25 75 Q -5 45 15 25 Q 35 45 42 65 Z" fill="#22c55e" stroke="#15803d" stroke-width="2" class="clown-hair-tuft"/>
+      <path d="M 35 95 Q 5 85 10 60 Q 30 75 48 85 Z" fill="#06b6d4" stroke="#0891b2" stroke-width="2" class="clown-hair-tuft"/>
+      <path d="M 30 115 Q 0 120 15 140 Q 35 125 45 110 Z" fill="#a855f7" stroke="#7e22ce" stroke-width="2" class="clown-hair-tuft"/>
+      <!-- Wild Toxic Hair Tufts (Right) -->
+      <path d="M 175 65 Q 205 35 185 20 Q 165 40 158 60 Z" fill="#22c55e" stroke="#15803d" stroke-width="2" class="clown-hair-tuft"/>
+      <path d="M 165 85 Q 215 75 210 50 Q 190 70 152 80 Z" fill="#06b6d4" stroke="#0891b2" stroke-width="2" class="clown-hair-tuft"/>
+      <path d="M 170 110 Q 220 115 205 135 Q 185 120 155 105 Z" fill="#a855f7" stroke="#7e22ce" stroke-width="2" class="clown-hair-tuft"/>
+      <!-- Pointy Clown Ears -->
+      <ellipse cx="45" cy="110" rx="14" ry="18" fill="#e4e4e7" stroke="#71717a" stroke-width="2"/>
+      <ellipse cx="155" cy="110" rx="14" ry="18" fill="#e4e4e7" stroke="#71717a" stroke-width="2"/>
+      <!-- Silver Piercing on Ear -->
+      <circle cx="36" cy="120" r="4" fill="none" stroke="#facc15" stroke-width="2"/>
+      <!-- Main Face Base -->
+      <path d="M 50 85 Q 100 20 150 85 Q 165 140 100 175 Q 35 140 50 85 Z" fill="#f4f4f5" stroke="#18181b" stroke-width="4"/>
+      <!-- Blue Diamond Warpaint over Eyes -->
+      <polygon points="75,55 85,82 75,108 65,82" fill="#3b82f6" opacity="0.95"/>
+      <polygon points="125,55 135,82 125,108 115,82" fill="#3b82f6" opacity="0.95"/>
+      <!-- Demonic Arching Eyebrows -->
+      <path d="M 58 68 Q 78 52 92 72" stroke="#dc2626" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M 142 68 Q 122 52 108 72" stroke="#dc2626" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <!-- Bloodshot Asymmetrical Eyes -->
+      <ellipse cx="75" cy="82" rx="13" ry="10" fill="#fef08a" stroke="#18181b" stroke-width="2"/>
+      <circle cx="75" cy="82" r="5" fill="#ef4444" class="clown-eye-pupil"/>
+      <circle cx="73" cy="80" r="2" fill="#fff"/>
+      <ellipse cx="125" cy="82" rx="13" ry="10" fill="#fef08a" stroke="#18181b" stroke-width="2"/>
+      <circle cx="125" cy="82" r="5" fill="#ef4444" class="clown-eye-pupil"/>
+      <circle cx="123" cy="80" r="2" fill="#fff"/>
+      <!-- Giant Shiny Bulbous Red Nose (Clickable!) -->
+      <circle cx="100" cy="104" r="18" fill="url(#clownNoseGlow)" stroke="#991b1b" stroke-width="3" class="clown-shiny-nose" filter="url(#clownCrazyGlow)"/>
+      <ellipse cx="94" cy="98" rx="5" ry="3" fill="#ffffff" opacity="0.8"/>
+      <!-- Cheeks Blush Spirals -->
+      <circle cx="56" cy="120" r="10" fill="#ef4444" opacity="0.4"/>
+      <circle cx="144" cy="120" r="10" fill="#ef4444" opacity="0.4"/>
+      <!-- Grotesque Ear-to-Ear Grin (Mouth cavity) -->
+      <path d="M 52 128 Q 100 185 148 128 Q 100 142 52 128 Z" fill="#450a0a" stroke="#991b1b" stroke-width="4"/>
+      <!-- Razor-Sharp Jagged Teeth -->
+      <path d="M 58 131 L 65 142 L 72 133 L 80 144 L 88 135 L 96 146 L 104 135 L 112 146 L 120 135 L 128 144 L 136 133 L 142 131" stroke="#fef9c3" stroke-width="3.5" fill="none" stroke-linejoin="round"/>
+      <path d="M 64 152 L 72 142 L 80 153 L 88 143 L 96 155 L 104 144 L 112 154 L 120 143 L 128 153 L 136 142" stroke="#fef9c3" stroke-width="3.5" fill="none" stroke-linejoin="round"/>
+      <!-- Sticking-Out Mocking Tongue -->
+      <path d="M 88 144 C 88 170 112 170 112 144 Z" fill="#ec4899" stroke="#be185d" stroke-width="2.5" class="clown-mock-tongue"/>
+      <!-- Pointing Cartoon White Glove (Mocking finger pointing at user) -->
+      <g class="clown-pointing-hand" transform="translate(140, 130)">
+        <path d="M 10 30 Q 30 10 55 12 Q 62 14 62 20 Q 62 26 48 28 L 65 29 Q 72 31 70 37 Q 68 42 50 42 L 60 45 Q 65 48 62 53 Q 58 58 40 54 L 15 55 Z" fill="#ffffff" stroke="#18181b" stroke-width="3.5"/>
+        <path d="M 30 15 L 75 14 Q 84 15 84 21 Q 84 27 75 28 L 35 28" fill="#ffffff" stroke="#18181b" stroke-width="3.5"/>
+        <line x1="75" y1="21" x2="60" y2="21" stroke="#ef4444" stroke-width="2"/>
+        <rect x="2" y="24" width="14" height="34" rx="4" fill="#ef4444" stroke="#18181b" stroke-width="3"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
 {{- /* SCRIPT LOGIC FOR SOUNDS, MODALS, & TRIPPERS */ -}}
 <script>
 (function() {
@@ -578,6 +653,146 @@
     } catch(e) {}
   }
 
+  // 4b. Brassy Rubber Clown Horn Honk
+  function playClownHonk(loud = false) {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      const vol = loud ? 0.35 : 0.22;
+      [
+        { t: 0.00, f1: 580, f2: 740, dur: 0.09 },
+        { t: 0.12, f1: 620, f2: 820, dur: 0.14 }
+      ].forEach(b => {
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc2.type = 'square';
+        osc1.frequency.setValueAtTime(b.f1, now + b.t);
+        osc2.frequency.setValueAtTime(b.f2, now + b.t);
+
+        gain.gain.setValueAtTime(0.01, now + b.t);
+        gain.gain.linearRampToValueAtTime(vol, now + b.t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + b.t + b.dur);
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(700, now + b.t);
+        filter.Q.setValueAtTime(3.0, now + b.t);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc1.start(now + b.t);
+        osc2.start(now + b.t);
+        osc1.stop(now + b.t + b.dur);
+        osc2.stop(now + b.t + b.dur);
+      });
+    } catch(e) {}
+  }
+
+  // 4c. Disgusting / Nasty Mocking Bully Clown Laugh FM Synthesis
+  function playBullyClownNastyCackle() {
+    ensureAudio();
+    if (!audioCtx) return;
+    try {
+      // 1. Honk first!
+      playClownHonk(false);
+
+      // 2. Then unleash 12 rapid cackling hysterical laughs
+      const now = audioCtx.currentTime + 0.18;
+      const bursts = [
+        { t: 0.00, dur: 0.13, startF: 1280, endF: 860, vol: 0.32, vowel: 1400 },
+        { t: 0.15, dur: 0.12, startF: 1350, endF: 920, vol: 0.34, vowel: 1600 },
+        { t: 0.30, dur: 0.12, startF: 1220, endF: 810, vol: 0.35, vowel: 1300 },
+        { t: 0.44, dur: 0.12, startF: 1100, endF: 740, vol: 0.36, vowel: 1100 },
+        { t: 0.58, dur: 0.11, startF: 980,  endF: 650, vol: 0.36, vowel: 950 },
+        { t: 0.71, dur: 0.11, startF: 920,  endF: 590, vol: 0.38, vowel: 880 },
+        { t: 0.84, dur: 0.11, startF: 840,  endF: 520, vol: 0.38, vowel: 820 },
+        { t: 0.97, dur: 0.12, startF: 760,  endF: 460, vol: 0.35, vowel: 750 },
+        { t: 1.11, dur: 0.13, startF: 680,  endF: 400, vol: 0.32, vowel: 680 },
+        { t: 1.26, dur: 0.15, startF: 600,  endF: 340, vol: 0.30, vowel: 600 },
+        { t: 1.43, dur: 0.20, startF: 520,  endF: 280, vol: 0.28, vowel: 520 },
+        { t: 1.66, dur: 0.55, startF: 440,  endF: 90,  vol: 0.26, vowel: 350 }
+      ];
+
+      const delay = audioCtx.createDelay();
+      delay.delayTime.setValueAtTime(0.14, now);
+      const feedback = audioCtx.createGain();
+      feedback.gain.setValueAtTime(0.32, now);
+      delay.connect(feedback);
+      feedback.connect(delay);
+      delay.connect(audioCtx.destination);
+
+      bursts.forEach(b => {
+        const bTime = now + b.t;
+        const osc = audioCtx.createOscillator();
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        const gain = audioCtx.createGain();
+
+        // 16Hz Vibrato LFO for human-like throat spasm
+        lfo.frequency.setValueAtTime(16, bTime);
+        lfoGain.gain.setValueAtTime(45, bTime);
+        lfo.connect(osc.frequency);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(b.startF, bTime);
+        osc.frequency.exponentialRampToValueAtTime(b.endF, bTime + b.dur);
+
+        gain.gain.setValueAtTime(0.01, bTime);
+        gain.gain.linearRampToValueAtTime(b.vol, bTime + 0.018);
+        gain.gain.exponentialRampToValueAtTime(0.001, bTime + b.dur);
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(b.vowel, bTime);
+        filter.Q.setValueAtTime(3.8, bTime);
+
+        // Sub-octave raspy buzz for disgusting throat undertone
+        const subOsc = audioCtx.createOscillator();
+        const subGain = audioCtx.createGain();
+        subOsc.type = 'square';
+        subOsc.frequency.setValueAtTime(b.startF * 0.5, bTime);
+        subOsc.frequency.exponentialRampToValueAtTime(b.endF * 0.5, bTime + b.dur);
+        subGain.gain.setValueAtTime(0.01, bTime);
+        subGain.gain.linearRampToValueAtTime(b.vol * 0.45, bTime + 0.02);
+        subGain.gain.exponentialRampToValueAtTime(0.001, bTime + b.dur);
+
+        osc.connect(filter);
+        subOsc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        gain.connect(delay);
+
+        lfo.start(bTime);
+        osc.start(bTime);
+        subOsc.start(bTime);
+
+        lfo.stop(bTime + b.dur);
+        osc.stop(bTime + b.dur);
+        subOsc.stop(bTime + b.dur);
+      });
+
+      // 3. Web Speech Layer (mocking screechy goblin voice!)
+      if ('speechSynthesis' in window && !window.speechSynthesis.speaking) {
+        try {
+          const mockingUtterance = new SpeechSynthesisUtterance(
+            isEn ? "Hahaha! You clicked that?!" : "Hahaha! Oraya mı tıkladın?!"
+          );
+          mockingUtterance.rate = 1.48;
+          mockingUtterance.pitch = 1.95;
+          mockingUtterance.volume = 0.9;
+          window.speechSynthesis.speak(mockingUtterance);
+        } catch(e) {}
+      }
+    } catch(e) {}
+  }
+
   // 5. 15,000 RPM Delta Fan Jet Turbine Whine
   function playDeltaFanWhine(duration = 5) {
     ensureAudio();
@@ -731,16 +946,145 @@
   // [04] Creepy Clown Phantom
   function triggerClown() {
     const modal = document.getElementById('clown-overlay');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    modal.setAttribute('aria-hidden', 'false');
-    playCreepyClownLaugh();
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      playCreepyClownLaugh();
 
-    setTimeout(() => {
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-    }, 2800);
+      setTimeout(() => {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }, 2800);
+    }
+    triggerEdgeBullyClown(window.innerWidth - 80, window.innerHeight * 0.4);
   }
+
+  // ==========================================
+  // [04b] EDGE-PEEKING BULLY CLOWN (ZORBA KENAR PALYAÇOSU)
+  // ==========================================
+  let edgeClownActive = false;
+  let lastEdgeClownTime = 0;
+  let edgeClownClickCount = 0;
+  let edgeClownDismissTimer = null;
+
+  const edgeClownEl = document.getElementById('edge-clown-apparatus');
+  const edgeClownTextEl = document.getElementById('edge-clown-text');
+  const edgeClownAvatarEl = document.getElementById('edge-clown-avatar');
+
+  const clownQuotesTr = [
+    '"HAHAHAHAHA! CİDDEN ORTAYA MI TIKLADIN?!"',
+    '"HİHİHİHİ! BİR DAHA TIKLA BELKİ ÇALIŞIR ZAVALLI!"',
+    '"HEHEHE! BUTONU BULAMADIN MI SEN?!"',
+    '"AHAHAHA! SİSTEM ERİŞİMİN TAMAMEN REDDEDİLDİ!"',
+    '"HO-HO-HO! NEYİ DÜZELTMEYE ÇALIŞIYORSUN?!"',
+    '"GEÇERSİZ TIKLAMA! EFORUNA GÜLÜYORUM SADECE!"',
+    '"HAHAHA! KLAVYE VE FARE SENİN NEYİNE?!"'
+  ];
+
+  const clownQuotesEn = [
+    '"HAHAHAHAHA! YOU SERIOUSLY CLICKED THAT?!"',
+    '"HIHIHIHI! CLICK AGAIN MAYBE IT WORKS, ROOKIE!"',
+    '"HEHEHE! LOOKING FOR BUTTONS? ZERO PERMISSIONS!"',
+    '"AHAHAHA! INSUFFICIENT PRIVILEGES DETECTED!"',
+    '"HO-HO-HO! WHAT ARE YOU TRYING TO FIX?!"',
+    '"INVALID CLICK! CHUCKLES IS LAUGHING AT YOU!"',
+    '"HAHAHA! WHO GAVE YOU MOUSE PRIVILEGES?!"'
+  ];
+
+  function triggerEdgeBullyClown(clickX, clickY) {
+    if (!edgeClownEl || edgeClownActive) return;
+    edgeClownActive = true;
+    lastEdgeClownTime = Date.now();
+    edgeClownClickCount = 0;
+
+    const viewW = window.innerWidth;
+    const viewH = window.innerHeight;
+
+    // Reset placement
+    edgeClownEl.classList.remove('peeking-right', 'peeking-left', 'peeking-bottom', 'edge-clown-hidden');
+
+    if (clickY && clickY > viewH * 0.72 && Math.random() < 0.35) {
+      edgeClownEl.classList.add('peeking-bottom');
+      edgeClownEl.style.top = '';
+      edgeClownEl.style.bottom = '0';
+      edgeClownEl.style.left = `${Math.max(20, Math.min(viewW - 300, (clickX || viewW * 0.5) - 80))}px`;
+      edgeClownEl.style.right = '';
+    } else if (clickX && clickX < viewW * 0.45) {
+      edgeClownEl.classList.add('peeking-left');
+      const safeY = Math.max(90, Math.min(viewH - 240, (clickY || viewH * 0.38) - 80));
+      edgeClownEl.style.top = `${safeY}px`;
+      edgeClownEl.style.bottom = '';
+      edgeClownEl.style.left = '0';
+      edgeClownEl.style.right = '';
+    } else {
+      edgeClownEl.classList.add('peeking-right');
+      const safeY = Math.max(90, Math.min(viewH - 240, (clickY || viewH * 0.38) - 80));
+      edgeClownEl.style.top = `${safeY}px`;
+      edgeClownEl.style.bottom = '';
+      edgeClownEl.style.right = '0';
+      edgeClownEl.style.left = '';
+    }
+
+    const quotes = isEn ? clownQuotesEn : clownQuotesTr;
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    if (edgeClownTextEl) edgeClownTextEl.textContent = quote;
+
+    edgeClownEl.classList.add('edge-clown-peeking');
+    playBullyClownNastyCackle();
+
+    clearTimeout(edgeClownDismissTimer);
+    edgeClownDismissTimer = setTimeout(() => {
+      dismissEdgeBullyClown();
+    }, 3400);
+  }
+
+  function handleClownPoke() {
+    if (!edgeClownActive) return;
+    playClownHonk(true);
+    if (edgeClownTextEl) {
+      edgeClownTextEl.textContent = isEn ? '"OUCH! DON\'T TOUCH ME, NOOB! [HONK]"' : '"BANA DOKUNMA DEDİM SANA ÇÖMEZ! [HONK]"';
+    }
+    edgeClownEl.classList.add('clown-angry-honk');
+    clearTimeout(edgeClownDismissTimer);
+    edgeClownDismissTimer = setTimeout(() => {
+      dismissEdgeBullyClown();
+    }, 950);
+  }
+
+  function dismissEdgeBullyClown() {
+    if (!edgeClownEl) return;
+    edgeClownEl.classList.remove('edge-clown-peeking', 'clown-angry-honk');
+    edgeClownEl.classList.add('edge-clown-hidden');
+    setTimeout(() => {
+      edgeClownActive = false;
+      edgeClownEl.classList.remove('peeking-right', 'peeking-left', 'peeking-bottom');
+    }, 450);
+  }
+
+  if (edgeClownAvatarEl) {
+    edgeClownAvatarEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleClownPoke();
+    });
+  }
+
+  // Global click listener to summon clown on interaction
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#edge-clown-apparatus')) return;
+
+    edgeClownClickCount++;
+    const now = Date.now();
+
+    // At least 4.5s cooldown between jumpscares
+    if (now - lastEdgeClownTime < 4500 || edgeClownActive) {
+      return;
+    }
+
+    // Trigger on every 3rd click, or 32% chance on any random click
+    if (edgeClownClickCount >= 3 || Math.random() < 0.32) {
+      triggerEdgeBullyClown(e.clientX, e.clientY);
+    }
+  }, { passive: true });
 
   // [05] Linux Kernel Panic
   function triggerPanic() {
@@ -1817,6 +2161,7 @@
     triggerNuke,
     triggerQuake,
     triggerClown,
+    triggerEdgeClown: triggerEdgeBullyClown,
     triggerPanic,
     triggerCaptcha,
     triggerDeltaFan,

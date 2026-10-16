@@ -3517,5 +3517,208 @@ body.thermal-meltdown {
   font-weight: 900;
 }
 
+/* ==========================================================================
+   EDGE-PEEKING BULLY CLOWN (ZORBA KENAR PALYAÇOSU)
+   ========================================================================== */
+.edge-clown-apparatus {
+  position: fixed;
+  z-index: 10008;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.28), opacity 0.25s ease;
+  user-select: none;
+}
+
+/* Hidden States */
+.edge-clown-apparatus.edge-clown-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* RIGHT EDGE PEEK */
+.edge-clown-apparatus.peeking-right {
+  right: 0;
+  transform: translateX(115%) rotate(12deg);
+}
+
+.edge-clown-apparatus.peeking-right.edge-clown-peeking {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-10px) rotate(-6deg);
+}
+
+/* LEFT EDGE PEEK */
+.edge-clown-apparatus.peeking-left {
+  left: 0;
+  flex-direction: row-reverse;
+  transform: translateX(-115%) rotate(-12deg);
+}
+
+.edge-clown-apparatus.peeking-left.edge-clown-peeking {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(10px) rotate(6deg);
+}
+
+/* BOTTOM EDGE PEEK */
+.edge-clown-apparatus.peeking-bottom {
+  bottom: 0;
+  flex-direction: column-reverse;
+  transform: translateY(115%) rotate(8deg);
+}
+
+.edge-clown-apparatus.peeking-bottom.edge-clown-peeking {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-8px) rotate(-3deg);
+}
+
+/* Clown Avatar / Container */
+.edge-clown-avatar {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.65)) drop-shadow(0 0 10px rgba(250, 204, 21, 0.5));
+  animation: clown-cackle-head-rock 0.16s infinite alternate;
+}
+
+.edge-clown-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Clown Animations */
+@keyframes clown-cackle-head-rock {
+  0% { transform: rotate(-7deg) scale(0.98); }
+  50% { transform: rotate(0deg) scale(1.05); }
+  100% { transform: rotate(7deg) scale(1.02); }
+}
+
+@keyframes clown-tongue-wag {
+  0%, 100% { transform: scaleY(1) rotate(0deg); }
+  50% { transform: scaleY(1.35) rotate(12deg); }
+}
+
+@keyframes clown-finger-point-wag {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-10px, -5px) scale(1.15); }
+}
+
+@keyframes clown-eye-jitter {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(2px, -2px); }
+  75% { transform: translate(-2px, 2px); }
+}
+
+@keyframes clown-hair-flutter {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(4deg); }
+}
+
+.clown-mock-tongue {
+  transform-origin: 100px 144px;
+  animation: clown-tongue-wag 0.18s infinite;
+}
+
+.clown-pointing-hand {
+  transform-origin: 140px 130px;
+  animation: clown-finger-point-wag 0.22s infinite;
+}
+
+.clown-eye-pupil {
+  animation: clown-eye-jitter 0.09s infinite;
+}
+
+.clown-hair-tuft {
+  animation: clown-hair-flutter 0.14s infinite alternate;
+}
+
+.clown-shiny-nose {
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.clown-shiny-nose:hover {
+  transform: scale(1.2);
+}
+
+/* Violent Angry Honk when clicked */
+.edge-clown-apparatus.clown-angry-honk .edge-clown-avatar {
+  animation: clown-violent-honk 0.08s 8 alternate !important;
+}
+
+@keyframes clown-violent-honk {
+  0% { transform: scale(1.25) rotate(-18deg); }
+  100% { transform: scale(1.35) rotate(18deg); }
+}
+
+/* Speech Bubble Beside Clown */
+.edge-clown-speech {
+  background: #09090b;
+  border: 3px solid #facc15;
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.4), inset 0 0 15px rgba(220, 38, 38, 0.3);
+  padding: 12px 16px;
+  border-radius: 6px;
+  max-width: 290px;
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+  animation: clown-speech-pulse 0.4s infinite alternate;
+}
+
+@keyframes clown-speech-pulse {
+  0% { border-color: #facc15; box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); }
+  100% { border-color: #ef4444; box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+}
+
+.clown-speech-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  color: #ef4444;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.clown-badge-dot {
+  color: #22c55e;
+  animation: pulse-terminal-led 0.3s infinite;
+}
+
+.clown-speech-text {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #facc15;
+  line-height: 1.35;
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+  margin-bottom: 6px;
+}
+
+.clown-speech-sub {
+  font-size: 0.62rem;
+  color: #71717a;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 768px) {
+  .edge-clown-avatar {
+    width: 130px;
+    height: 130px;
+  }
+  .edge-clown-speech {
+    max-width: 200px;
+    padding: 8px 10px;
+  }
+  .clown-speech-text {
+    font-size: 0.78rem;
+  }
+}
+
 
 
