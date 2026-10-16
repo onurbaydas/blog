@@ -99,21 +99,21 @@
 
       <button type="button" class="defcon-btn btn-dossier" id="act-dossier">
         <span class="defcon-code">[11 // SPY_DRONE]</span>
-        <strong class="defcon-label">{{ if $is_en }}FLOATING SNOOPING VISITOR DOSSIER{{ else }}GEZEN ELDİVENLİ ZİYARETÇİ KÜNYESİ{{ end }}</strong>
-        <span class="defcon-hint">{{ if $is_en }}Exposes IP, GPU, CPU, battery with pointing finger :D{{ else }}IP, GPU, CPU, pil ve tüm verileri gösterip gezen kutu :D{{ end }}</span>
+        <strong class="defcon-label">{{ if $is_en }}FLOATING SNOOPING VISITOR DOSSIER{{ else }}OTONOM TELEMETRİ TAKİP DRONU{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Exposes IP, GPU, CPU, battery with pointing finger{{ else }}Hedef IP, GPU, donanım ve telemetriyi denetleyen hava aparatı{{ end }}</span>
       </button>
 
       <button type="button" class="defcon-btn btn-bugs" id="act-bugs">
         <span class="defcon-code">[12 // BIO_HAZARD]</span>
-        <strong class="defcon-label">{{ if $is_en }}SERVER ROOM PEST INFESTATION{{ else }}SUNUCU ODASI HAŞERE İSTİLASI (PIT-PIT){{ end }}</strong>
-        <span class="defcon-hint">{{ if $is_en }}Creepy crawlies scurrying with pitter-patter feet :D{{ else }}Pıtı pıtı ayak sesleriyle koşan böcekler :D{{ end }}</span>
+        <strong class="defcon-label">{{ if $is_en }}SERVER ROOM PEST INFESTATION{{ else }}SUNUCU ODASI HAŞERE SIZINTISI{{ end }}</strong>
+        <span class="defcon-hint">{{ if $is_en }}Kablo tunnels biological infestation anomaly{{ else }}Kablo tünellerinde biyolojik haşere ve eklembacaklı sızıntısı{{ end }}</span>
       </button>
     </div>
 
     <div class="defcon-footer">
       <span>HOTKEY: <kbd>Alt + D</kbd> // TOGGLE DEFCON CONSOLE</span>
-      <button type="button" id="defcon-auto-toggle-btn" class="defcon-auto-toggle-btn" title="{{ if $is_en }}Toggle autonomous random harassment engine{{ else }}Otomatik ziyaretçi rahatsız etme motorunu aç/kapat{{ end }}">
-        <span>⚡ {{ if $is_en }}AUTONOMOUS_HARASSMENT:{{ else }}OTOMATİK_RAHATSIZLIK:{{ end }}</span>
+      <button type="button" id="defcon-auto-toggle-btn" class="defcon-auto-toggle-btn" title="{{ if $is_en }}Toggle autonomous stress drill engine{{ else }}Otonom stres tatbikat motorunu aç/kapat{{ end }}">
+        <span>⚡ {{ if $is_en }}AUTONOMOUS_DRILL:{{ else }}OTONOM_TATBİKAT_MOTORU:{{ end }}</span>
         <strong id="auto-harass-status" class="text-neon">{{ if $is_en }}ARMED & ACTIVE (RNG){{ else }}AKTİF (RASTGELE TETİKLEME){{ end }}</strong>
       </button>
     </div>
@@ -278,9 +278,9 @@
 {{- /* 10. FLOATING SURVEILLANCE DOSSIER DRONE WITH POINTING GLOVED FINGER */ -}}
 <div id="surveillance-drone-apparatus" class="surveillance-drone-apparatus" style="display: none;">
   <!-- The Animated Gloved Finger Pointer -->
-  <div id="gloved-finger-pointer" class="gloved-finger-pointer" title="{{ if $is_en }}Target Locked On You! Click hand to poke back :D{{ else }}Hedef kilitlendi! Parmağa tıklayarak dürtebilirsin :D{{ end }}">
+  <div id="gloved-finger-pointer" class="gloved-finger-pointer" title="{{ if $is_en }}Target Locked On You! Click hand to ping sensor{{ else }}Hedef kilitlendi! Parmağa tıklayarak sensörü test et{{ end }}">
     <div class="finger-bubble" id="finger-speech-bubble" style="display: none;">
-      {{ if $is_en }}"🫵 YES YOU! WE SEE EVERYTHING! :D"{{ else }}"🫵 EVET SEN! BÜTÜN BİLGİLERİN BURADA! :D"{{ end }}
+      {{ if $is_en }}"🫵 TARGET IDENTIFIED // TELEMETRY LOG ACTIVE"{{ else }}"🫵 HEDEF TESPİT EDİLDİ // TELEMETRİ KAYDI AKTİF"{{ end }}
     </div>
     <svg viewBox="0 0 120 120" class="gloved-finger-svg" width="75" height="75" aria-hidden="true">
       <defs>
@@ -656,11 +656,73 @@
     }, 4200);
   }
 
-  // [03] Quake
+  // [03] Quake & Structural Collapse
+  let isQuakeCollapsed = false;
   function triggerQuake() {
-    playEarthquakeRumble(4.2);
+    playEarthquakeRumble(4.8);
     document.body.classList.add('earthquake-active');
-    showSecurityToast('[SEISMIC_TELEMETRY] Richter 7.8 shockwave detected along fault line.');
+    showSecurityToast(isEn 
+      ? '[SEISMIC_TELEMETRY] Richter 7.8 shockwave detected. Structural anchoring failure!'
+      : '[SEİSMİK_ALARM] 7.8 Richter şok dalgası algılandı. Montaj şasileri koptu!'
+    );
+
+    // Physical Button Detachment & Gravity Shatter
+    setTimeout(() => {
+      if (isQuakeCollapsed) return;
+      isQuakeCollapsed = true;
+
+      const candidates = document.querySelectorAll(
+        'button:not(.gravity-reassemble-pill), .tool-tab-btn, .spec-chip, .hero-sticker, .chassis-bolt, .badge, .status-pill, .status-stamp, .dadaist-ransom-title, .app-card-tag'
+      );
+
+      const winH = window.innerHeight;
+      candidates.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top >= -100 && rect.bottom <= winH + 300) {
+          const fallDistance = winH - rect.top - rect.height - 15 + (Math.random() * 40 - 20);
+          const rot = (Math.random() * 80 - 40);
+          const xScatter = (Math.random() * 120 - 60);
+
+          el.style.setProperty('--fall-dist', `${fallDistance}px`);
+          el.style.setProperty('--rot-deg', `${rot}deg`);
+          el.style.setProperty('--x-scatter', `${xScatter}px`);
+          el.classList.add('quake-shattered-tumble');
+        }
+      });
+
+      setTimeout(() => {
+        if (typeof playRelayClick === 'function') {
+          playRelayClick(85, 0.16, 0.28);
+        }
+      }, 700);
+
+      if (!document.getElementById('gravity-reassemble-btn')) {
+        const reassembleBtn = document.createElement('button');
+        reassembleBtn.id = 'gravity-reassemble-btn';
+        reassembleBtn.type = 'button';
+        reassembleBtn.className = 'gravity-reassemble-pill';
+        reassembleBtn.innerHTML = isEn 
+          ? '<span>⚡ [RECALIBRATE_GRAVITY // REASSEMBLE]</span>' 
+          : '<span>⚡ [YERÇEKİMİNİ SIFIRLA // PARÇALARI TOPLA]</span>';
+
+        reassembleBtn.onclick = () => {
+          candidates.forEach(el => {
+            el.classList.remove('quake-shattered-tumble');
+            el.style.removeProperty('--fall-dist');
+            el.style.removeProperty('--rot-deg');
+            el.style.removeProperty('--x-scatter');
+          });
+          if (typeof playRelayClick === 'function') {
+            playRelayClick(650, 0.08, 0.15);
+          }
+          showSecurityToast(isEn ? '[STRUCTURE_RESTORED] Magnetic dampers re-engaged. Controls re-docked.' : '[ŞASİ_ONARILDI] Manyetik sönümleyiciler kilitlendi. Butonlar yerine oturdu.');
+          reassembleBtn.remove();
+          isQuakeCollapsed = false;
+        };
+        document.body.appendChild(reassembleBtn);
+      }
+    }, 450);
+
     setTimeout(() => {
       document.body.classList.remove('earthquake-active');
     }, 4200);
@@ -1126,7 +1188,7 @@
 
     // 12. Do Not Track
     const dntEl = document.getElementById('d-dnt');
-    if (dntEl) dntEl.textContent = navigator.doNotTrack === '1' ? 'ACTIVE [IGNORED BY SNOOPER :D]' : 'UNRESTRICTED TELEMETRY';
+    if (dntEl) dntEl.textContent = navigator.doNotTrack === '1' ? 'ACTIVE [TELEMETRY_OVERRIDE]' : 'UNRESTRICTED TELEMETRY';
 
     // 13. Referrer
     const refEl = document.getElementById('d-ref');
@@ -1212,7 +1274,7 @@
       droneDockPill.style.display = 'none';
       isDroneVisible = true;
       populateDossierMetrics();
-      showSecurityToast(isEn ? '[DRONE_DEPLOYED] Visitor surveillance dossier launched on patrol.' : '[DRONE_AKTİF] Gezen eldivenli ziyaretçi künyesi devriyeye çıktı :D');
+      showSecurityToast(isEn ? '[DRONE_DEPLOYED] Visitor surveillance dossier launched on patrol.' : '[DRONE_AKTİF] Ziyaretçi gözetim kapsülü devriyeye çıkarıldı.');
     } else {
       droneApparatus.style.display = 'none';
       isDroneVisible = false;
@@ -1247,7 +1309,7 @@
     });
     droneCard.addEventListener('mouseleave', () => {
       isDroneHovered = false;
-      if (dronePatrolStatus) dronePatrolStatus.textContent = isEn ? 'DRONE_PATROL: MOVING' : 'DRONE_DEVRİYE: GEZİYOR :D';
+      if (dronePatrolStatus) dronePatrolStatus.textContent = isEn ? 'DRONE_PATROL: MOVING' : 'DRONE_DEVRİYE: SEKTÖR TARANIYOR';
     });
   }
 
@@ -1547,7 +1609,7 @@
   }
 
   function triggerBugSwarm(count = 7) {
-    showSecurityToast(isEn ? '[BIO_ALERT] Server room rack pest swarm detected scurrying on floor :D' : '[BÖCEK_ALARM] Sunucu odasında haşereler pıtı pıtı koşuyor :D');
+    showSecurityToast(isEn ? '[BIO_ALERT] Server room cable gallery biological pest anomaly detected.' : '[BİYOLOJİK_SİZIŞTI] Sunucu odası kablo galerilerinde zararlı haşere tespit edildi.');
     for (let i = 0; i < count; i++) {
       setTimeout(() => {
         spawnBug();
@@ -1566,8 +1628,7 @@
   }, 36000);
 
   // ==========================================
-  // AUTONOMOUS CHAOS & VISITOR HARASSMENT ENGINE
-  // "bu defcondaki şeyler kendiliğinden rast gele olsun amaç userı rahatsız etmek zaten sfadsadasdas :DDDD"
+  // AUTONOMOUS PROTOCOL & STRESS TEST ENGINE
   // ==========================================
   let isAutoHarassmentActive = true;
   let autoHarassTimer = null;
@@ -1593,8 +1654,8 @@
     }
     updateAutoHarassStatusUI();
     showSecurityToast(isAutoHarassmentActive 
-      ? (isEn ? '[CHAOS_ENGINE] Autonomous harassment re-armed!' : '[OTOMATİK_RAHATSIZLIK] Ziyaretçi rahatsız etme motoru tekrar devrede!')
-      : (isEn ? '[CHAOS_ENGINE] Autonomous harassment disarmed.' : '[OTOMATİK_RAHATSIZLIK] Ziyaretçi rahatsız etme motoru durduruldu.')
+      ? (isEn ? '[STRESS_ENGINE] Autonomous infrastructure stress engine armed.' : '[TATBİKAT_MOTORU] Otonom altyapı stres motoru devrede.')
+      : (isEn ? '[STRESS_ENGINE] Autonomous stress engine disarmed.' : '[TATBİKAT_MOTORU] Otonom stres motoru durduruldu.')
     );
     return isAutoHarassmentActive;
   }
@@ -1629,64 +1690,64 @@
     {
       name: 'QUAKE',
       weight: 3.0,
-      toastEn: '[SEISMIC_EVENT] Spontaneous tectonic earthquake shook the viewport :D',
-      toastTr: '[DEPREM_ALARM] Tektonik deprem sarsıntısı ekranı salladı :D',
+      toastEn: '[SEISMIC_EVENT] Spontaneous tectonic Richter 7.8 shockwave shook the viewport.',
+      toastTr: '[SİSMİK_ALARM] Tektonik Richter 7.8 şok dalgası şasiyi sarstı.',
       action: triggerQuake
     },
     {
       name: 'BUGS',
       weight: 4.0,
-      toastEn: '[BIO_HAZARD] Server room pest swarm scurrying with pitter-patter feet :D',
-      toastTr: '[BÖCEK_ALARM] Sunucu odası haşereleri pıtı pıtı koşuşturuyor :D',
+      toastEn: '[BIO_HAZARD] Server room cable gallery biological pest anomaly detected.',
+      toastTr: '[BİYOLOJİK_SİZIŞTI] Sunucu odası kablo galerilerinde zararlı haşere tespit edildi.',
       action: () => triggerBugSwarm(Math.floor(5 + Math.random() * 5))
     },
     {
       name: 'CLOWN',
       weight: 2.8,
-      toastEn: '[CVE-666-CACKLE] Demonic jester cackle & phantom glitch appeared :D',
-      toastTr: '[KORKUNÇ_PALYAÇO] Şeytani palyaço kahkahası ve hayaleti belirdi :D',
+      toastEn: '[CVE-666-CACKLE] Memory corrupt visual pattern (CVE-666) surfaced on display.',
+      toastTr: '[GÖRSEL_ANOMALİ] Bellek adresinde bozuk görsel şablon (CVE-666) tetiklendi.',
       action: triggerClown
     },
     {
       name: 'DELTA_FAN',
       weight: 2.5,
-      toastEn: '[DELTA_TURBINE] 1U Delta fan spun to 15,000 RPM high pitch scream :D',
-      toastTr: '[DELTA_FAN] 15.000 RPM 1U Delta sunucu fanı jet motoru gibi bağırdı :D',
+      toastEn: '[DELTA_TURBINE] 1U Delta chassis fan reached maximum speed of 15,240 RPM.',
+      toastTr: '[TACHOMETER] 1U Delta sunucu fanı azami devir hızına (15.240 RPM) ulaştı.',
       action: triggerDeltaFan
     },
     {
       name: 'NUKE',
       weight: 2.2,
-      toastEn: '[NUCLEAR_FALLOUT] Tactical detonation shockwave & whiteout blast :D',
-      toastTr: '[NÜKLEER_FLAŞ] Taktiksel patlama ve kör edici radyasyon flaşı :D',
+      toastEn: '[NUCLEAR_FALLOUT] Tactical detonation simulation & ionizing radiation flash.',
+      toastTr: '[ASKERİ_ALARM] Taktiksel patlama simülasyonu ve termal radyasyon flaşı tetiklendi.',
       action: triggerNuke
     },
     {
       name: 'SIREN',
       weight: 2.2,
-      toastEn: '[AIR_RAID] Civil defense emergency siren sounded across sector :D',
-      toastTr: '[SİVİL_SAVUNMA] Hava taarruz alarmı sivil savunma sireni çaldı :D',
+      toastEn: '[AIR_RAID] Sector-07 civil defense emergency siren sounded across fabric.',
+      toastTr: '[SİVİL_SAVUNMA] Sektör-07 acil durum hava taarruz sirenleri yürürlüğe girdi.',
       action: triggerSiren
     },
     {
       name: 'THERMAL',
       weight: 2.0,
-      toastEn: '[THERMAL_104C] CPU junction hit 104°C molten silicon meltdown :D',
-      toastTr: '[TERMAL_ERİME] İşlemci 104°C sıcaklığa ulaştı, ekran akkor kızıla büründü :D',
+      toastEn: '[THERMAL_104C] CPU die reached 104°C critical junction. PROCHOT engaged.',
+      toastTr: '[TERMAL_ERİME] İşlemci 104°C sıcaklığa ulaştı, PROCHOT kısıtlaması devrede.',
       action: triggerThermal
     },
     {
       name: 'DAEMON',
       weight: 2.5,
-      toastEn: '[EVIL_DAEMON] ASCII Clippy nightmare spawned offering to corrupt filesystem :D',
-      toastTr: '[KÖTÜ_SYSADMIN] ASCII şeytani asistan belirdi :D',
+      toastEn: '[SYS_DAEMON] Unregistered background assistant requested filesystem audit.',
+      toastTr: '[SİSTEM_DAEMON] Yetkisiz arka plan asistanı dosya sistemi denetimi talep ediyor.',
       action: triggerDaemon
     },
     {
       name: 'FINGER_POKE',
       weight: 2.5,
-      toastEn: '[SURVEILLANCE_PROBE] Surveillance drone pointing finger poked you :D',
-      toastTr: '[DÜRTME] Gezen eldivenli parmak seni işaret edip dürttü :D',
+      toastEn: '[SURVEILLANCE_PROBE] Surveillance drone confirmed active optical target lock.',
+      toastTr: '[HEDEF_KİLİDİ] Otonom takip dronu hedef optik temasını teyit etti.',
       action: () => {
         toggleSurveillanceDrone(true);
         setTimeout(pokeFinger, 400);
@@ -1695,22 +1756,22 @@
     {
       name: 'CAPTCHA',
       weight: 1.6,
-      toastEn: '[SYSADMIN_CAPTCHA] Surprise 5-second chmod / iptables challenge :D',
-      toastTr: '[ACİL_CAPTCHA] Cehennemden çıkma 5 saniyelik sysadmin sorusu :D',
+      toastEn: '[SECURITY_CHALLENGE] Level-5 sysadmin authorization verification protocol engaged.',
+      toastTr: '[GÜVENLİK_DENETİMİ] Seviye-5 yetki doğrulama protokolü devreye girdi.',
       action: triggerCaptcha
     },
     {
       name: 'SELINUX',
       weight: 1.6,
-      toastEn: '[SELINUX_EPERM] Kernel AVC denied privileged user space action :D',
-      toastTr: '[SELINUX_ENGEL] SELinux Enforcing modu izinsiz eylemi derhal kesti :D',
+      toastEn: '[SELINUX_EPERM] Kernel AVC denied privileged user space execution.',
+      toastTr: '[SELINUX_ENGEL] SELinux Enforcing modu yetkisiz çekirdek eylemini kesti.',
       action: triggerSelinuxAlert
     },
     {
       name: 'KERNEL_PANIC',
       weight: 1.2,
-      toastEn: '[KERNEL_OOPS] Simulated Linux 6.12 Kernel Panic & Register Dump :D',
-      toastTr: '[KERNEL_PANIC] Linux çekirdek kilitlenmesi Call Trace dökümü :D',
+      toastEn: '[KERNEL_OOPS] Critical CPU exception: System halted, register dump to screen.',
+      toastTr: '[ÇEKİRDEK_ÇÖKÜŞÜ] Kritik CPU istisnası: Sistem kilitlendi ve bellek döküldü.',
       action: triggerPanic
     }
   ];

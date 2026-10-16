@@ -122,9 +122,9 @@ Available system commands:
   thermal           Trigger CPU 104°C thermal junction meltdown
   daemon            Spawn evil sysadmin ASCII assistant
   selinux           Trigger SELinux AVC EPERM denial dialog
-  dossier           Deploy floating visitor surveillance drone & finger :D
-  bugs / pests      Release server room insect infestation (pitter-patter feet) :D
-  chaos / harass    Toggle autonomous random DEFCON harassment engine :D
+  dossier           Deploy autonomous visitor surveillance telemetry drone
+  bugs / pests      Trigger server room cable gallery biological pest anomaly
+  chaos / harass    Toggle autonomous random stress drill engine
   clear             Clear terminal screen
   exit              Close terminal session
 `,
@@ -144,13 +144,18 @@ Fingerprint: 4A8E 9B21 C3F0 7E85 D902 B11A 5E43 F709 881B D0A4
 Key Block Download: https://onurbaydas.online/pubkey.asc
 `,
     posts: () => `
-Recent technical post-mortems and architecture breakdowns:
-  1. [DOCKER-AUTHZ-OPA] CVE-2024-41110: Silent Fail-Open in Docker Auth Plugins
-     URL: ${isEn ? '/en/posts/docker-authz-opa-fail-open/' : '/posts/docker-authz-opa-fail-open/'}
-  2. [LINUX-UID-MISMATCH] Rootless Containers, NFSv4 & Kerberos UID Mapping
-     URL: ${isEn ? '/en/posts/nfs-uid-mismatch-kerberos/' : '/posts/nfs-uid-mismatch-kerberos/'}
-  3. [RADAR-DIGEST] Daily Systems & Security Intelligence Wire
-     URL: ${isEn ? '/en/radar/' : '/radar/'}
+Root Cause Analysis (RCA) Post-Mortem Records:
+  1. [INC-2026-08] NFSv4.2 RPC Socket Starvation on 8x A100 Checkpoint Flush
+  2. [INC-2026-05] Silent OPA Docker Authz Bypass (CVE-2024-41110)
+  3. [INC-2026-02] Active Directory Kerberos Ticket Expiry on Multi-Tenant Node
+  Visit ${isEn ? '/en/incidents/' : '/incidents/'} for full post-mortem reports.
+`,
+    incidents: () => `
+Root Cause Analysis (RCA) Post-Mortem Records:
+  1. [INC-2026-08] NFSv4.2 RPC Socket Starvation on 8x A100 Checkpoint Flush
+  2. [INC-2026-05] Silent OPA Docker Authz Bypass (CVE-2024-41110)
+  3. [INC-2026-02] Active Directory Kerberos Ticket Expiry on Multi-Tenant Node
+  Visit ${isEn ? '/en/incidents/' : '/incidents/'} for full post-mortem reports.
 `,
     tools: () => `
 Interactive Systems Engineering Tools:
@@ -237,7 +242,7 @@ Emergency Production Runbooks (SOP):
     },
     dossier: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.toggleSurveillanceDrone(true);
-      return '[DRONE_DEPLOYED] Floating snooping dossier dispatched with pointing finger :D';
+      return '[DRONE_DEPLOYED] Autonomous visitor telemetry reconnaissance drone deployed.';
     },
     defcon: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.openDefconModal();
@@ -245,19 +250,19 @@ Emergency Production Runbooks (SOP):
     },
     bugs: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.triggerBugSwarm(8);
-      return '[BIO_HAZARD] Cockroaches, centipedes, and spiders scurrying across screen with pitter-patter feet :D';
+      return '[BIO_HAZARD] Cable gallery arthropod infestation anomaly detected.';
     },
     pests: () => {
       if (window.ObCrisisEngine) window.ObCrisisEngine.triggerBugSwarm(8);
-      return '[BIO_HAZARD] Server room pest swarm released. Watch your step!';
+      return '[BIO_HAZARD] Server room biological pest swarm detected in ducting.';
     },
     chaos: () => {
       const active = window.ObCrisisEngine?.toggleAutoHarassment();
-      return active ? '[CHAOS_ENGINE] Autonomous harassment is ARMED. Disasters will strike randomly :D' : '[CHAOS_ENGINE] Autonomous harassment DISARMED.';
+      return active ? '[STRESS_ENGINE] Autonomous infrastructure stress engine ARMED.' : '[STRESS_ENGINE] Autonomous infrastructure stress engine DISARMED.';
     },
     harass: () => {
       const active = window.ObCrisisEngine?.toggleAutoHarassment();
-      return active ? '[CHAOS_ENGINE] Autonomous harassment is ARMED. Disasters will strike randomly :D' : '[CHAOS_ENGINE] Autonomous harassment DISARMED.';
+      return active ? '[STRESS_ENGINE] Autonomous infrastructure stress engine ARMED.' : '[STRESS_ENGINE] Autonomous infrastructure stress engine DISARMED.';
     },
     exit: () => {
       toggleTerminal();
@@ -315,10 +320,10 @@ Emergency Production Runbooks (SOP):
 TITLE: Docker Authz Plugin Content-Length 0 Authorization Bypass
 DESCRIPTION: An authorization bypass vulnerability in Docker Engine when configured with an Authz plugin allowing unprivileged requests with 0 length bodies to bypass policy evaluation.
 AFFECTED: Docker &lt; 27.1.1, &lt; 26.1.5, &lt; 25.0.6
-DEEP DIVE POST: /posts/docker-authz-opa-fail-open/
+CONTAINMENT RUNBOOK: /runbooks/#sop-sec-01
 `;
       } else {
-        response = `cve: '${args[0] || ''}' not cached in local buffer. Check /radar/ for live CVE streams or visit https://nvd.nist.gov/vuln/detail/${cveId}`;
+        response = `cve: '${args[0] || ''}' not cached in local buffer. Check /runbooks/ or visit https://nvd.nist.gov/vuln/detail/${cveId}`;
       }
     } else if (cmd === 'ping') {
       const host = args[0] || 'truenas.lab';
@@ -338,7 +343,7 @@ FETCHING SYSTEMS & SECURITY RADAR INTEL...
 [CVE] CVE-2024-41110 Docker Authz Silent Fail-Open Bypass (NVD 9.8)
 [INFRA] OpenZFS 2.2.6 Storage Pool Scrub Panic Patched
 [GITHUB] eBPF XDP Layer-4 Load Balancer for Multi-Tenant Clusters
-Visit ${isEn ? '/en/radar/' : '/radar/'} for live grep filtering.
+Visit ${isEn ? '/en/tools/' : '/tools/'} for interactive simulators.
 `;
     } else {
       response = `bash: ${cmd}: command not found. Type 'help' for available commands.`;

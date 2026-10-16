@@ -128,7 +128,7 @@
     let humOsc = null;
     let humGain = null;
     let geigerInterval = null;
-    let isAudioActive = false;
+    let isAudioActive = (localStorage.getItem('core-audio') !== 'false');
     let mouseSpeed = 0;
     let lastMouseX = 0, lastMouseY = 0, lastMouseTime = Date.now();
 
@@ -229,14 +229,29 @@
     const audioBtn = document.getElementById('audio-btn');
     if (audioBtn) {
         audioBtn.addEventListener('click', toggleAudioEngine);
-        if (localStorage.getItem('core-audio') === 'true') {
-            // Auto start requires user interaction per browser policy
-            document.addEventListener('click', function autoStarter() {
-                if (!isAudioActive && localStorage.getItem('core-audio') === 'true') {
-                    toggleAudioEngine();
+        if (isAudioActive) {
+            const btnText = document.getElementById('audio-btn-text');
+            if (btnText) btnText.textContent = 'AUDIO: 380V ON';
+            audioBtn.classList.add('audio-active');
+
+            function unlockAudioEngine() {
+                if (isAudioActive) {
+                    initAudio();
+                    startHum();
                 }
-                document.removeEventListener('click', autoStarter);
-            }, { once: true });
+                ['click', 'pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+                    window.removeEventListener(evt, unlockAudioEngine, { passive: true });
+                });
+            }
+
+            try {
+                initAudio();
+                startHum();
+            } catch(e) {}
+
+            ['click', 'pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+                window.addEventListener(evt, unlockAudioEngine, { once: true, passive: true });
+            });
         }
     }
 

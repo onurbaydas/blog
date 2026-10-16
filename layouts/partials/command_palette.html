@@ -35,15 +35,13 @@
   const isEn = document.documentElement.lang === 'en';
 
   const items = [
-    // Pages
-    { title: isEn ? 'Posts // Technical Analyses' : 'Yazılar // Teknik Analizler', url: isEn ? '/en/posts/' : '/posts/', cat: 'PAGE', tag: '#01' },
-    { title: isEn ? 'Systems & Security Radar' : 'Sistem ve Güvenlik Radarı', url: isEn ? '/en/radar/' : '/radar/', cat: 'PAGE', tag: '#02' },
-    { title: isEn ? 'Interactive Systems Engineering Tools' : 'İnteraktif Sistem Mühendisliği Araçları', url: isEn ? '/en/tools/' : '/tools/', cat: 'PAGE', tag: '#03' },
-    { title: isEn ? 'Infrastructure & Lab Topology Blueprint' : 'Laboratuvar & Altyapı Mimarisi', url: isEn ? '/en/lab/' : '/lab/', cat: 'PAGE', tag: '#04' },
-    { title: isEn ? 'Emergency Production Runbooks' : 'Acil Durum Üretim Runbookları', url: isEn ? '/en/runbooks/' : '/runbooks/', cat: 'PAGE', tag: '#05' },
-    { title: isEn ? 'Incident Post-Mortems // Root Cause Analysis' : 'Olay İncelemeleri // Kök Neden Analizleri', url: isEn ? '/en/incidents/' : '/incidents/', cat: 'PAGE', tag: '#06' },
-    { title: isEn ? 'Technology Radar & Production Stack' : 'Teknoloji Radarı & Üretim Mimarisi', url: isEn ? '/en/stack/' : '/stack/', cat: 'PAGE', tag: '#07' },
-    { title: isEn ? 'About // Operator Dossier' : 'Hakkımda // Operatör Dosyası', url: isEn ? '/en/about/' : '/about/', cat: 'PAGE', tag: '#08' },
+    // Primary Pages & Apparatuses
+    { title: isEn ? 'Interactive Systems Engineering Tools' : 'İnteraktif Sistem Mühendisliği Araçları', url: isEn ? '/en/tools/' : '/tools/', cat: 'PAGE', tag: '#01' },
+    { title: isEn ? 'Infrastructure & Lab Topology Blueprint' : 'Laboratuvar & Altyapı Mimarisi', url: isEn ? '/en/lab/' : '/lab/', cat: 'PAGE', tag: '#02' },
+    { title: isEn ? 'Emergency Production Runbooks' : 'Acil Durum Üretim Runbookları', url: isEn ? '/en/runbooks/' : '/runbooks/', cat: 'PAGE', tag: '#03' },
+    { title: isEn ? 'Incident Post-Mortems // Root Cause Analysis' : 'Olay İncelemeleri // Kök Neden Analizleri', url: isEn ? '/en/incidents/' : '/incidents/', cat: 'PAGE', tag: '#04' },
+    { title: isEn ? 'Technology Radar & Production Stack' : 'Teknoloji Radarı & Üretim Mimarisi', url: isEn ? '/en/stack/' : '/stack/', cat: 'PAGE', tag: '#05' },
+    { title: isEn ? 'Subject Dossier: YOU // Surveillance' : 'Hedef Dosyası: Ziyaretçi // Telemetri', url: isEn ? '/en/about/' : '/about/', cat: 'PAGE', tag: '#06' },
     { title: isEn ? 'Warrant Canary // Cryptographic Declaration' : 'Warrant Canary // Güvence Beyanı', url: isEn ? '/en/canary/' : '/canary/', cat: 'SECURITY', tag: 'CANARY' },
     { title: isEn ? 'PGP Public Key // Fingerprint' : 'PGP Açık Anahtar // Parmak İzi', url: isEn ? '/en/pgp/' : '/pgp/', cat: 'SECURITY', tag: 'PGP' },
 
@@ -61,19 +59,19 @@
     { title: isEn ? 'Action: Toggle Decay Engine / Glitch Mode' : 'Eylem: Mekanik Parçalanma / Glitch Modu', action: 'toggle_glitch', cat: 'ACTION', tag: 'CHAOS' },
     { title: isEn ? 'Action: Print Classified Whitepaper Dossier (Ctrl+P)' : 'Eylem: Gizli Teknik Raporu Yazdır (Ctrl+P)', action: 'print_dossier', cat: 'ACTION', tag: 'PRINT' },
     { title: isEn ? 'Action: Switch Language' : 'Eylem: Dil Değiştir (TR/EN)', action: 'toggle_lang', cat: 'ACTION', tag: 'LANG' },
-    { title: isEn ? 'Catastrophe: Trigger Air-Raid Siren' : 'Felaket: Hava Taarruz Sirenini Çal', action: 'crisis_siren', cat: 'DRILL', tag: 'SIREN' },
-    { title: isEn ? 'Catastrophe: Nuclear Detonation & Fallout' : 'Felaket: Nükleer Patlama ve Radyasyon Şoku', action: 'crisis_nuke', cat: 'DRILL', tag: 'NUKE' },
-    { title: isEn ? 'Catastrophe: Tectonic Earthquake Vibration' : 'Felaket: Şiddetli Tektonik Deprem Titreşimi', action: 'crisis_quake', cat: 'DRILL', tag: 'QUAKE' },
-    { title: isEn ? 'Catastrophe: Demonic Clown Laughter & Phantom' : 'Muziplik: Korkunç Palyaço Gülüşü & Hayaleti', action: 'crisis_clown', cat: 'DRILL', tag: 'JOKER' },
-    { title: isEn ? 'Catastrophe: Simulate Linux Kernel Panic' : 'Kriz: Linux Çekirdek Kilitlenmesi (Kernel Panic)', action: 'crisis_panic', cat: 'DRILL', tag: 'PANIC' },
-    { title: isEn ? 'Challenge: Senior Sysadmin CAPTCHA from Hell' : 'Muziplik: Cehennemden Çıkma Sysadmin CAPTCHA', action: 'crisis_captcha', cat: 'DRILL', tag: 'CAPTCHA' },
-    { title: isEn ? 'Catastrophe: 15,000 RPM 1U Delta Fan Whine' : 'Akustik: 15.000 RPM Delta Sunucu Fanı Çığlığı', action: 'crisis_delta', cat: 'DRILL', tag: 'DELTA' },
-    { title: isEn ? 'Catastrophe: CPU 104°C Thermal Meltdown' : 'Kriz: Aşırı Isınma & Termal Erime (104°C)', action: 'crisis_thermal', cat: 'DRILL', tag: 'THERMAL' },
-    { title: isEn ? 'Catastrophe: Summon Evil Sysadmin Daemon' : 'Muziplik: Kötü Ruhlu Sysadmin Asistanını Çağır', action: 'crisis_daemon', cat: 'DRILL', tag: 'DAEMON' },
-    { title: isEn ? 'Catastrophe: Open DEFCON-1 Emergency Switchboard' : 'Kontrol: DEFCON-1 Acil Durum Santralini Aç', action: 'crisis_defcon', cat: 'DRILL', tag: 'DEFCON' },
-    { title: isEn ? 'Catastrophe: Floating Snooping Visitor Dossier :D' : 'Muziplik: Gezen Eldivenli Ziyaretçi Künyesi :D', action: 'crisis_dossier', cat: 'DRILL', tag: 'DRONE' },
-    { title: isEn ? 'Catastrophe: Server Room Pest Infestation (Pitter-Patter)' : 'Muziplik: Sunucu Odası Haşere İstilası (Pıtı Pıtı Ayak Sesleri)', action: 'crisis_bugs', cat: 'DRILL', tag: 'BUGS' },
-    { title: isEn ? 'Settings: Toggle Autonomous Random Harassment Engine' : 'Ayar: Otomatik Ziyaretçi Rahatsız Etme Motorunu Aç/Kapat', action: 'toggle_harass', cat: 'DRILL', tag: 'CHAOS' }
+    { title: isEn ? 'Protocol: Sound Civil Defense Air-Raid Siren' : 'Protokol: Sivil Savunma Hava Taarruz Sirenini Çal', action: 'crisis_siren', cat: 'DRILL', tag: 'SIREN' },
+    { title: isEn ? 'Protocol: Nuclear Detonation & Fallout Simulation' : 'Protokol: Nükleer Patlama ve Radyasyon Şoku Simülasyonu', action: 'crisis_nuke', cat: 'DRILL', tag: 'NUKE' },
+    { title: isEn ? 'Protocol: Tectonic Earthquake Vibration (Collapses Controls)' : 'Protokol: Şiddetli Tektonik Deprem (Butonları Döker)', action: 'crisis_quake', cat: 'DRILL', tag: 'QUAKE' },
+    { title: isEn ? 'Anomaly: CVE-666 Memory Corrupt Visual Pattern' : 'Anomali: CVE-666 Akustik & Görsel İhlal Şablonu', action: 'crisis_clown', cat: 'DRILL', tag: 'JOKER' },
+    { title: isEn ? 'Crisis: Simulate Linux Kernel Panic (Register Dump)' : 'Kriz: Linux Çekirdek Kilitlenmesi (Kernel Panic)', action: 'crisis_panic', cat: 'DRILL', tag: 'PANIC' },
+    { title: isEn ? 'Security: Level-5 Sysadmin Authorization Challenge' : 'Güvenlik: Seviye-5 Yetki Doğrulama Meydan Okuması', action: 'crisis_captcha', cat: 'DRILL', tag: 'CAPTCHA' },
+    { title: isEn ? 'Acoustic: 15,000 RPM 1U Delta Server Fan Jet' : 'Akustik: 15.000 RPM Delta Sunucu Fanı Çığlığı', action: 'crisis_delta', cat: 'DRILL', tag: 'DELTA' },
+    { title: isEn ? 'Crisis: CPU 104°C Thermal Junction Meltdown' : 'Kriz: Aşırı Isınma & Termal Erime (104°C)', action: 'crisis_thermal', cat: 'DRILL', tag: 'THERMAL' },
+    { title: isEn ? 'Protocol: Summon Unregistered System Daemon' : 'Protokol: Başıboş Sistem Daemon\'ını Çağır', action: 'crisis_daemon', cat: 'DRILL', tag: 'DAEMON' },
+    { title: isEn ? 'Control: Open DEFCON-1 Emergency Switchboard' : 'Kontrol: DEFCON-1 Acil Durum Santralini Aç', action: 'crisis_defcon', cat: 'DRILL', tag: 'DEFCON' },
+    { title: isEn ? 'Surveillance: Deploy Floating Visitor Telemetry Drone' : 'İstihbarat: Otonom Ziyaretçi Telemetri Dronunu Gönder', action: 'crisis_dossier', cat: 'DRILL', tag: 'DRONE' },
+    { title: isEn ? 'Bio-Hazard: Server Room Cable Gallery Pest Infiltration' : 'Biyolojik Anomali: Sunucu Odası Haşere Sızıntısı', action: 'crisis_bugs', cat: 'DRILL', tag: 'BUGS' },
+    { title: isEn ? 'Settings: Toggle Autonomous Stress Drill Engine' : 'Ayar: Otonom Stres Tatbikat Motorunu Aç/Kapat', action: 'toggle_harass', cat: 'DRILL', tag: 'CHAOS' }
   ];
 
   let activeIdx = 0;

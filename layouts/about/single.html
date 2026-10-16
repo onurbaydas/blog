@@ -1,0 +1,606 @@
+{{- define "main" }}
+{{- $is_en := eq site.Language.Lang "en" }}
+
+<div class="about-dossier-container fracture-container">
+  {{- /* Top Telemetry Header */ -}}
+  <div class="radar-telemetry-chassis">
+    <div class="chassis-header-row">
+      <div class="chassis-title-wrap">
+        <span class="chassis-tag text-alert">[ CLASSIFIED // SECTOR-07 RECONNAISSANCE ]</span>
+        <h1 class="chassis-headline">{{ if $is_en }}SUBJECT DOSSIER: YOU // TARGET SURVEILLANCE{{ else }}HEDEF DOSYASI: ZİYARETÇİ // CANLI İSTİHBARAT KÜNYESİ{{ end }}</h1>
+      </div>
+      <div class="chassis-status-pill card-target-highlight">
+        <span class="status-indicator" style="background: #ef4444; box-shadow: 0 0 8px #ef4444;"></span>
+        <span class="status-name text-alert">{{ if $is_en }}SURVEILLANCE: ACTIVE // TARGET ACQUIRED{{ else }}GÖZETİM: AKTİF // HEDEF KİLİTLENDİ{{ end }}</span>
+      </div>
+    </div>
+    <div class="chassis-desc">
+      {{ if $is_en }}
+      NOTICE: This file does not contain operator biography. This terminal is configured to actively interrogate, record, and inspect the physical workstation and biometric identity of the individual currently seated at this screen.
+      {{ else }}
+      DİKKAT: Bu sayfa operatör biyografisi içermez. Bu terminal, şu anda ekranın karşısında oturan kişinin — yani BİZZAT SENİN — iş istasyonu donanımını, tarayıcı belleğini ve biyometrik optik telemetrisini denetlemek üzere tasarlanmış aktif bir istihbarat arşividir.
+      {{ end }}
+    </div>
+  </div>
+
+  {{- /* SECTION 1: OPTICAL SURVEILLANCE & WEBCAM CRT FEED */ -}}
+  <div class="dossier-chassis-card">
+    <div class="card-top-tag">
+      <span>[ SENSOR_01 // OPTICAL_BIOMETRIC_FEED ]</span>
+      <span class="text-alert">REC ● LIVE_FEED</span>
+    </div>
+
+    <div class="optical-recon-grid">
+      <div class="crt-surveillance-monitor">
+        <div class="monitor-glass-overlay"></div>
+        <div class="monitor-scanlines"></div>
+        <div class="monitor-hud-overlay">
+          <span class="m-tag tag-tl">CAM_01 // VISITOR_SECTOR</span>
+          <span class="m-tag tag-tr" id="cam-fps-counter">FPS: 30.0 // ISO_800</span>
+          <span class="m-tag tag-bl">OPTICAL_ZOOM: 1.0X // CRT_PHOSPHOR</span>
+          <span class="m-tag tag-br" id="cam-time-display">00:00:00:00</span>
+          <div class="monitor-target-reticle">
+            <div class="reticle-box"></div>
+            <span class="reticle-label">TARGET_FACE // LOCK</span>
+          </div>
+        </div>
+
+        <video id="dossier-webcam" class="dossier-video" autoplay playsinline muted></video>
+        <canvas id="dossier-canvas" class="dossier-canvas" style="display: none;"></canvas>
+
+        <div id="cam-fallback-screen" class="cam-fallback-screen">
+          <div class="fallback-silhouette">
+            <svg viewBox="0 0 100 100" class="silhouette-svg" width="120" height="120">
+              <circle cx="50" cy="38" r="22" fill="#141416" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 2"/>
+              <path d="M 20 88 C 20 62 80 62 80 88 Z" fill="#141416" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 2"/>
+              <line x1="15" y1="38" x2="85" y2="38" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2 4"/>
+              <line x1="50" y1="12" x2="50" y2="64" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2 4"/>
+            </svg>
+          </div>
+          <div class="fallback-status">
+            <strong>{{ if $is_en }}OPTICAL SENSOR STANDBY{{ else }}OPTİK SENSÖR BEKLEMEDE{{ end }}</strong>
+            <p>{{ if $is_en }}Click 'ACTIVATE OPTICAL SENSOR' to establish direct visual surveillance stream.{{ else }}Doğrudan optik gözetim akışını başlatmak için aşağıdaki 'OPTİK SENSÖRÜ BAĞLA' butonunu kullanın.{{ end }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="optical-controls-col">
+        <div class="optical-status-panel">
+          <div class="panel-metric-row">
+            <span class="p-key">{{ if $is_en }}SENSOR_STATUS:{{ else }}SENSÖR_DURUMU:{{ end }}</span>
+            <strong id="cam-status-label" class="p-val text-alert">{{ if $is_en }}OFFLINE // STANDBY{{ else }}ÇEVRİMDIŞI // BEKLEMEDE{{ end }}</strong>
+          </div>
+          <div class="panel-metric-row">
+            <span class="p-key">{{ if $is_en }}BIOMETRIC_HASH:{{ else }}BİYOMETRİK_KOD:{{ end }}</span>
+            <span id="cam-biometric-hash" class="p-val text-amber">0x7F00_UNCONTAINED</span>
+          </div>
+          <div class="panel-metric-row">
+            <span class="p-key">{{ if $is_en }}FACIAL_GEOMETRY:{{ else }}YÜZ_GEOMETRİSİ:{{ end }}</span>
+            <span class="p-val text-neon">{{ if $is_en }}ESTIMATED VIA GPU BUFFER{{ else }}GPU TAMPONUNDAN HESAPLANDI{{ end }}</span>
+          </div>
+        </div>
+
+        <div class="optical-btn-stack">
+          <button type="button" id="btn-connect-cam" class="dossier-btn btn-connect-cam">
+            <span>📷 {{ if $is_en }}[ ACTIVATE OPTICAL SENSOR // WEBCAM ]{{ else }}[ OPTİK SENSÖRÜ BAĞLA // WEBCAM ]{{ end }}</span>
+          </button>
+          <button type="button" id="btn-snapshot-cam" class="dossier-btn btn-snapshot-cam" disabled>
+            <span>📸 {{ if $is_en }}[ CAPTURE BIOMETRIC EVIDENCE ]{{ else }}[ ANLIK BİYOMETRİK DELİL YAKALA ]{{ end }}</span>
+          </button>
+          <button type="button" id="btn-disconnect-cam" class="dossier-btn btn-disconnect-cam" style="display: none;">
+            <span>🛑 {{ if $is_en }}[ SEVER OPTICAL FEED ]{{ else }}[ SENSÖR BAĞLANTISINI KES ]{{ end }}</span>
+          </button>
+        </div>
+
+        <div id="snapshot-result-box" class="snapshot-result-box" style="display: none;">
+          <div class="snap-titlebar">
+            <span>[ ARŞİV_FOTOĞRAFI #9042 // DELİL_ZAPTI ]</span>
+            <span class="text-alert">STAMPED</span>
+          </div>
+          <img id="snapshot-img" class="snapshot-preview-img" alt="Captured Target Biometric" />
+          <div class="snap-footer-tag">
+            <span>{{ if $is_en }}BIOMETRIC SIGNATURE ARCHIVED TO SECTOR-07{{ else }}BİYOMETRİK İMZA SEKTÖR-07 VERİ TABANINA İŞLENDİ{{ end }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{- /* SECTION 2: STORAGE & COOKIE FORENSICS */ -}}
+  <div class="dossier-chassis-card">
+    <div class="card-top-tag">
+      <span>[ SENSOR_02 // STORAGE_AND_COOKIE_FORENSICS ]</span>
+      <span class="text-dim">RFC 6265 // HTML5 Storage API</span>
+    </div>
+
+    <div class="storage-forensics-header">
+      <p class="tool-desc-box">
+        {{ if $is_en }}
+        Real-time audit of cookies, persistent browser key-value stores, and cached state currently stored on your device by this domain.
+        {{ else }}
+        Bu alan adı tarafından tarayıcınızda saklanan çerezlerin (cookies), localStorage anahtarlarının ve oturum kayıtlarının gerçek zamanlı adli dökümü.
+        {{ end }}
+      </p>
+      <div class="storage-action-row">
+        <button type="button" id="btn-refresh-storage" class="dossier-mini-btn">
+          <span>🔄 {{ if $is_en }}RE-SCAN STORAGE{{ else }}BELLEĞİ YENİDEN TARA{{ end }}</span>
+        </button>
+        <button type="button" id="btn-purge-storage" class="dossier-mini-btn text-alert">
+          <span>☣ {{ if $is_en }}PURGE ALL DETECTED TOKENS{{ else }}TÜM VERİLERİ ZORLA SİL{{ end }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="storage-audit-tables">
+      <!-- Cookie Table -->
+      <div class="audit-table-wrap">
+        <div class="audit-table-title">
+          <span>[ HTTP_COOKIES // DOCUMENT.COOKIE ]</span>
+          <span id="cookie-count-badge" class="badge-count">0 ITEMS</span>
+        </div>
+        <div id="cookie-data-list" class="audit-data-list">
+          <div class="empty-audit-hint">{{ if $is_en }}No plain cookies exposed. Tokens protected or scoped HttpOnly.{{ else }}Açık çerez bulunamadı. Belirteçler HttpOnly korumasında.{{ end }}</div>
+        </div>
+      </div>
+
+      <!-- LocalStorage Table -->
+      <div class="audit-table-wrap">
+        <div class="audit-table-title">
+          <span>[ LOCALSTORAGE_PERSISTENT_STATE ]</span>
+          <span id="storage-count-badge" class="badge-count">SCANNING...</span>
+        </div>
+        <div id="localstorage-data-list" class="audit-data-list">
+          <div class="empty-audit-hint">Auditing localStorage slots...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{- /* SECTION 3: WORKSTATION HARDWARE & NETWORK FINGERPRINT */ -}}
+  <div class="dossier-chassis-card">
+    <div class="card-top-tag">
+      <span>[ SENSOR_03 // HARDWARE_AND_NETWORK_TELEMETRY ]</span>
+      <span class="text-neon">16 SENSORS ACTIVE</span>
+    </div>
+
+    <div class="dossier-telemetry-grid" id="about-telemetry-grid">
+      <div class="t-cell">
+        <span class="t-k">PUBLIC_IP:</span>
+        <strong class="t-v text-alert" id="tel-ip">PROBING_NETWORK...</strong>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">PHYSICAL_GEO:</span>
+        <strong class="t-v text-neon" id="tel-geo">TRIANGULATING...</strong>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">ISP_TRANSIT:</span>
+        <span class="t-v" id="tel-isp">RESOLVING_ASN...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">UNMASKED_GPU:</span>
+        <strong class="t-v text-amber" id="tel-gpu">QUERYING_WEBGL...</strong>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">CPU_CONCURRENCY:</span>
+        <span class="t-v" id="tel-cpu">DETECTING...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">SYSTEM_RAM_EST:</span>
+        <span class="t-v" id="tel-ram">CALCULATING...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">OPERATING_SYSTEM:</span>
+        <span class="t-v" id="tel-os">ANALYZING_KERNEL...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">BROWSER_ENGINE:</span>
+        <span class="t-v" id="tel-browser">PARSING_USER_AGENT...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">DISPLAY_RESOLUTION:</span>
+        <span class="t-v" id="tel-screen">MEASURING...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">VIEWPORT_BOUNDS:</span>
+        <span class="t-v" id="tel-viewport">MEASURING...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">BATTERY_POWER:</span>
+        <strong class="t-v text-neon" id="tel-battery">INTERROGATING...</strong>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">SYSTEM_TIMEZONE:</span>
+        <span class="t-v" id="tel-tz">READING...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">LANG_PREFERENCES:</span>
+        <span class="t-v" id="tel-lang">CHECKING...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">NETWORK_BANDWIDTH:</span>
+        <span class="t-v" id="tel-net">PROBING_RTT...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">DO_NOT_TRACK:</span>
+        <span class="t-v text-alert" id="tel-dnt">ANALYZING...</span>
+      </div>
+      <div class="t-cell">
+        <span class="t-k">REFERRER_SOURCE:</span>
+        <span class="t-v" id="tel-ref">ANALYZING...</span>
+      </div>
+    </div>
+  </div>
+
+  {{- /* SECTION 4: CLIPBOARD SURVEILLANCE PROBE */ -}}
+  <div class="dossier-chassis-card">
+    <div class="card-top-tag">
+      <span>[ SENSOR_04 // CLIPBOARD_MEMORY_INSPECTION ]</span>
+      <span class="text-amber">INTERACTIVE_AUDIT</span>
+    </div>
+
+    <div class="clipboard-recon-wrap">
+      <p class="tool-desc-box">
+        {{ if $is_en }}
+        The Web Clipboard API permits privileged processes to inspect volatile clipboard cache. Click to test if your operating system allows this terminal to read your latest copied string.
+        {{ else }}
+        Web Clipboard API, yetkili süreçlerin panodaki son kopyalanan metni incelemesine olanak tanır. Aşağıdaki butona tıklayarak tarayıcınızın panonuzu bu terminale sızdırıp sızdırmadığını test edin.
+        {{ end }}
+      </p>
+
+      <div class="clipboard-action-bar">
+        <button type="button" id="btn-read-clipboard" class="dossier-btn btn-read-clipboard">
+          <span>📋 {{ if $is_en }}[ EXECUTE CLIPBOARD PROBE ]{{ else }}[ PANO İÇERİĞİNİ SORGULA // CLIPBOARD PROBE ]{{ end }}</span>
+        </button>
+      </div>
+
+      <div id="clipboard-result-box" class="clipboard-result-box" style="display: none;">
+        <div class="clip-result-header">
+          <span class="text-alert">⚠ {{ if $is_en }}VOLATILE CLIPBOARD CACHE EXPOSED{{ else }}PANODAKİ VERİ BAŞARIYLA DEŞİFRE EDİLDİ{{ end }}</span>
+        </div>
+        <pre id="clipboard-text-dump" class="clip-dump-content"></pre>
+      </div>
+    </div>
+  </div>
+
+  {{- /* SECTION 5: FINAL SYSTEM VERDICT */ -}}
+  <div class="dossier-verdict-plate">
+    <div class="verdict-inner">
+      <div class="verdict-col">
+        <span class="v-label">[ SURVEILLANCE_CLASSIFICATION ]</span>
+        <strong class="v-val text-alert">SECTOR-07 SUBJECT // PRIORITY-ALPHA</strong>
+      </div>
+      <div class="verdict-col">
+        <span class="v-label">[ THREAT_RATING ]</span>
+        <strong class="v-val text-neon">98.4% // ANOMALY DETECTED</strong>
+      </div>
+      <div class="verdict-col">
+        <span class="v-label">[ AUDIT_DISPOSITION ]</span>
+        <strong class="v-val">PHYSICAL WORKSTATION MAPPED // DO NOT CLOSE VIEWPORT</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const isEn = {{ $is_en }};
+
+  // 1. Live Camera Reconnaissance
+  const video = document.getElementById('dossier-webcam');
+  const canvas = document.getElementById('dossier-canvas');
+  const fallback = document.getElementById('cam-fallback-screen');
+  const btnConnect = document.getElementById('btn-connect-cam');
+  const btnSnapshot = document.getElementById('btn-snapshot-cam');
+  const btnDisconnect = document.getElementById('btn-disconnect-cam');
+  const camStatusLabel = document.getElementById('cam-status-label');
+  const snapResultBox = document.getElementById('snapshot-result-box');
+  const snapImg = document.getElementById('snapshot-img');
+  const camTimeDisplay = document.getElementById('cam-time-display');
+
+  let mediaStream = null;
+
+  function updateCamTimer() {
+    const now = new Date();
+    const h = String(now.getUTCHours()).padStart(2, '0');
+    const m = String(now.getUTCMinutes()).padStart(2, '0');
+    const s = String(now.getUTCSeconds()).padStart(2, '0');
+    const ms = String(Math.floor(now.getUTCMilliseconds() / 10)).padStart(2, '0');
+    if (camTimeDisplay) camTimeDisplay.textContent = `${h}:${m}:${s}:${ms}`;
+  }
+  setInterval(updateCamTimer, 40);
+
+  if (btnConnect) {
+    btnConnect.addEventListener('click', async () => {
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+          audio: false
+        });
+        video.srcObject = mediaStream;
+        fallback.style.display = 'none';
+        video.style.display = 'block';
+        btnConnect.style.display = 'none';
+        btnDisconnect.style.display = 'inline-flex';
+        btnSnapshot.disabled = false;
+        camStatusLabel.textContent = isEn ? 'ONLINE // LIVE SURVEILLANCE' : 'ÇEVRİMİÇİ // CANLI GÖZETİM';
+        camStatusLabel.className = 'p-val text-neon';
+      } catch(err) {
+        camStatusLabel.textContent = isEn ? 'ACCESS_DENIED // USER SHIELD ACTIVE' : 'ERİŞİM_REDDEDİLDİ // KULLANICI KALKANI AKTİF';
+        camStatusLabel.className = 'p-val text-alert';
+        alert(isEn 
+          ? 'Optical sensor access denied by client permissions. Fallback silhouette will remain active.' 
+          : 'Kamera izni verilmedi. GPU tamponundan oluşturulan yapay silüet gözetimi devrede kalacak.'
+        );
+      }
+    });
+  }
+
+  if (btnDisconnect) {
+    btnDisconnect.addEventListener('click', () => {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(t => t.stop());
+        mediaStream = null;
+      }
+      video.style.display = 'none';
+      fallback.style.display = 'flex';
+      btnConnect.style.display = 'inline-flex';
+      btnDisconnect.style.display = 'none';
+      btnSnapshot.disabled = true;
+      camStatusLabel.textContent = isEn ? 'OFFLINE // DISCONNECTED' : 'ÇEVRİMDISI // KOPARILDI';
+      camStatusLabel.className = 'p-val text-alert';
+    });
+  }
+
+  if (btnSnapshot) {
+    btnSnapshot.addEventListener('click', () => {
+      if (!video || !canvas) return;
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Apply Night Vision CRT green filter overlay
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.15)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Add watermark stamp
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 18px "JetBrains Mono", monospace';
+      ctx.fillText('[SECTOR-07 SUBJECT #9042 // CLASSIFIED]', 20, canvas.height - 25);
+
+      const dataUrl = canvas.toDataURL('image/png');
+      if (snapImg) snapImg.src = dataUrl;
+      if (snapResultBox) snapResultBox.style.display = 'block';
+
+      if (typeof playRelayClick === 'function') {
+        playRelayClick(800, 0.08, 0.15);
+      }
+    });
+  }
+
+  // 2. Storage & Cookie Forensics
+  function auditStorage() {
+    // Cookies
+    const cookieBox = document.getElementById('cookie-data-list');
+    const cookieBadge = document.getElementById('cookie-count-badge');
+    const rawCookies = document.cookie;
+
+    if (rawCookies && rawCookies.trim()) {
+      const parts = rawCookies.split(';').map(p => p.trim());
+      if (cookieBadge) cookieBadge.textContent = `${parts.length} COOKIES LOGGED`;
+      if (cookieBox) {
+        cookieBox.innerHTML = parts.map(p => {
+          const [k, v] = p.split('=');
+          return `
+            <div class="audit-row">
+              <span class="audit-k text-amber">${m(k)}:</span>
+              <strong class="audit-v">${m(v || '')}</strong>
+              <span class="audit-badge text-alert">[LOGGED]</span>
+            </div>
+          `;
+        }).join('');
+      }
+    } else {
+      if (cookieBadge) cookieBadge.textContent = '0 ITEMS';
+      if (cookieBox) cookieBox.innerHTML = `<div class="empty-audit-hint">${isEn ? 'No exposed plaintext cookies in document.cookie buffer.' : 'Açık metin çerez bulunamadı.'}</div>`;
+    }
+
+    // LocalStorage
+    const lsBox = document.getElementById('localstorage-data-list');
+    const lsBadge = document.getElementById('storage-count-badge');
+    const keys = Object.keys(localStorage);
+
+    if (keys.length > 0) {
+      if (lsBadge) lsBadge.textContent = `${keys.length} SLOTS COMPROMISED`;
+      if (lsBox) {
+        lsBox.innerHTML = keys.map(k => {
+          const val = localStorage.getItem(k);
+          return `
+            <div class="audit-row">
+              <span class="audit-k text-neon">${m(k)}:</span>
+              <span class="audit-v">${m(val || '')}</span>
+              <span class="audit-badge text-alert">[EXPOSED]</span>
+            </div>
+          `;
+        }).join('');
+      }
+    } else {
+      if (lsBadge) lsBadge.textContent = '0 SLOTS';
+      if (lsBox) lsBox.innerHTML = `<div class="empty-audit-hint">${isEn ? 'Storage slots empty.' : 'Depolama slotu boş.'}</div>`;
+    }
+  }
+
+  auditStorage();
+
+  const btnRefreshStorage = document.getElementById('btn-refresh-storage');
+  if (btnRefreshStorage) {
+    btnRefreshStorage.addEventListener('click', () => {
+      auditStorage();
+      if (typeof playRelayClick === 'function') playRelayClick(400, 0.04, 0.08);
+    });
+  }
+
+  const btnPurgeStorage = document.getElementById('btn-purge-storage');
+  if (btnPurgeStorage) {
+    btnPurgeStorage.addEventListener('click', () => {
+      localStorage.clear();
+      auditStorage();
+      alert(isEn ? '[PURGE_EXECUTED] Local storage wiped. System state reset.' : '[TASFİYE_TAMAMLANDI] Yerel depolama sıfırlandı.');
+    });
+  }
+
+  // 3. Telemetry Population
+  function populateTelemetry() {
+    // GPU WebGL
+    const gpuEl = document.getElementById('tel-gpu');
+    if (gpuEl) {
+      try {
+        const c = document.createElement('canvas');
+        const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          const ext = gl.getExtension('WEBGL_debug_renderer_info');
+          gpuEl.textContent = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'Generic WebGL Accelerator';
+        } else {
+          gpuEl.textContent = 'WebGL Hardware Disabled';
+        }
+      } catch(e) {
+        gpuEl.textContent = 'Protected Graphics Context';
+      }
+    }
+
+    // CPU & RAM
+    const cpuEl = document.getElementById('tel-cpu');
+    if (cpuEl) cpuEl.textContent = `${navigator.hardwareConcurrency || 8} Logical Cores`;
+
+    const ramEl = document.getElementById('tel-ram');
+    if (ramEl) ramEl.textContent = navigator.deviceMemory ? `${navigator.deviceMemory} GB Hardware RAM` : '>= 8 GB Estimated';
+
+    // OS
+    const osEl = document.getElementById('tel-os');
+    const ua = navigator.userAgent;
+    let os = 'Unknown Architecture';
+    if (ua.indexOf('Win') !== -1) os = 'Windows NT 10.0/11.0 (x86_64)';
+    else if (ua.indexOf('Mac') !== -1) os = 'macOS (Darwin ARM64 / x86_64)';
+    else if (ua.indexOf('Linux') !== -1) os = 'GNU/Linux (POSIX Kernel)';
+    else if (ua.indexOf('Android') !== -1) os = 'Android Mobile Kernel';
+    else if (ua.indexOf('like Mac') !== -1) os = 'Apple iOS / iPadOS';
+    if (osEl) osEl.textContent = os;
+
+    // Browser
+    const bEl = document.getElementById('tel-browser');
+    let b = 'Modern Web Browser';
+    if (ua.indexOf('Firefox') !== -1) b = 'Mozilla Firefox (Gecko)';
+    else if (ua.indexOf('Edg') !== -1) b = 'Microsoft Edge (Chromium)';
+    else if (ua.indexOf('Chrome') !== -1) b = 'Google Chrome (Blink/V8)';
+    else if (ua.indexOf('Safari') !== -1) b = 'Apple Safari (WebKit)';
+    if (bEl) bEl.textContent = b;
+
+    // Screen
+    const sEl = document.getElementById('tel-screen');
+    if (sEl) sEl.textContent = `${window.screen.width}x${window.screen.height} (${window.screen.colorDepth}-bit, DPR: ${window.devicePixelRatio})`;
+
+    const vEl = document.getElementById('tel-viewport');
+    if (vEl) vEl.textContent = `${window.innerWidth}x${window.innerHeight} px`;
+
+    // Timezone
+    const tzEl = document.getElementById('tel-tz');
+    if (tzEl) {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      const offset = -new Date().getTimezoneOffset() / 60;
+      tzEl.textContent = `${tz} (UTC${offset >= 0 ? '+' : ''}${offset})`;
+    }
+
+    // Lang
+    const lEl = document.getElementById('tel-lang');
+    if (lEl) lEl.textContent = navigator.languages ? navigator.languages.join(', ') : navigator.language;
+
+    // Net
+    const netEl = document.getElementById('tel-net');
+    if (netEl) {
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      netEl.textContent = conn ? `${conn.effectiveType ? conn.effectiveType.toUpperCase() : 'LAN'} (${conn.downlink || 10} Mbps, ${conn.rtt || 20}ms RTT)` : 'Gigabit Backbone';
+    }
+
+    // DNT & Ref
+    const dntEl = document.getElementById('tel-dnt');
+    if (dntEl) dntEl.textContent = navigator.doNotTrack === '1' ? 'FLAG_ON [IGNORED BY SNOOPER]' : 'UNRESTRICTED';
+
+    const refEl = document.getElementById('tel-ref');
+    if (refEl) refEl.textContent = document.referrer ? new URL(document.referrer).hostname : 'DIRECT_ENTRY / BOOKMARK';
+
+    // Battery
+    const batEl = document.getElementById('tel-battery');
+    if (batEl && navigator.getBattery) {
+      navigator.getBattery().then(bat => {
+        batEl.textContent = `${Math.round(bat.level * 100)}% [${bat.charging ? 'CHARGING ⚡' : 'BATTERY'}]`;
+      }).catch(() => {
+        if (batEl) batEl.textContent = 'Mains Power [DESKTOP AC]';
+      });
+    } else if (batEl) {
+      batEl.textContent = 'Mains Power [DESKTOP AC]';
+    }
+
+    // Live IP
+    fetchIp();
+  }
+
+  async function fetchIp() {
+    const ipEl = document.getElementById('tel-ip');
+    const geoEl = document.getElementById('tel-geo');
+    const ispEl = document.getElementById('tel-isp');
+
+    try {
+      const r = await fetch('https://ipapi.co/json/');
+      if (r.ok) {
+        const d = await r.json();
+        if (ipEl) ipEl.textContent = d.ip || '127.0.0.1';
+        if (geoEl) geoEl.textContent = `${d.city || ''}, ${d.region_code || ''} ${d.country_name || ''} [${d.latitude || 0}, ${d.longitude || 0}]`;
+        if (ispEl) ispEl.textContent = `${d.org || d.asn || 'Internet Service Provider'}`;
+        return;
+      }
+    } catch(e) {}
+
+    try {
+      const r2 = await fetch('https://api.ipify.org?format=json');
+      if (r2.ok) {
+        const d2 = await r2.json();
+        if (ipEl) ipEl.textContent = d2.ip;
+        if (geoEl) geoEl.textContent = 'Coordinates Protected by Proxy';
+        if (ispEl) ispEl.textContent = 'Transit Uplink';
+        return;
+      }
+    } catch(e) {}
+
+    if (ipEl) ipEl.textContent = '192.168.1.137 [NAT_EGRESS]';
+    if (geoEl) geoEl.textContent = 'Sector-07 Edge Node [41.0082, 28.9784]';
+    if (ispEl) ispEl.textContent = 'Autonomous Fiber Transit';
+  }
+
+  populateTelemetry();
+
+  // 4. Clipboard Probe
+  const btnClip = document.getElementById('btn-read-clipboard');
+  const clipResultBox = document.getElementById('clipboard-result-box');
+  const clipDump = document.getElementById('clipboard-text-dump');
+
+  if (btnClip) {
+    btnClip.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (clipDump) clipDump.textContent = text || (isEn ? '[EMPTY CLIPBOARD STRING]' : '[PANO BOŞ YA DA METİN İÇERMİYOR]');
+        if (clipResultBox) clipResultBox.style.display = 'block';
+        if (typeof playRelayClick === 'function') playRelayClick(880, 0.06, 0.2);
+      } catch(err) {
+        if (clipDump) clipDump.textContent = isEn ? 'CLIPBOARD READ PERMISSION DENIED BY OPERATING SYSTEM' : 'PANO OKUMA YETKİSİ İŞLETİM SİSTEMİ TARAFINDAN ENGELLENDİ';
+        if (clipResultBox) clipResultBox.style.display = 'block';
+      }
+    });
+  }
+
+  function m(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+})();
+</script>
+
+{{- end }}

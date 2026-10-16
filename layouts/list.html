@@ -52,36 +52,58 @@
 {{- if and .IsHome site.Params.homeInfoParams (eq $paginator.PageNumber 1) }}
 {{- partial "home_info.html" . }}
 
-{{- with site.Data.radar }}
-<aside class="radar-home-ticker">
-  <div class="ticker-left">
-    <div class="ticker-status-beacon">
-      <span class="beacon-pulse" aria-hidden="true"></span>
-      <span>{{ if $is_en }}SYS_RADAR ACTIVE{{ else }}SİSTEM RADARI AKTİF{{ end }}</span>
+<section class="home-apparatus-section">
+  <div class="apparatus-section-header">
+    <div class="header-blueprint-badge">
+      <span class="badge-dot">■</span>
+      <span class="badge-text">{{ if $is_en }}OPERATIONAL APPARATUS MATRIX // SECTOR-07{{ else }}BİRİNCİL ÇALIŞMA MATRİSİ // SEKTÖR-07{{ end }}</span>
     </div>
-    <div class="ticker-content">
-      <span>{{ if $is_en }}Tracking {{ .total_items }} records across 25+ authorities{{ else }}25+ kaynaktan {{ .total_items }} aktif istihbarat akışı{{ end }}</span>
-      {{- if gt .cve_alerts_count 0 }}
-      <span class="ticker-cve-pill">⚠ {{ .cve_alerts_count }} {{ if $is_en }}CVE DETECTIONS{{ else }}CVE ALARMI{{ end }}</span>
-      {{- end }}
+    <div class="apparatus-security-pill">
+      <span class="pill-led"></span>
+      <span>{{ if $is_en }}REALTIME ACCESS PERMITTED{{ else }}GERÇEK ZAMANLI ERİŞİM AÇIK{{ end }}</span>
     </div>
   </div>
-  <a href="{{ if $is_en }}/en/radar/{{ else }}/radar/{{ end }}" class="ticker-cta-link">
-    <span>{{ if $is_en }}OPEN RADAR TERMINAL &rarr;{{ else }}RADAR TERMİNALİNİ AÇ &rarr;{{ end }}</span>
-  </a>
-</aside>
-{{- end }}
 
-<div class="post-feed-divider">
-  <div class="divider-line"></div>
-  <div class="divider-stamp stamp-dystopian-banner">
-    <span class="stamp-pulse">☣</span>
-    <span class="stamp-text">{{ if $is_en }}CLASSIFIED_DOSSIERS [{{ len $pages }}]{{ else }}KAYITLI_DOSYALAR [{{ len $pages }}] // CRITICAL{{ end }}</span>
+  <div class="apparatus-grid">
+    <a href="{{ if $is_en }}/en/tools/{{ else }}/tools/{{ end }}" class="apparatus-card brutal-card-docket fracture-card">
+      <div class="app-card-tag">[ APPARATUS #01 // SIMULATOR ]</div>
+      <h3 class="app-card-title">{{ if $is_en }}SYSTEMS ENGINEERING TOOLKIT{{ else }}SİSTEM MÜHENDİSLİĞİ SİMÜLATÖRLERİ{{ end }}</h3>
+      <p class="app-card-desc">{{ if $is_en }}Client-side sandboxes for Linux User Namespaces, CVSS v3.1 vectors, ZFS ashift/recordsize, and OPA policy evaluation.{{ else }}Linux ad alanları (namespaces), CVSS v3.1 risk matrisi, ZFS ashift hesaplayıcı ve OPA Docker yetki test sandbox'ı.{{ end }}</p>
+      <span class="app-card-link">{{ if $is_en }}INITIALIZE SIMULATORS &rarr;{{ else }}SİMÜLATÖRLERİ BAŞLAT &rarr;{{ end }}</span>
+    </a>
+
+    <a href="{{ if $is_en }}/en/lab/{{ else }}/lab/{{ end }}" class="apparatus-card brutal-card-docket fracture-card">
+      <div class="app-card-tag">[ APPARATUS #02 // TOPOLOGY ]</div>
+      <h3 class="app-card-title">{{ if $is_en }}42U MULTI-USER GPU FABRIC{{ else }}42U ÇOK KULLANICILI GPU ALTYAPISI{{ end }}</h3>
+      <p class="app-card-desc">{{ if $is_en }}Interactive blueprint of 8x A100 SXM4 / RTX 4090 cluster, Arista 100GbE RoCE v2, and TrueNAS Kerberized NFSv4.2 ZFS storage.{{ else }}8x A100 SXM4 / RTX 4090 hesaplama kümesi, 100GbE RoCE v2 kumaşı ve Kerberos NFSv4.2 kurumsal ZFS depolama topolojisi.{{ end }}</p>
+      <span class="app-card-link">{{ if $is_en }}INSPECT BLUEPRINT &rarr;{{ else }}TOPOLOJİYİ İNCELE &rarr;{{ end }}</span>
+    </a>
+
+    <a href="{{ if $is_en }}/en/runbooks/{{ else }}/runbooks/{{ end }}" class="apparatus-card brutal-card-docket fracture-card">
+      <div class="app-card-tag">[ APPARATUS #03 // SOP ]</div>
+      <h3 class="app-card-title">{{ if $is_en }}EMERGENCY PRODUCTION RUNBOOKS{{ else }}ACİL DURUM ÜRETİM RUNBOOKLARI{{ end }}</h3>
+      <p class="app-card-desc">{{ if $is_en }}Runnable SOP checklists for Docker OPA bypass, NFSv4 stale handles, SSSD AD cache invalidation, and GPU PCIe recovery.{{ else }}Saha müdahale kontrol listeleri: Docker OPA bypass, NFSv4 kilitlenme kurtarma, SSSD önbellek tasfiyesi ve GPU PCIe reset.{{ end }}</p>
+      <span class="app-card-link">{{ if $is_en }}OPEN RUNBOOKS &rarr;{{ else }}RUNBOOKLARI AÇ &rarr;{{ end }}</span>
+    </a>
+
+    <a href="{{ if $is_en }}/en/incidents/{{ else }}/incidents/{{ end }}" class="apparatus-card brutal-card-docket fracture-card">
+      <div class="app-card-tag">[ APPARATUS #04 // RCA ]</div>
+      <h3 class="app-card-title">{{ if $is_en }}INCIDENT POST-MORTEM DOSSIERS{{ else }}KÖK NEDEN ANALİZİ & RCA RAPORLARI{{ end }}</h3>
+      <p class="app-card-desc">{{ if $is_en }}Blameless technical dissections of major production outages, kernel oops call traces, and storage socket starvation.{{ else }}Büyük sistem kesintileri, çekirdek çöküşleri ve soket tıkanmalarına dair şeffaf kök neden analizi günlükleri.{{ end }}</p>
+      <span class="app-card-link">{{ if $is_en }}VIEW POST-MORTEMS &rarr;{{ else }}RAPORLARI GÖRÜNTÜLE &rarr;{{ end }}</span>
+    </a>
+
+    <a href="{{ if $is_en }}/en/about/{{ else }}/about/{{ end }}" class="apparatus-card brutal-card-docket fracture-card card-target-highlight">
+      <div class="app-card-tag text-alert">[ APPARATUS #05 // SURVEILLANCE ]</div>
+      <h3 class="app-card-title text-alert">{{ if $is_en }}SUBJECT DOSSIER: YOU{{ else }}HEDEF DOSYASI: ZİYARETÇİ{{ end }}</h3>
+      <p class="app-card-desc">{{ if $is_en }}Live optical sensor feed, storage forensics, unmasked GPU signature, and network telemetry analysis of your workstation.{{ else }}Canlı optik sensör taraması, çerez ve depolama adli analizi, ekran kartı imzası ve iş istasyonunuzun ağ telemetrisi.{{ end }}</p>
+      <span class="app-card-link text-alert">{{ if $is_en }}OPEN SURVEILLANCE FILE &rarr;{{ else }}HEDEF DOSYASINI AÇ &rarr;{{ end }}</span>
+    </a>
   </div>
-  <div class="divider-line"></div>
-</div>
+</section>
 {{- end }}
 
+{{- if not .IsHome }}
 <div class="brutal-posts-stream">
 {{- $term := .Data.Term }}
 {{- range $index, $page := $paginator.Pages }}
@@ -171,6 +193,7 @@
 </article>
 {{- end }}
 </div>
+{{- end }}
 
 {{- if gt $paginator.TotalPages 1 }}
 <footer class="page-footer brutal-pagination-wrap">
