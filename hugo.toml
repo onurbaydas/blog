@@ -21,7 +21,7 @@ enableRobotsTXT = true
     weight = 1
     title = 'Onur Baydaş'
     [languages.tr.params]
-      description = 'Onur Baydaş - Sistem ve Altyapı Mühendisliği Blogu. Linux çekirdek iç mekanizmaları, UID/GID eşleme, TrueNAS Scale NFSv4 Kerberos entegrasyonu, Active Directory SSSD kimlik yönetimi, Docker daemon yetkilendirme (OPA) fail-open açıkları ve çok kullanıcılı GPU cluster mimarileri üzerine teknik analizler.'
+      description = 'Onur Baydaş - Sistem ve Altyapı Mühendisliği. Linux çekirdek iç mekanizmaları, UID/GID eşleme, TrueNAS Scale NFSv4 Kerberos entegrasyonu, Active Directory SSSD kimlik yönetimi, Docker daemon yetkilendirme (OPA) fail-open açıkları ve çok kullanıcılı GPU cluster mimarileri üzerine teknik analizler.'
       keywords = ['Onur Baydaş', 'Sistem Mühendisliği', 'Linux Çekirdeği', 'UID GID Eşleme', 'TrueNAS SCALE', 'NFSv4 Kerberos', 'Active Directory SSSD', 'Docker Güvenliği', 'Open Policy Agent', 'OPA Docker Authz', 'Fail-Open', 'CVE-2024-41110', 'GPU Cluster', 'ZFS Depolama']
       [languages.tr.params.homeInfoParams]
         Title = 'OB'

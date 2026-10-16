@@ -1,5 +1,5 @@
 # ==============================================================================
-# ROBOTS.TXT // ONUR BAYDAŞ - SYSTEMS & INFRASTRUCTURE ENGINEERING BLOG
+# ROBOTS.TXT // ONUR BAYDAŞ - SYSTEMS & INFRASTRUCTURE ENGINEERING
 # https://onurbaydas.online
 # ==============================================================================
 
