@@ -128,7 +128,8 @@
     let humOsc = null;
     let humGain = null;
     let geigerInterval = null;
-    let isAudioActive = (localStorage.getItem('core-audio') !== 'false');
+    // Always default to ON (v2 key ensures stale browser cache does not keep it OFF)
+    let isAudioActive = (localStorage.getItem('core-audio-v2') !== 'false');
     let mouseSpeed = 0;
     let lastMouseX = 0, lastMouseY = 0, lastMouseTime = Date.now();
 
@@ -216,12 +217,12 @@
             startHum();
             if (btnText) btnText.textContent = 'AUDIO: 380V ON';
             if (btn) btn.classList.add('audio-active');
-            localStorage.setItem('core-audio', 'true');
+            localStorage.setItem('core-audio-v2', 'true');
         } else {
             stopHum();
             if (btnText) btnText.textContent = 'AUDIO: OFF';
             if (btn) btn.classList.remove('audio-active');
-            localStorage.setItem('core-audio', 'false');
+            localStorage.setItem('core-audio-v2', 'false');
         }
         playRelayClick(450, 0.04, 0.12);
     }
@@ -229,8 +230,9 @@
     const audioBtn = document.getElementById('audio-btn');
     if (audioBtn) {
         audioBtn.addEventListener('click', toggleAudioEngine);
+        const btnText = document.getElementById('audio-btn-text');
+
         if (isAudioActive) {
-            const btnText = document.getElementById('audio-btn-text');
             if (btnText) btnText.textContent = 'AUDIO: 380V ON';
             audioBtn.classList.add('audio-active');
 
@@ -252,6 +254,9 @@
             ['click', 'pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
                 window.addEventListener(evt, unlockAudioEngine, { once: true, passive: true });
             });
+        } else {
+            if (btnText) btnText.textContent = 'AUDIO: OFF';
+            audioBtn.classList.remove('audio-active');
         }
     }
 
